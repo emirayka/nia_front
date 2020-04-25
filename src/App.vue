@@ -1,6 +1,9 @@
 <template>
   <div id="app">
-    <router-view @nav="handleNav"/>
+    <router-view
+      @nav="handleNav"
+      @execute="executeHandler($event)"
+    />
   </div>
 </template>
 
@@ -23,6 +26,11 @@
           path: event
         })
       },
+      executeHandler: function (code) {
+        ipcRenderer.send('nia-server-execute-code-request', {
+          code
+        })
+      },
     },
     mounted: function () {
       if (this.$router.currentRoute.path !== '/Keyboards') {
@@ -31,19 +39,22 @@
         })
       }
 
-      ipcRenderer.on('nia-server-handshake', (event, {version, info}) => {
+      ipcRenderer.on('nia-server-handshake-result', (event, {version, info}) => {
         this.$store.commit('setVersion', version)
         this.$store.commit('setInfo', info)
       })
 
-      ipcRenderer.on('nia-server-get-devices', (event, devices) => {
+      ipcRenderer.on('nia-server-get-devices-result', (event, devices) => {
         this.$store.commit('setDevices', devices)
       })
 
-      ipcRenderer.on('nia-server-get-devices-info', (event, devicesInfo) => {
+      ipcRenderer.on('nia-server-get-devices-info-result', (event, devicesInfo) => {
         this.$store.commit('setDevicesInfo', devicesInfo)
       })
 
+      ipcRenderer.on('nia-server-execute-code-result', (event, executionResult) => {
+        this.$store.commit('setExecutionResult', executionResult)
+      })
 
       ipcRenderer.send('nia-app-mounted', {})
     },

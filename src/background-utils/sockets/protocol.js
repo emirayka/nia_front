@@ -2,49 +2,13 @@ import WebSocket from 'ws'
 
 import NiaProtocolJs from 'nia-protocol-js'
 
-const makeKeyChordPart = (value) => {
-  const keyChordPart = new NiaProtocolJs.KeyChordPart()
-
-  if (value instanceof Array) {
-    const keyChordPart2 = new NiaProtocolJs.KeyChordPart.KeyChordPart2()
-
-    keyChordPart2.setKeyboardId(value[0])
-    keyChordPart2.setKeyId(value[1])
-
-    keyChordPart.setKeyChordPart2(keyChordPart2)
-  } else {
-    const keyChordPart1 = new NiaProtocolJs.KeyChordPart.KeyChordPart1()
-
-    keyChordPart1.setKeyId(value)
-
-    keyChordPart.setKeyChordPart1(keyChordPart1)
-  }
-
-  return keyChordPart
-}
-
-const makeKeyChord = (value) => {
-  const modifiers = value[0]
-  const key = value[1]
-
-  const modifierKeyChordParts = modifiers.map(makeKeyChordPart)
-  const keyKeyChordPart = makeKeyChordPart(key)
-
-  const keyChord = new NiaProtocolJs.KeyChord()
-
-  keyChord.setModifiersList(modifierKeyChordParts)
-  keyChord.setKey(keyKeyChordPart)
-
-  return keyChord
-}
-
-const makeKeyChords = (keyChords) => {
-  return keyChords.map(makeKeyChord)
-}
-
-const makeAction = () => {
-  return NiaProtocolJs.Action()
-}
+import {
+  buildRegisterKeyboardCode,
+  buildDefineModifierCode,
+  buildDefineGlobalMappingCode,
+  buildStartListeningCode,
+  buildStoptListeningCode
+} from '../code-builder'
 
 export default class {
   constructor(port) {
@@ -58,11 +22,15 @@ export default class {
   }
 
   ready() {
-    return new Promise((resolve) => {
-      this._ws.once('open', () => {
-        resolve()
+    if (this._ready) {
+      return Promise.resolve()
+    } else {
+      return new Promise((resolve) => {
+        this._ws.once('open', () => {
+          resolve()
+        })
       })
-    })
+    }
   }
 
   handshake() {
@@ -221,7 +189,7 @@ export default class {
             } else if (executeCodeResponse.hasErrorResult()) {
               const errorResult = executeCodeResponse.getErrorResult()
 
-              reject({
+              resolve({
                 failure: false,
                 error: true,
                 success: false,
@@ -230,7 +198,7 @@ export default class {
             } else if (executeCodeResponse.hasFailureResult()) {
               const failureResult = executeCodeResponse.getFailureResult()
 
-              reject({
+              resolve({
                 failure: true,
                 error: false,
                 success: false,
@@ -252,175 +220,32 @@ export default class {
   }
 
   registerKeyboard(path, name) {
-    const registerKeyboardRequest = new NiaProtocolJs.RegisterKeyboardRequest()
+    const code = buildRegisterKeyboardCode(path, name)
 
-    registerKeyboardRequest.setDevicePath(path)
-    registerKeyboardRequest.setDeviceName(name)
-
-    const request = new NiaProtocolJs.Request()
-    request.setRegisterKeyboardRequest(registerKeyboardRequest)
-
-    return new Promise((resolve, reject) => {
-      this._ws.once('message', message => {
-        if (message instanceof Uint8Array) {
-          const response = NiaProtocolJs.Response.deserializeBinary(message)
-
-          if (response.hasRegisterKeyboardResponse()) {
-            const registerKeyboardResponse = response.getRegisterKeyboardResponse()
-
-            if (registerKeyboardResponse.hasSuccessResult()) {
-              resolve()
-            } else if (registerKeyboardResponse.hasErrorResult()) {
-              reject()
-            } else {
-              reject()
-            }
-          } else {
-            reject()
-          }
-        } else {
-          reject()
-        }
-      })
-
-      this._ws.send(request.serializeBinary())
-    })
+    return this.executeCode(code)
   }
 
   defineModifier(keyId, keyboardId) {
-    const defineModifierRequest = new NiaProtocolJs.DefineModifierRequest()
+    const code = buildDefineModifierCode(keyId, keyboardId)
 
-    const keyChordPart = makeKeyChordPart(keyId, keyboardId)
-    defineModifierRequest.setKeyChordPart(keyChordPart)
-
-    const request = new NiaProtocolJs.Request()
-    request.setDefineModifierRequest(defineModifierRequest)
-
-    return new Promise((resolve, reject) => {
-      this._ws.once('message', message => {
-        if (message instanceof Uint8Array) {
-          const response = NiaProtocolJs.Response.deserializeBinary(message)
-
-          if (response.hasDefineModifierResponse()) {
-            const defineModifierResponse = response.getDefineModifierResponse()
-
-            if (defineModifierResponse.hasSuccessResult()) {
-              resolve()
-            } else if (defineModifierResponse.hasErrorResult()) {
-              reject()
-            } else {
-              reject()
-            }
-          } else {
-            reject()
-          }
-        } else {
-          reject()
-        }
-      })
-
-      this._ws.send(request.serializeBinary())
-    })
+    return this.executeCode(code)
   }
 
-  defineBinding(keyChords, action) {
-    const requestKeyChords = makeKeyChords(keyChords)
-    const requestAction = makeAction()
+  defineGlobalMapping(keyChords, action) {
+    const code = buildDefineGlobalMappingCode(keyChords, action)
 
-    const defineBindingRequest = new NiaProtocolJs.DefineBindingRequest()
-
-    defineBindingRequest.setKeyChordsList(requestKeyChords)
-    defineBindingRequest.setAction(requestAction)
-
-    const request = new NiaProtocolJs.Request()
-    request.setDefineBindingRequest(defineBindingRequest)
-
-    return new Promise((resolve, reject) => {
-      this._ws.once('message', message => {
-        if (message instanceof Uint8Array) {
-          const response = NiaProtocolJs.Response.deserializeBinary(message)
-
-          if (response.hasDefineBindingResponse()) {
-            const defineBindingResponse = response.getDefineBindingResponse()
-
-            if (defineBindingResponse.hasSuccessResult()) {
-              resolve()
-            } else if (defineBindingResponse.hasErrorResult()) {
-              reject()
-            } else {
-              reject()
-            }
-          } else {
-            reject()
-          }
-        } else {
-          reject()
-        }
-      })
-
-      this._ws.send(request.serializeBinary())
-    })
+    return this.executeCode(code)
   }
 
   startListening() {
-    const startListeningRequest = new NiaProtocolJs.StartListeningRequest()
+    const code = buildStartListeningCode()
 
-    const request = new NiaProtocolJs.Request()
-    request.setStartListeningRequest(startListeningRequest)
-
-    return new Promise((resolve, reject) => {
-      this._ws.once('message', message => {
-        if (message instanceof Uint8Array) {
-          const response = NiaProtocolJs.Response.deserializeBinary(message)
-
-          if (response.hasStartListeningResponse()) {
-            const startListeningResponse = response.getStartListeningResponse()
-
-            if (startListeningResponse.hasSuccessResult()) {
-              resolve()
-            } else {
-              reject()
-            }
-          } else {
-            reject()
-          }
-        } else {
-          reject()
-        }
-      })
-
-      this._ws.send(request.serializeBinary())
-    })
+    return this.executeCode(code)
   }
 
   stopListening() {
-    const stopListeningRequest = new NiaProtocolJs.StopListeningRequest()
+    const code = buildStoptListeningCode()
 
-    const request = new NiaProtocolJs.Request()
-    request.setStopListeningRequest(stopListeningRequest)
-
-    return new Promise((resolve, reject) => {
-      this._ws.once('message', message => {
-        if (message instanceof Uint8Array) {
-          const response = NiaProtocolJs.Response.deserializeBinary(message)
-
-          if (response.hasStopListeningResponse()) {
-            const stopListeningResponse = response.getStopListeningResponse()
-
-            if (stopListeningResponse.hasSuccessResult()) {
-              resolve()
-            } else {
-              reject()
-            }
-          } else {
-            reject()
-          }
-        } else {
-          reject()
-        }
-      })
-
-      this._ws.send(request.serializeBinary())
-    })
+    return this.executeCode(code)
   }
 }

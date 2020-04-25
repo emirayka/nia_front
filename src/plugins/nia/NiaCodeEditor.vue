@@ -23,20 +23,48 @@
   export default {
     name: 'NiaCodeEditor',
     data: () => ({
-      code: 'const a = 10',
       editor: null,
+      changeHandler: null,
     }),
+    props: {
+      code: {
+        type: String,
+        required: true,
+      },
+    },
     mounted: function () {
       this.editor = codemirror(
         this.$refs.editorElement,
         {
-          value: "function myScript(){return 100;}\n",
+          value: this.code,
           mode: "nia",
           theme: 'darcula',
           lineNumbers: true,
           autofocus: true,
           scrollbarStyle: null,
         })
+
+      this.editor.setOption("extraKeys", {
+        "Ctrl-Enter": (instance) => {
+          let selectedCode = instance.getSelection()
+
+          if (selectedCode === '') {
+            selectedCode = instance.getValue()
+          }
+
+          this.$emit('execute', selectedCode)
+        }
+      });
+
+      this.changeHandler = (instance, changeObj) => {
+        const newCode = instance.getValue()
+
+        this.$emit('change', newCode)
+      }
+      this.editor.on('change', this.changeHandler)
+    },
+    destroyed() {
+      this.editor.off('change', this.changeHandler)
     },
   }
 </script>

@@ -1,5 +1,8 @@
 'use strict'
 
+import os from 'os'
+import path from 'path'
+
 import {
   app,
   protocol,
@@ -16,6 +19,7 @@ import {
   Protocol,
 } from './background-utils'
 
+
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 let win: BrowserWindow | null
@@ -28,7 +32,7 @@ function createWindow() {
     width: 1024,
     height: 768,
     resizable: false,
-    frame: false
+    frame: false,
   })
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
@@ -64,6 +68,9 @@ function createWindow() {
     if (isDevelopment && !process.env.IS_TEST) {
       try {
         await installVueDevtools()
+        BrowserWindow.addDevToolsExtension(
+          path.join(os.homedir(), '/.config/google-chrome/Default/Extensions/')
+        )
       } catch (e) {
         console.error('Vue Devtools failed to install:', e.toString())
       }
@@ -87,28 +94,30 @@ function createWindow() {
   }
 })()
 
+let niaProtocol = null
+
 ipcMain.once('nia-app-mounted', async () => {
   try {
     if (win === null) {
       throw new Error('window is not ready')
     }
 
-    const protocol = new Protocol(12112)
-    await protocol.ready()
+    niaProtocol = new Protocol(12112)
+    await niaProtocol.ready()
 
-    const handshakeResponse = await protocol.handshake()
-    win.webContents.send('nia-server-handshake', handshakeResponse)
+    const handshakeResponse = await niaProtocol.handshake()
+    win.webContents.send('nia-server-handshake-result', handshakeResponse)
 
-    const devices = await protocol.getDevices()
-    win.webContents.send('nia-server-get-devices', devices)
+    const devices = await niaProtocol.getDevices()
+    win.webContents.send('nia-server-get-devices-result', devices)
 
-    let devicesInfo = await protocol.getMultipleDeviceInfo(devices)
+    let devicesInfo = await niaProtocol.getMultipleDeviceInfo(devices)
     devicesInfo = devicesInfo.map(deviceInfo => {
       let parsedModel = JSON.parse(deviceInfo.model)
 
       const newDeviceInfo = {
         ...deviceInfo,
-        model: parsedModel
+        model: parsedModel,
       }
 
       console.log(newDeviceInfo)
@@ -116,9 +125,20 @@ ipcMain.once('nia-app-mounted', async () => {
       return newDeviceInfo
     })
 
-    win.webContents.send('nia-server-get-devices-info', devicesInfo)
-  }
-  catch (e) {
+    win.webContents.send('nia-server-get-devices-info-result', devicesInfo)
+  } catch (e) {
     console.error(e)
   }
+})
+
+ipcMain.on('nia-server-execute-code-request', async (_, event) => {
+  if (win === null || niaProtocol === null) {
+    return
+  }
+
+  await niaProtocol.ready()
+
+  const executionResult = await niaProtocol.executeCode(event.code)
+
+  win.webContents.send('nia-server-execute-code-result', executionResult)
 })

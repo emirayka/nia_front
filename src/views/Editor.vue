@@ -1,5 +1,5 @@
 <template>
-  <div class="editor">
+  <div class="nia-editor">
     <NiaAppNavbar @nav="$emit('nav', $event)" />
     <NiaToolbar>
       <NiaToolbarItem>
@@ -10,17 +10,47 @@
       </NiaToolbarItem>
     </NiaToolbar>
 
-    <NiaCodeEditor />
+    <div class="nia-editor__content">
+      <div class="nia-editor__content__nia-code-editor-wrapper">
+        <NiaCodeEditor
+          class="nia-editor__nia-code-editor"
+          :code="code"
+          @change="changeHandler($event)"
+          @execute="$emit('execute', $event)"
+        />
+      </div>
+
+      <div class="nia-editor__content__nia-console-wrapper">
+        <NiaConsole
+          class="nia-editor__nia-console"
+          :log="log"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
   import NiaAppNavbar from '../components/NiaAppNavbar.vue'
+  import {
+    mapState,
+  } from 'vuex'
 
   export default {
     name: "Editor",
     components: {
       NiaAppNavbar,
+    },
+    methods: {
+      changeHandler: function (code) {
+        this.$store.commit('setCode', code)
+      },
+    },
+    computed: {
+      ...mapState({
+        log: state => state.log,
+        code: state => state.code,
+      }),
     },
   }
 </script>
@@ -30,12 +60,20 @@
   lang="scss"
 >
 
-  .editor {
+  .nia-editor {
     height: 100%;
   }
 
-  .nia-code-editor__codemirror {
-    height: 100%;
+  .nia-editor__content {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+  }
+
+  .nia-editor__content__nia-code-editor-wrapper {
+  }
+
+  .nia-editor__content__nia-console-wrapper {
   }
 
 </style>

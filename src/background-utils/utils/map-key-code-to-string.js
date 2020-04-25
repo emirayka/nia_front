@@ -1,7 +1,7 @@
 const map = {}
 
 map[0] = 'Reserved'
-map[1] = 'ESC'
+map[1] = 'Esc'
 map[2] = '1'
 map[3] = '2'
 map[4] = '3'
