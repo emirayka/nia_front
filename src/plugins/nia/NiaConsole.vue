@@ -8,20 +8,23 @@
   </div>
 </template>
 
-<script>
-  import NiaConsoleItem from './NiaConsoleItem.vue'
+<script lang="ts">
+  import Vue from 'vue'
+  import Component from 'vue-class-component'
+  import {Prop} from 'vue-property-decorator'
 
-  export default {
+  import NiaConsoleItem from './NiaConsoleItem.vue'
+  import {ExecutionResult} from '@/store/models'
+
+  @Component({
     name: "NiaConsole",
     components: {
       NiaConsoleItem,
     },
-    props: {
-      log: {
-        type: Array,
-        required: true,
-      },
-    },
+  })
+  export default class NiaConsole extends Vue {
+    @Prop({required: true})
+    log!: Array<ExecutionResult>
   }
 </script>
 

@@ -1,6 +1,6 @@
-import * as eventCodes from './linux-input-event-codes.js'
+import * as eventCodes from './linux-input-event-codes'
 
-const map = {}
+const map: {[key: number]: string} = {}
 
 map[eventCodes.KEY_TAB] = "Tab"
 map[eventCodes.KEY_CAPSLOCK] = "CapsLock"
@@ -113,4 +113,4 @@ map[eventCodes.KEY_KPPLUS] = "KPPlus"
 map[eventCodes.KEY_KPENTER] = "KPEnter"
 map[eventCodes.KEY_KPDOT] = "KPDot"
 
-export default keyId => map[keyId]
+export default (keyId: number) => map[keyId]

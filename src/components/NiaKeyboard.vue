@@ -22,58 +22,61 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+  import Vue from 'vue'
+  import Component from 'vue-class-component'
+
+  import {Prop} from 'vue-property-decorator'
+
+  import KeyDescription from '@/store/models/key-description'
+  import KeyboardModel from '@/store/models/keyboard-model'
   import NiaKeyboardKey from './NiaKeyboardKey.vue'
 
-  const normalize = (value, min, max, multiplier) => {
+  const normalize = (value: number, min: number, max: number, multiplier: number): number => {
     const diff = max - min
 
     return (value - min) / diff * multiplier
   }
 
-  export default {
+  @Component({
     name: "NiaKeyboard",
     components: {
       NiaKeyboardKey,
     },
-    props: {
-      width: {
-        type: Number,
-        required: true,
-      },
-      height: {
-        type: Number,
-        required: true,
-      },
-      model: {
-        type: Object,
-        required: true,
-      },
-    },
-    computed: {
-      normalizedKeyboardKeys: function () {
-        const keyboardWidth = this.model.width;
-        const keyboardHeight = this.model.height;
+  })
+  export default class NiaKeyboard extends Vue {
+    @Prop({ required: true })
+    width!: number
 
-        const normalizedKeyboardKeys = this.model.keys.map(keyboardKey => {
-          return {
-            x: normalize(keyboardKey.x, 0, keyboardWidth, this.width),
-            y: normalize(keyboardKey.y, 0, keyboardHeight, this.height),
-            width: normalize(keyboardKey.width, 0, keyboardWidth, this.width),
-            height: normalize(keyboardKey.height, 0, keyboardHeight, this.height),
-            code: keyboardKey.code,
-          }
-        })
+    @Prop({ required: true })
+    height!: number
 
-        return normalizedKeyboardKeys
-      },
-      style: function () {
+    @Prop({ required: true })
+    model!: KeyboardModel
+
+    get normalizedKeyboardKeys(): object {
+      const keyboardWidth: number = this.model.width;
+      const keyboardHeight: number = this.model.height;
+
+      const normalizedKeyboardKeys: Array<KeyDescription> = this.model.keys.map(keyboardKey => {
         return {
-          width: `${this.width}px`,
-          height: `${this.height}px`,
+          x: normalize(keyboardKey.x, 0, keyboardWidth, this.width),
+          y: normalize(keyboardKey.y, 0, keyboardHeight, this.height),
+          width: normalize(keyboardKey.width, 0, keyboardWidth, this.width),
+          height: normalize(keyboardKey.height, 0, keyboardHeight, this.height),
+          code: keyboardKey.code,
         }
-      },
-    },
+      })
+
+      return normalizedKeyboardKeys
+    }
+
+    get style(): object {
+      return {
+        width: `${this.width}px`,
+        height: `${this.height}px`,
+      }
+    }
   }
 </script>
 

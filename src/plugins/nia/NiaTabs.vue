@@ -4,9 +4,14 @@
   </b-tabs>
 </template>
 
-<script>
-  export default {
+<script lang="ts">
+  import Vue from 'vue'
+  import Component from 'vue-class-component'
+
+  @Component({
     name: "NiaTabs",
+  })
+  export default class NiaTabs extends Vue {
   }
 </script>
 

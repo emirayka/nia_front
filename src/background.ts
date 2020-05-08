@@ -18,7 +18,12 @@ import {
 import {
   Protocol,
 } from './background-utils'
-
+import NiaHandshakeResponse from '@/background-utils/protocol/response/handshake-response.js'
+import NiaGetDeviceInfoResponse from '@/background-utils/protocol/response/get-device-info-response.js'
+import NiaGetDevicesResponse from '@/background-utils/protocol/response/get-devices-response.js'
+import NiaHandshakeResult from '@/background-utils/protocol/domain/handshake-result.js'
+import {NiaGetDeviceInfoResult, NiaGetDevicesResult} from '@/background-utils/protocol/domain'
+import NiaExecuteCodeResult from '@/background-utils/protocol/domain/execute-code-result.js'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -94,7 +99,7 @@ function createWindow() {
   }
 })()
 
-let niaProtocol = null
+let niaProtocol: Protocol | null = null
 
 ipcMain.once('nia-app-mounted', async () => {
   try {
@@ -103,15 +108,16 @@ ipcMain.once('nia-app-mounted', async () => {
     }
 
     niaProtocol = new Protocol(12112)
-    await niaProtocol.ready()
+    await niaProtocol.is_ready()
 
-    const handshakeResponse = await niaProtocol.handshake()
-    win.webContents.send('nia-server-handshake-result', handshakeResponse)
+    const handshakeResult: NiaHandshakeResult = await niaProtocol.handshake()
+    win.webContents.send('nia-server-handshake-result', handshakeResult)
 
-    const devices = await niaProtocol.getDevices()
-    win.webContents.send('nia-server-get-devices-result', devices)
+    const getDevicesResponse: NiaGetDevicesResult = await niaProtocol.getDevices()
+    win.webContents.send('nia-server-get-devices-result', getDevicesResponse)
 
-    let devicesInfo = await niaProtocol.getMultipleDeviceInfo(devices)
+    let devicesInfo: Array<NiaGetDeviceInfoResult> = await niaProtocol.getMultipleDeviceInfo(getDevicesResponse)
+
     devicesInfo = devicesInfo.map(deviceInfo => {
       let parsedModel = JSON.parse(deviceInfo.model)
 
@@ -119,8 +125,6 @@ ipcMain.once('nia-app-mounted', async () => {
         ...deviceInfo,
         model: parsedModel,
       }
-
-      console.log(newDeviceInfo)
 
       return newDeviceInfo
     })
@@ -136,9 +140,9 @@ ipcMain.on('nia-server-execute-code-request', async (_, event) => {
     return
   }
 
-  await niaProtocol.ready()
+  await niaProtocol.is_ready()
 
-  const executionResult = await niaProtocol.executeCode(event.code)
+  const executionResult: NiaExecuteCodeResult = await niaProtocol.executeCode(event.code)
 
   win.webContents.send('nia-server-execute-code-result', executionResult)
 })

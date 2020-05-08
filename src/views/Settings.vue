@@ -4,14 +4,19 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+  import Vue from 'vue'
+  import Component from 'vue-class-component'
+
   import NiaAppNavbar from '../components/NiaAppNavbar.vue'
 
-  export default {
+  @Component({
     name: "Settings",
     components: {
       NiaAppNavbar,
     },
+  })
+  export default class Settings extends Vue {
   }
 </script>
 

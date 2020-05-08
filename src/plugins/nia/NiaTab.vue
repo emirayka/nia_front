@@ -7,15 +7,17 @@
   </b-tab>
 </template>
 
-<script>
-  export default {
+<script lang="ts">
+  import Vue from 'vue'
+  import Component from 'vue-class-component'
+  import {Prop} from 'vue-property-decorator'
+
+  @Component({
     name: "NiaTab",
-    props: {
-      title: {
-        type: String,
-        default: '',
-      },
-    },
+  })
+  export default class NiaTab extends Vue {
+    @Prop({ default: '' })
+    title!: string
   }
 </script>
 

@@ -45,7 +45,7 @@
       } else if (ch == "#") {
         var ch = stream.next();
         if (ch == "(") { type = "open"; return "bracket"; }
-        else if (/[+\-=\.']/.test(ch)) return null;
+        else if (/[+\-=.']/.test(ch)) return null;
         else if (/\d/.test(ch) && stream.match(/^\d*#/)) return null;
         else if (ch == "|") return (state.tokenize = inComment)(stream, state);
         else if (ch == ":") { readSym(stream); return "meta"; }

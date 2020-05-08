@@ -1,4 +1,4 @@
-const map = {}
+const map: {[key: number]: string} = {}
 
 map[0] = 'Reserved'
 map[1] = 'Esc'
@@ -544,4 +544,4 @@ map[0x2aa] = 'macro27'
 map[0x2ab] = 'macro28'
 map[0x2ac] = 'macro29'
 
-export default keyCode => map[keyCode]
+export default (keyCode: number) => map[keyCode]

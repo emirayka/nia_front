@@ -18,7 +18,10 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+  import Vue from 'vue'
+  import Component from 'vue-class-component'
+
   import {
     mapGetters,
   } from 'vuex'
@@ -26,7 +29,7 @@
   import NiaAppNavbar from '../components/NiaAppNavbar.vue'
   import NiaKeyboard from '../components/NiaKeyboard.vue'
 
-  export default {
+  @Component({
     name: 'Keyboards',
     components: {
       NiaAppNavbar,
@@ -37,6 +40,8 @@
         'getDevicesInfo',
       ]),
     },
+  })
+  export default class Keyboards extends Vue {
   }
 </script>
 

@@ -4,9 +4,14 @@
   </b-button>
 </template>
 
-<script>
-  export default {
+<script lang="ts">
+  import Vue from 'vue'
+  import Component from 'vue-class-component'
+
+  @Component({
     name: "NiaToolbarItem",
+  })
+  export default class NiaToolbarItem extends Vue {
   }
 </script>
 

@@ -10,7 +10,8 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+  import Vue from 'vue'
   import codemirror from 'codemirror'
 
   import 'codemirror/lib/codemirror.css'
@@ -19,20 +20,24 @@
   import '@/plugins/codemirror-nia'
 
   import 'codemirror/theme/darcula.css'
+  import Component from 'vue-class-component'
+  import {Prop} from 'vue-property-decorator'
 
-  export default {
+  @Component({
     name: 'NiaCodeEditor',
-    data: () => ({
-      editor: null,
-      changeHandler: null,
-    }),
-    props: {
-      code: {
-        type: String,
-        required: true,
-      },
-    },
-    mounted: function () {
+  })
+  export default class NiaCodeEditor extends Vue {
+    editor: codemirror.Editor | null = null
+    changeHandler: ((instance: codemirror.Editor, changeObj: codemirror.EditorChangeLinkedList) => void) | null = null
+
+    @Prop({ required: true})
+    code!: string;
+
+    $refs!: {
+      editorElement: HTMLElement;
+    }
+
+    mounted() {
       this.editor = codemirror(
         this.$refs.editorElement,
         {
@@ -41,11 +46,11 @@
           theme: 'darcula',
           lineNumbers: true,
           autofocus: true,
-          scrollbarStyle: null,
-        })
+        },
+      )
 
       this.editor.setOption("extraKeys", {
-        "Ctrl-Enter": (instance) => {
+        "Ctrl-Enter": (instance: CodeMirror.Editor) => {
           let selectedCode = instance.getSelection()
 
           if (selectedCode === '') {
@@ -53,19 +58,31 @@
           }
 
           this.$emit('execute', selectedCode)
+        },
+        "Tab": function(instance: CodeMirror.Editor) {
+          const indentUnit: number = instance.getOption("indentUnit") || 2
+          const spaces: string = Array(indentUnit + 1).join(" ");
+
+          instance.replaceSelection(spaces);
         }
       });
 
-      this.changeHandler = (instance, changeObj) => {
+      this.changeHandler = (instance) => {
         const newCode = instance.getValue()
 
         this.$emit('change', newCode)
       }
+
       this.editor.on('change', this.changeHandler)
-    },
+    }
+
     destroyed() {
+      if (this.editor === null || this.changeHandler === null) {
+        return
+      }
+      
       this.editor.off('change', this.changeHandler)
-    },
+    }
   }
 </script>
 

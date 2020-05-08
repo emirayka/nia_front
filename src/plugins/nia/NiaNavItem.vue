@@ -5,19 +5,20 @@
   </b-nav-item>
 </template>
 
-<script>
-  export default {
+<script lang="ts">
+  import Vue from 'vue'
+  import Component from 'vue-class-component'
+  import {Prop} from 'vue-property-decorator'
+
+  @Component({
     name: "NiaNavItem",
-    props: {
-      title: {
-        type: String,
-        default: '',
-      },
-      path: {
-        type: String,
-        default: '',
-      },
-    },
+  })
+  export default class NiaNavItem extends Vue {
+    @Prop({default: ''})
+    title!: string
+
+    @Prop({default: ''})
+    path!: string
   }
 </script>
 

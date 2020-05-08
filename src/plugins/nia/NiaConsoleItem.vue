@@ -7,27 +7,31 @@
   </div>
 </template>
 
-<script>
-  export default {
+<script lang="ts">
+  import Vue from 'vue'
+  import Component from 'vue-class-component'
+  import {Prop} from 'vue-property-decorator'
+
+  import {ExecutionResult} from '@/store/models'
+
+  @Component({
     name: "NiaConsoleItem",
-    props: {
-      logItem: {
-        type: Object,
-        required: true,
-      },
-    },
-    computed: {
-      classObject: function () {
-        return {
-          success: this.logItem.success,
-          error: this.logItem.error,
-          failure: this.logItem.failure,
-        }
-      },
-      message: function () {
-        return this.logItem.message
-      },
-    },
+  })
+  export default class NiaConsoleItem extends Vue {
+    @Prop({ required: true })
+    logItem!: ExecutionResult
+
+    get classObject(): object {
+      return {
+        success: this.logItem.success,
+        error: this.logItem.error,
+        failure: this.logItem.failure,
+      }
+    }
+
+    get message(): string {
+      return this.logItem.message
+    }
   }
 </script>
 

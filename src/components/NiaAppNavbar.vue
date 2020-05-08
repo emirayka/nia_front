@@ -26,9 +26,14 @@
   </div>
 </template>
 
-<script>
-  export default {
+<script lang="ts">
+  import Vue from 'vue'
+  import Component from 'vue-class-component'
+
+  @Component({
     name: 'NiaAppNavbar',
+  })
+  export default class NiaAppNavbar extends Vue {
   }
 </script>
 

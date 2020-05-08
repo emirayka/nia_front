@@ -4,9 +4,14 @@
   </b-navbar-nav>
 </template>
 
-<script>
-  export default {
+<script lang="ts">
+  import Vue from 'vue'
+  import Component from 'vue-class-component'
+
+  @Component({
     name: "NiaNavbarNav",
+  })
+  export default class NiaNavbarNav extends Vue {
   }
 </script>
 

@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import {DeviceInfo, ExecutionResult, State} from '@/store/models'
 
 Vue.use(Vuex)
 
@@ -7,12 +8,11 @@ export default new Vuex.Store({
   state: {
     devices: [],
     devicesInfo: [],
-    executionResult: null,
     code: '',
     log: [],
     version: '',
     info: '',
-  },
+  } as State,
   getters: {
     getDevices: (state) => state.devices,
 
@@ -21,34 +21,32 @@ export default new Vuex.Store({
     getInfo: (state) => state.info,
   },
   mutations: {
-    setDevices(state, devices) {
+    setDevices(state, devices: Array<string>) {
       state.devices = devices
     },
-    setDevicesInfo(state, devicesInfo) {
+    setDevicesInfo(state, devicesInfo: Array<DeviceInfo>) {
       state.devicesInfo = devicesInfo
     },
-    setVersion(state, version) {
+    setVersion(state, version: string) {
       state.version = version
     },
-    setInfo(state, info) {
+    setInfo(state, info: string) {
       state.info = info
     },
-    setCode: function (state, code) {
+    setCode: function (state, code: string) {
       state.code = code
     },
-    setExecutionResult(state, executionResult) {
-      state.executionResult = executionResult
-
-      const logItem = {
+    setExecutionResult(state, executionResult: ExecutionResult) {
+      const logItem: ExecutionResult = {
         success: false,
         error: false,
         failure: false,
-        message: null,
+        message: '',
       }
 
       if (executionResult.success) {
         logItem.success = true
-        logItem.message = executionResult.result
+        logItem.message = executionResult.message
       } else if (executionResult.error) {
         logItem.error = true
         logItem.message = executionResult.message

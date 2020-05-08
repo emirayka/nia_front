@@ -1,6 +1,6 @@
-import {keyChordPartToString} from './index.js'
+import {keyChordPartToString} from './index'
 
-export default (keyChord) => {
+export default (keyChord: [[number], number]) => {
   const all = [...keyChord[0], keyChord[1]]
 
   return all.map(keyChordPart => keyChordPartToString(keyChordPart))

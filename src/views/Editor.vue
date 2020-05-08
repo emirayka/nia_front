@@ -30,28 +30,29 @@
   </div>
 </template>
 
-<script>
-  import NiaAppNavbar from '../components/NiaAppNavbar.vue'
+<script lang="ts">
+  import Vue from 'vue'
+  import Component from 'vue-class-component'
+
   import {
     mapState,
   } from 'vuex'
 
-  export default {
+  import NiaAppNavbar from '../components/NiaAppNavbar.vue'
+
+  @Component({
     name: "Editor",
     components: {
       NiaAppNavbar,
     },
-    methods: {
-      changeHandler: function (code) {
-        this.$store.commit('setCode', code)
-      },
-    },
     computed: {
-      ...mapState({
-        log: state => state.log,
-        code: state => state.code,
-      }),
+      ...mapState(['log', 'code']),
     },
+  })
+  export default class Editor extends Vue{
+    changeHandler(code: string): void {
+      this.$store.commit('setCode', code)
+    }
   }
 </script>
 

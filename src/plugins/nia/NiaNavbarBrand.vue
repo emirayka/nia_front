@@ -4,9 +4,14 @@
   </b-navbar-brand>
 </template>
 
-<script>
-  export default {
+<script lang="ts">
+  import Vue from 'vue'
+  import Component from 'vue-class-component'
+
+  @Component({
     name: "NiaNavbarBrand",
+  })
+  export default class NiaNavbarBrand extends Vue {
   }
 </script>
 
