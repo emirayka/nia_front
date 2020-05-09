@@ -1,6 +1,5 @@
 <template>
   <div class="settings">
-    <NiaAppNavbar @nav="$emit('nav', $event)" />
   </div>
 </template>
 
@@ -8,13 +7,8 @@
   import Vue from 'vue'
   import Component from 'vue-class-component'
 
-  import NiaAppNavbar from '../components/NiaAppNavbar.vue'
-
   @Component({
-    name: "Settings",
-    components: {
-      NiaAppNavbar,
-    },
+    name: 'Settings',
   })
   export default class Settings extends Vue {
   }

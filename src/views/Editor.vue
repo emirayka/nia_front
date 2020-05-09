@@ -1,6 +1,5 @@
 <template>
   <div class="nia-editor">
-    <NiaAppNavbar @nav="$emit('nav', $event)" />
     <NiaToolbar>
       <NiaToolbarItem>
         1
@@ -38,13 +37,8 @@
     mapState,
   } from 'vuex'
 
-  import NiaAppNavbar from '../components/NiaAppNavbar.vue'
-
   @Component({
     name: "Editor",
-    components: {
-      NiaAppNavbar,
-    },
     computed: {
       ...mapState(['log', 'code']),
     },

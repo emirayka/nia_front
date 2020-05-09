@@ -1,20 +1,43 @@
 <template>
-  <div class="home">
-    <NiaAppNavbar @nav="$emit('nav', $event)" />
+  <div class="keyboards">
+    <NiaGridLayout
+      :column-number="100"
+      :row-number="100"
+      :margin="[10, 10]"
+    >
 
-    <NiaTabs >
-      <NiaTab
-        v-for="(device, index) of getDevicesInfo"
-        :key="index"
-        :title="device.name"
+      <NiaGridItem
+        :x="1"
+        :y="1"
+        :w="20"
+        :h="100"
       >
-        <NiaKeyboard
-          :width="900"
-          :height="240"
-          :model="device.model"
-        />
-      </NiaTab>
-    </NiaTabs>
+        <NiaColoredDiv>
+          2
+        </NiaColoredDiv>
+      </NiaGridItem>
+
+      <NiaGridItem
+        :x="21"
+        :y="1"
+        :w="80"
+        :h="70"
+      >
+        <NiaKeyboards />
+      </NiaGridItem>
+
+      <NiaGridItem
+        :x="21"
+        :y="71"
+        :w="80"
+        :h="30"
+      >
+        <NiaColoredDiv>
+          3
+        </NiaColoredDiv>
+      </NiaGridItem>
+
+    </NiaGridLayout>
   </div>
 </template>
 
@@ -26,14 +49,13 @@
     mapGetters,
   } from 'vuex'
 
-  import NiaAppNavbar from '../components/NiaAppNavbar.vue'
-  import NiaKeyboard from '../components/NiaKeyboard.vue'
+  import NiaKeyboards from '@/components/NiaKeyboards.vue'
+  import {GridItemData} from 'vue-grid-layout'
 
   @Component({
     name: 'Keyboards',
     components: {
-      NiaAppNavbar,
-      NiaKeyboard,
+      NiaKeyboards,
     },
     computed: {
       ...mapGetters([
@@ -49,4 +71,12 @@
   scoped
   lang="scss"
 >
+  .keyboards {
+  }
+
+  .nia-grid-layout {
+    box-sizing: border-box;
+    margin-top: 15px;
+    height: 1008px;
+  }
 </style>

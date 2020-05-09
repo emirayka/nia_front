@@ -11,7 +11,7 @@ import NiaComponents from '@/plugins/nia'
 
 Vue.config.productionTip = false
 
-Vue.use(BootstrapVue)
+// Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
 Vue.use(NiaComponents)
 

@@ -17,7 +17,7 @@
   } from '@/background-utils/utils'
 
   @Component({
-    name: "NiaKeyboardKey",
+    name: 'NiaKeyboardKey',
   })
   export default class NiaKeyboardKey extends Vue {
     @Prop({required: true})
@@ -38,13 +38,11 @@
     get style(): object {
       return {
         position: 'absolute',
-        border: '1px solid black',
-        left: `${this.x}px`,
-        top: `${this.y}px`,
-        width: `${this.width}px`,
-        height: `${this.height}px`,
+        left: `${this.x - 2}px`,
+        top: `${this.y - 2}px`,
+        width: `${this.width + 5}px`,
+        height: `${this.height + 5}px`,
         fontSize: this.fontSize,
-        wordBreak: 'break-all',
       }
     }
 
@@ -64,9 +62,10 @@
       switch (length) {
         case 1:
         case 2:
-          return '1em'
+        case 3:
+          return '1.1em'
         default:
-          return `${Math.max(0.25, 0.8 - length * 0.05)}em`
+          return `${Math.max(0.25, 0.9 - length * 0.05)}em`
       }
     }
   }
@@ -77,15 +76,48 @@
   lang="scss"
 >
   .nia-keyboard-key {
+    box-sizing: content-box;
+
     -moz-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
     -o-user-select: none;
-    text-align: center;
+    word-break: break-all;
+
+    /*background: linear-gradient(to left, #666, #555, #444, #333, #272727);*/
+    background: rgb(80, 80, 80);
+    background: -moz-linear-gradient(top, rgb(60, 60, 60), rgb(80, 80, 80));
+    background: -webkit-gradient(linear, left top, left bottom, from(rgb(60, 60, 60)), to(rgb(80, 80, 80)));
+    color: rgb(250, 250, 250);
+    text-shadow: -1px -1px 0 rgb(70, 70, 70);
+    -moz-box-shadow: inset 0 0 1px rgb(150, 150, 150), inset 0 -.05em .4em rgb(80, 80, 80), 0 .1em 0 rgb(30, 30, 30), 0 .1em .1em rgba(0, 0, 0, .3);
+    -webkit-box-shadow: inset 0 0 1px rgb(150, 150, 150), inset 0 -.05em .4em rgb(80, 80, 80), 0 .1em 0 rgb(30, 30, 30), 0 .1em .1em rgba(0, 0, 0, .3);
+    box-shadow: inset 0 0 1px rgb(150, 150, 150), inset 0 -.05em .4em rgb(80, 80, 80), 0 .1em 0 rgb(30, 30, 30), 0 .1em .1em rgba(0, 0, 0, .3);
+
+    border-top: 1px solid #222;
+    border-right: 1px solid #222;
+    border-bottom: 5px solid #333;
+    border-left: 4px solid #222;
+    border-radius: 7px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .nia-keyboard-key:hover {
-    background-color: lightskyblue;
+    background: #FFDD03;
+    /*background: -moz-linear-gradient(top, gold, orange);*/
+    /*background: -webkit-gradient(linear, orange, gold);*/
+
+    border-top: 1px solid #222;
+    border-right: 1px solid #222;
+    border-bottom: 5px solid #333;
+    border-left: 4px solid #222;
+
+    color: black;
+    font-weight: bold;
+    text-shadow: -1px -1px 0 gold;
   }
 </style>

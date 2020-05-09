@@ -25,6 +25,7 @@ export default new Vuex.Store({
       state.devices = devices
     },
     setDevicesInfo(state, devicesInfo: Array<DeviceInfo>) {
+      console.log(devicesInfo)
       state.devicesInfo = devicesInfo
     },
     setVersion(state, version: string) {

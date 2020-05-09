@@ -1,11 +1,15 @@
 <template>
   <div
-    class="nia-keyboard"
+    class="nia-keyboard-wrapper-wrapper"
+    :style="keyboardWrapperWrapperStyle"
   >
-    <div class="nia-keyboard-wrapper-1">
+    <div
+      class="nia-keyboard-wrapper"
+      :style="keyboardWrapperStyle"
+    >
       <div
-        class="nia-keyboard-wrapper-2"
-        :style="style"
+        class="nia-keyboard"
+        :style="keyboardStyle"
       >
         <NiaKeyboardKey
           v-for="(key, index) in normalizedKeyboardKeys"
@@ -46,36 +50,79 @@
   })
   export default class NiaKeyboard extends Vue {
     @Prop({ required: true })
-    width!: number
-
-    @Prop({ required: true })
-    height!: number
-
-    @Prop({ required: true })
     model!: KeyboardModel
 
-    get normalizedKeyboardKeys(): object {
-      const keyboardWidth: number = this.model.width;
-      const keyboardHeight: number = this.model.height;
+    @Prop({ required: true })
+    keyboardHeight!: number
 
+    @Prop({ required: true })
+    keyboardWidth!: number
+
+    get keyboardModelWidth(): number {
+      return this.model.width
+    }
+
+    get keyboardModelHeight(): number {
+      return this.model.height
+    }
+
+    get keyboardModelAspectRatio(): number {
+      return this.keyboardModelWidth / this.keyboardModelHeight
+    }
+
+    get keyboardAspectRatio(): number {
+      return this.keyboardWidth / this.keyboardHeight
+    }
+
+    get keyboardVisibleHeight(): number {
+      if (this.keyboardModelAspectRatio > this.keyboardAspectRatio) {
+        return this.keyboardWidth / this.keyboardModelAspectRatio
+      } else {
+        return this.keyboardHeight
+      }
+    }
+
+    get keyboardVisibleWidth(): number {
+      if (this.keyboardModelAspectRatio > this.keyboardAspectRatio) {
+        return this.keyboardWidth
+      } else {
+        return this.keyboardHeight * this.keyboardModelAspectRatio
+      }
+    }
+
+    get keyboardStyle(): object {
+      return {
+        width: `${this.keyboardVisibleWidth - 60}px`,
+        height: `${this.keyboardVisibleHeight - 60}px`,
+      }
+    }
+
+    get keyboardWrapperStyle(): object {
+      return {
+        width: `${this.keyboardVisibleWidth - 30}px`,
+        height: `${this.keyboardVisibleHeight - 30}px`,
+      }
+    }
+
+    get keyboardWrapperWrapperStyle(): object {
+      return {
+        width: `${this.keyboardWidth}px`,
+        height: `${this.keyboardHeight}px`,
+      }
+    }
+
+    get normalizedKeyboardKeys(): object {
       const normalizedKeyboardKeys: Array<KeyDescription> = this.model.keys.map(keyboardKey => {
         return {
-          x: normalize(keyboardKey.x, 0, keyboardWidth, this.width),
-          y: normalize(keyboardKey.y, 0, keyboardHeight, this.height),
-          width: normalize(keyboardKey.width, 0, keyboardWidth, this.width),
-          height: normalize(keyboardKey.height, 0, keyboardHeight, this.height),
+          x: normalize(keyboardKey.x, 0, this.keyboardModelWidth, this.keyboardVisibleWidth - 90) + 30,
+          y: normalize(keyboardKey.y, 0, this.keyboardModelHeight, this.keyboardVisibleHeight - 90) + 30,
+          width: normalize(keyboardKey.width, 0, this.keyboardModelWidth, this.keyboardVisibleWidth - 90),
+          height: normalize(keyboardKey.height, 0, this.keyboardModelHeight, this.keyboardVisibleHeight - 90),
           code: keyboardKey.code,
         }
       })
 
       return normalizedKeyboardKeys
-    }
-
-    get style(): object {
-      return {
-        width: `${this.width}px`,
-        height: `${this.height}px`,
-      }
     }
   }
 </script>
@@ -85,20 +132,23 @@
   lang="css"
 >
   .nia-keyboard {
-    margin: auto;
-    padding: 25px;
-  }
-
-  .nia-keyboard-wrapper-1 {
-    margin: auto;
-    border: 1px solid black;
-    background-color: #444444;
-  }
-
-  .nia-keyboard-wrapper-2 {
-    width: 100%;
-    height: 100%;
     position: relative;
-    margin: 20px;
+  }
+
+  .nia-keyboard-wrapper {
+    margin: auto;
+    background: linear-gradient(to left, #373737, #444, #444, #373737);
+
+    border-top: 1px solid black;
+    border-right: 1px solid black;
+    border-bottom: 7px solid #222;
+    border-left: 5px solid #171717;
+    border-radius: 15px;
+  }
+
+  .nia-keyboard-wrapper-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 </style>

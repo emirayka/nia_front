@@ -1,10 +1,8 @@
 <template>
-  <b-tab
-    class="nia-tab"
-    :title="title"
-  >
+  <div class="nia-tab"
+       v-show="isActive">
     <slot></slot>
-  </b-tab>
+  </div>
 </template>
 
 <script lang="ts">
@@ -16,8 +14,21 @@
     name: "NiaTab",
   })
   export default class NiaTab extends Vue {
+    isActive = false
+
     @Prop({ default: '' })
     title!: string
+
+    @Prop({default: false})
+    selected!: boolean
+
+    get href(): string {
+      return '#' + this.title.toLowerCase().replace(/ /g, '-');
+    }
+
+    mounted() {
+      this.isActive = this.selected;
+    }
   }
 </script>
 

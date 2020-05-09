@@ -1,5 +1,8 @@
 import NiaCodeEditor from './NiaCodeEditor.vue'
+import NiaColoredDiv from './NiaColoredDiv.vue'
 import NiaConsole from './NiaConsole.vue'
+import NiaGridLayout from './NiaGridLayout.vue'
+import NiaGridItem from './NiaGridItem.vue'
 import NiaNavbar from './NiaNavbar.vue'
 import NiaNavbarBrand from './NiaNavbarBrand.vue'
 import NiaNavbarNav from './NiaNavbarNav.vue'
@@ -14,7 +17,10 @@ import Vue from 'vue'
 export default {
   install: function (_vue: typeof Vue, options: object) {
     _vue.component('NiaCodeEditor', NiaCodeEditor)
+    _vue.component('NiaColoredDiv', NiaColoredDiv)
     _vue.component('NiaConsole', NiaConsole)
+    _vue.component('NiaGridLayout', NiaGridLayout)
+    _vue.component('NiaGridItem', NiaGridItem)
     _vue.component('NiaNavbar', NiaNavbar)
     _vue.component('NiaNavbarBrand', NiaNavbarBrand)
     _vue.component('NiaNavbarNav', NiaNavbarNav)

@@ -1,7 +1,7 @@
 <template>
-  <b-button-toolbar class="nia-toolbar">
+  <div class="nia-toolbar">
     <slot></slot>
-  </b-button-toolbar>
+  </div>
 </template>
 
 <script lang="ts">

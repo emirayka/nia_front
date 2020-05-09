@@ -1,9 +1,12 @@
 <template>
   <div id="app">
-    <router-view
-      @nav="handleNav"
-      @execute="executeHandler($event)"
-    />
+    <NiaAppNavbar @nav="handleNav"/>
+    <keep-alive>
+      <router-view
+        @nav="handleNav"
+        @execute="executeHandler($event)"
+      />
+    </keep-alive>
   </div>
 </template>
 
@@ -12,7 +15,12 @@
     ipcRenderer,
   } from 'electron'
 
+  import NiaAppNavbar from '@/components/NiaAppNavbar.vue'
+
   export default {
+    components: {
+      NiaAppNavbar
+    },
     data: () => ({
       devices: [],
     }),

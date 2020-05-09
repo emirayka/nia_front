@@ -1,8 +1,10 @@
 <template>
-  <b-nav-item class="nia-nav-item"
+  <li class="nia-nav-item"
     @click.prevent.capture="$emit('nav', path)">
-    {{ title }}
-  </b-nav-item>
+    <a>
+      {{ title }}
+    </a>
+  </li>
 </template>
 
 <script lang="ts">
@@ -24,7 +26,11 @@
 
 <style scoped>
   .nia-nav-item {
-    background-color: #777777;
-    color: #ffffff;
+    display: inline-block;
+  }
+
+  .nia-nav-item:hover {
+    background-color: #0A0A0A;
+    color: #FBFCD4 !important;
   }
 </style>
