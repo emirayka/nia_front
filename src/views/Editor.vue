@@ -33,19 +33,23 @@
   import Vue from 'vue'
   import Component from 'vue-class-component'
 
-  import {
-    mapState,
-  } from 'vuex'
+  import store from '@/store'
+  import ExecutionResult from '@/store/models/execution-result'
 
   @Component({
     name: "Editor",
-    computed: {
-      ...mapState(['log', 'code']),
-    },
   })
   export default class Editor extends Vue{
+    get log(): Array<ExecutionResult> {
+      return store.state.KeymappingModule.log
+    }
+
+    get code(): string {
+      return store.state.KeymappingModule.code
+    }
+
     changeHandler(code: string): void {
-      this.$store.commit('setCode', code)
+      store.commit.KeymappingModule.setCode(code)
     }
   }
 </script>

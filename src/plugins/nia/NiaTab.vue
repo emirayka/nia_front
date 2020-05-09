@@ -1,7 +1,7 @@
 <template>
-  <div class="nia-tab"
-       v-show="isActive">
-    <slot></slot>
+  <div class="nia-tab" v-if="selected">
+    <slot>
+    </slot>
   </div>
 </template>
 
@@ -11,23 +11,17 @@
   import {Prop} from 'vue-property-decorator'
 
   @Component({
-    name: "NiaTab",
+    name: "NiaTab.ts",
   })
   export default class NiaTab extends Vue {
-    isActive = false
-
     @Prop({ default: '' })
     title!: string
 
-    @Prop({default: false})
+    @Prop({ default: false })
     selected!: boolean
 
     get href(): string {
       return '#' + this.title.toLowerCase().replace(/ /g, '-');
-    }
-
-    mounted() {
-      this.isActive = this.selected;
     }
   }
 </script>
@@ -36,5 +30,6 @@
   .nia-tab {
     background-color: #777777;
     color: #ffffff;
+
   }
 </style>

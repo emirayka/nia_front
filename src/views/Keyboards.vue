@@ -23,7 +23,7 @@
         :w="80"
         :h="70"
       >
-        <NiaKeyboards />
+        <NiaKeyboards :devices-info="getDevicesInfo"/>
       </NiaGridItem>
 
       <NiaGridItem
@@ -50,20 +50,20 @@
   } from 'vuex'
 
   import NiaKeyboards from '@/components/NiaKeyboards.vue'
-  import {GridItemData} from 'vue-grid-layout'
+  import {DeviceInfo} from '@/store/models'
+
+  import store from '@/store'
 
   @Component({
     name: 'Keyboards',
     components: {
       NiaKeyboards,
     },
-    computed: {
-      ...mapGetters([
-        'getDevicesInfo',
-      ]),
-    },
   })
   export default class Keyboards extends Vue {
+    get getDevicesInfo(): Array<DeviceInfo> {
+      return store.getters.KeymappingModule.getDevicesInfo
+    }
   }
 </script>
 

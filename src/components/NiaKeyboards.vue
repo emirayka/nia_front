@@ -8,7 +8,7 @@
     >
       <NiaTab
         class="nia-keyboards__nia-tabs__nia-tab"
-        v-for="(device, index) of getDevicesInfo"
+        v-for="(device, index) of devicesInfo"
         :key="index"
         :title="device.name"
       >
@@ -37,23 +37,25 @@
   import {mapGetters} from 'vuex'
 
   import NiaKeyboard from '@/components/NiaKeyboard.vue'
+  import {Prop} from 'vue-property-decorator'
+  import DeviceInfo from '@/store/models/device-info'
 
   @Component({
     name: 'NiaKeyboards',
     components: {
       NiaKeyboard,
     },
-    computed: {
-      ...mapGetters(['getDevicesInfo']),
-    },
   })
   export default class NiaKeyboards extends Vue {
+    @Prop({required: true})
+    devicesInfo!: Array<DeviceInfo>
+
     $refs!: {
       tabs: HTMLDivElement;
     }
 
     get noDevices(): boolean {
-      return this.getDevicesInfo.length === 0
+      return this.devicesInfo.length === 0
     }
 
     get totalHeight(): number {

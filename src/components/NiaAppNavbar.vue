@@ -41,7 +41,6 @@
   scoped
   lang="scss"
 >
-
   .nia-app-navbar {
     background-color: #777777;
     color: #ffffff;

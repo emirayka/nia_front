@@ -1,4 +1,4 @@
-import KeyDescription from '@/store/models'
+import {KeyDescription} from '@/store/models'
 
 export default interface KeyboardModel {
   width: number

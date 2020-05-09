@@ -34,13 +34,15 @@
           path: event
         })
       },
-      executeHandler: function (code) {
+      executeHandler: function (code: string) {
         ipcRenderer.send('nia-server-execute-code-request', {
           code
         })
       },
     },
     mounted: function () {
+      const store = this.$store.direct
+
       if (this.$router.currentRoute.path !== '/Keyboards') {
         this.$router.push({
           path: '/Keyboards',
@@ -48,20 +50,20 @@
       }
 
       ipcRenderer.on('nia-server-handshake-result', (event, {version, info}) => {
-        this.$store.commit('setVersion', version)
-        this.$store.commit('setInfo', info)
+        store.commit.KeymappingModule.setVersion(version)
+        store.commit.KeymappingModule.setInfo(info)
       })
 
       ipcRenderer.on('nia-server-get-devices-result', (event, devices) => {
-        this.$store.commit('setDevices', devices)
+        store.commit.KeymappingModule.setDevices(devices)
       })
 
       ipcRenderer.on('nia-server-get-devices-info-result', (event, devicesInfo) => {
-        this.$store.commit('setDevicesInfo', devicesInfo)
+        store.commit.KeymappingModule.setDevicesInfo(devicesInfo)
       })
 
       ipcRenderer.on('nia-server-execute-code-result', (event, executionResult) => {
-        this.$store.commit('setExecutionResult', executionResult)
+        store.commit.KeymappingModule.setExecutionResult(executionResult)
       })
 
       ipcRenderer.send('nia-app-mounted', {})
@@ -73,6 +75,8 @@
   html, body {
     width: 100%;
     height: 100%;
+    margin: 0;
+    padding: 0;
   }
 
   #app {

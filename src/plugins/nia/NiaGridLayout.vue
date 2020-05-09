@@ -12,13 +12,8 @@
   import Component from 'vue-class-component'
   import {Prop} from 'vue-property-decorator'
 
-  import {GridItemData, GridLayout} from 'vue-grid-layout'
-
   @Component({
     name: "NiaTab",
-    components: {
-      GridLayout,
-    },
   })
   export default class NiaTab extends Vue {
     @Prop({ default: 10 })
