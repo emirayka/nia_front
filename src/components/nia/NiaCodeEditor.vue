@@ -17,7 +17,7 @@
   import 'codemirror/lib/codemirror.css'
 
   import 'codemirror/mode/javascript/javascript'
-  import '@/plugins/codemirror-nia'
+  import '@/plugins/codemirror-nia/index'
 
   import 'codemirror/theme/darcula.css'
   import Component from 'vue-class-component'

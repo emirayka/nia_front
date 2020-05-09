@@ -1,15 +1,20 @@
 <template>
-  <button class="nia-toolbar-item">
+  <NiaButton class="nia-toolbar-item">
     <slot></slot>
-  </button>
+  </NiaButton>
 </template>
 
 <script lang="ts">
   import Vue from 'vue'
   import Component from 'vue-class-component'
 
+  import {NiaButton} from '@/components/nia'
+
   @Component({
-    name: "NiaToolbarItem",
+    name: 'NiaToolbarItem',
+    components: {
+      NiaButton
+    }
   })
   export default class NiaToolbarItem extends Vue {
   }
@@ -18,7 +23,5 @@
 <style scoped>
   .nia-toolbar-item {
     margin-left: 5px;
-    background-color: #777777;
-    color: #ffffff;
   }
 </style>

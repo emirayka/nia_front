@@ -4,7 +4,7 @@ import router from './router'
 
 import store from './store'
 
-import NiaComponents from '@/plugins/nia'
+import NiaComponents from '@/components/nia'
 
 Vue.config.productionTip = false
 

@@ -1,15 +1,28 @@
 <template>
-  <div class="nia-tabs">
-    <div class="nia-tabs__tabs">
-      <ul class="nia-tabs__tabs__list">
+  <div
+    class="nia-tabs"
+    :style="niaTabsStyle"
+  >
+    <div
+      class="nia-tabs__tabs"
+      :style="niaTabsTabsStyle"
+    >
+      <ul
+        class="nia-tabs__tabs__list"
+        :style="niaTabsTabsListStyle"
+      >
         <li
           class="nia-tabs__tabs__list__item"
           v-for="(tab, index) in tabs"
+          :style="niaTabsTabsListItemStyle(isSelected(tab), hover === tab)"
           :key="index"
           @click="selectTab(tab)"
+          @mouseover="hover = tab"
+          @mouseleave="hover = null"
         >
           <a
             class="nia-tabs__tabs__list__item__link"
+            :style="niaTabsTabsListItemLinkStyle(isSelected(tab), hover === tab)"
             :class="{'selected': isSelected(tab)}"
           >{{ tab.title }}</a>
         </li>
@@ -27,12 +40,16 @@
   import Component from 'vue-class-component'
   import {Watch} from 'vue-property-decorator'
 
+  import store from '@/store'
+  import NiaTab from '@/components/nia/NiaTab.vue'
+
   @Component({
     name: "NiaTabs.ts",
   })
   export default class NiaTabs extends Vue {
     tabs: Array<Vue> = []
     selectedTab: Vue | null = null
+    hover: Vue | null = null
 
     updateTabs(): void {
       Vue.nextTick(() => {
@@ -42,10 +59,10 @@
       })
     }
 
-    selectTab(selectedTab: Vue) {
+    selectTab(selectedTab: NiaTab) {
       this.selectedTab = selectedTab
 
-      this.tabs.forEach((tab: Vue) => tab.selected = tab === this.selectedTab)
+      this.tabs.forEach((tab: NiaTab) => tab.selected = tab === this.selectedTab)
     }
 
     isSelected(tab: Vue): boolean {
@@ -65,6 +82,41 @@
       this.updateTabs()
     }
 
+    get niaTabsStyle(): object {
+      return {}
+    }
+
+    get niaTabsTabsStyle(): object {
+      return {}
+    }
+
+    get niaTabsTabsListStyle(): object {
+      return {}
+    }
+
+    niaTabsTabsListItemStyle(isSelected: boolean, isHovered: boolean): object {
+      const backgroundColor: string = isSelected
+        ? store.getters.ThemeModule.getBackgroundColorAccent2
+        : isHovered
+          ? store.getters.ThemeModule.getBackgroundColorAccentLight
+          : store.getters.ThemeModule.getBackgroundColorAccent1
+
+      return {
+        backgroundColor,
+      }
+    }
+
+    niaTabsTabsListItemLinkStyle(isSelected: boolean, isHovered: boolean): object {
+      const color: string = isSelected
+        ? store.getters.ThemeModule.getForegroundColorAccent2
+        : isHovered
+          ? store.getters.ThemeModule.getForegroundColorAccentLight
+          : store.getters.ThemeModule.getForegroundColorAccent1
+
+      return {
+        color,
+      }
+    }
   }
 </script>
 
@@ -90,7 +142,7 @@
   .nia-tabs__tabs__list {
     list-style: none;
     margin: 0;
-    padding: 0;
+    padding: .3125rem 0;
   }
 
   .nia-tabs__tabs__list__item {
@@ -100,8 +152,6 @@
     list-style: none;
 
     margin-left: 5px;
-    padding-top: .3125rem;
-    padding-bottom: .3125rem;
 
     border: 1px solid transparent;
     border-top-left-radius: .25rem;
@@ -124,22 +174,15 @@
 
   .nia-tabs__tabs__list__item__link {
     color: #ffffff;
-    transition: 0.2s;
+    transition: 0.05s;
     font-size: 20px;
     text-decoration: none;
-    padding: 4px 10px;
+    padding: 0 10px;
 
-    border-radius: 5px;
+    border-radius: 7px;
   }
 
   .nia-tabs__tabs__list__item__link:hover {
-    background-color: #ffffff;
-    color: #EEA200;
     cursor: pointer;
-  }
-
-  .nia-tabs__tabs__list__item__link.selected {
-    background-color: gold;
-    color: black;
   }
 </style>

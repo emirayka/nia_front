@@ -1,5 +1,6 @@
 <template>
-  <div class="nia-tab" v-if="selected">
+  <div class="nia-tab" v-if="selected"
+  :style="style">
     <slot>
     </slot>
   </div>
@@ -9,6 +10,8 @@
   import Vue from 'vue'
   import Component from 'vue-class-component'
   import {Prop} from 'vue-property-decorator'
+
+  import store from '@/store'
 
   @Component({
     name: "NiaTab.ts",
@@ -23,13 +26,17 @@
     get href(): string {
       return '#' + this.title.toLowerCase().replace(/ /g, '-');
     }
+
+    get style(): object {
+      return {
+        backgroundColor: store.getters.ThemeModule.getBackgroundColor,
+        color: store.getters.ThemeModule.getForegroundColor,
+      }
+    }
   }
 </script>
 
 <style scoped>
   .nia-tab {
-    background-color: #777777;
-    color: #ffffff;
-
   }
 </style>

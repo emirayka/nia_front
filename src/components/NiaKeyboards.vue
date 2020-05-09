@@ -27,6 +27,14 @@
           No devices were found
         </div>
       </NiaTab>
+      <NiaTab
+        :title="'No devices 2'"
+        v-if="noDevices"
+      >
+        <div>
+          No devices were found too
+        </div>
+      </NiaTab>
     </NiaTabs>
   </div>
 </template>
