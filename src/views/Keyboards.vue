@@ -12,9 +12,17 @@
         :w="20"
         :h="100"
       >
-        <NiaColoredDiv>
-          2
-        </NiaColoredDiv>
+        <NiaAccordion>
+          <NiaAccordionItem :id="'111'" :title="'title-1'" :multiple="false">
+            <div>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid dolor dolore, ducimus exercitationem facilis fugiat, harum, in ipsam iure laudantium officia officiis optio quod rem suscipit veniam veritatis voluptas voluptates.</div>
+          </NiaAccordionItem>
+          <NiaAccordionItem :id="'112'" :title="'title-2'" :multiple="false">
+            <div>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid dolor dolore, ducimus exercitationem facilis fugiat, harum, in ipsam iure laudantium officia officiis optio quod rem suscipit veniam veritatis voluptas voluptates.</div>
+          </NiaAccordionItem>
+          <NiaAccordionItem :id="'113'" :title="'title-3'" :multiple="false">
+            <div>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid dolor dolore, ducimus exercitationem facilis fugiat, harum, in ipsam iure laudantium officia officiis optio quod rem suscipit veniam veritatis voluptas voluptates.</div>
+          </NiaAccordionItem>
+        </NiaAccordion>
       </NiaGridItem>
 
       <NiaGridItem

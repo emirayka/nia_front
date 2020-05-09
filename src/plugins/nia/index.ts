@@ -1,3 +1,5 @@
+import NiaAccordion from './NiaAccordion.vue'
+import NiaAccordionItem from './NiaAccordionItem.vue'
 import NiaCodeEditor from './NiaCodeEditor.vue'
 import NiaColoredDiv from './NiaColoredDiv.vue'
 import NiaConsole from './NiaConsole.vue'
@@ -16,6 +18,8 @@ import Vue from 'vue'
 
 export default {
   install: function (_vue: typeof Vue, options: object) {
+    _vue.component('NiaAccordion', NiaAccordion)
+    _vue.component('NiaAccordionItem', NiaAccordionItem)
     _vue.component('NiaCodeEditor', NiaCodeEditor)
     _vue.component('NiaColoredDiv', NiaColoredDiv)
     _vue.component('NiaConsole', NiaConsole)

@@ -25,6 +25,8 @@
     "direct-vuex": "^0.11.0",
     "neverthrow": "^2.2.1",
     "nia-protocol-js": "file:../nia_protocol/nia-protocol-js",
+    "sass": "^1.26.5",
+    "sass-loader": "^8.0.2",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",
     "vue-codemirror": "^4.0.6",
@@ -52,7 +54,6 @@
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
     "node-sass": "^4.12.0",
-    "sass-loader": "^8.0.2",
     "typescript": "~3.8.3",
     "vue-cli-plugin-electron-builder": "~1.4.6",
     "vue-template-compiler": "^2.6.11"
