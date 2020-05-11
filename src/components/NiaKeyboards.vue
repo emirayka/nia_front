@@ -14,8 +14,14 @@
       >
         <NiaKeyboard
           :model="device.model"
+          :defined="device.defined"
           :keyboard-height="keyboardHeight"
           :keyboard-width="keyboardWidth"
+          :key-selected="selectedKey !== null && device.path === selectedKey.keyboardPath"
+          :selected-key-code="selectedKey !== null && selectedKey.keyCode"
+          @switch="switchHandler(device, $event)"
+          @click-key="clickKeyHandler(device, $event)"
+          @click-keyboard="clickKeyboardHandler(device)"
         />
       </NiaTab>
 
@@ -46,7 +52,9 @@
 
   import NiaKeyboard from '@/components/NiaKeyboard.vue'
   import {Prop} from 'vue-property-decorator'
-  import DeviceInfo from '@/store/models/device-info'
+
+  import {DeviceInfo, KeyboardKey} from '@/store/models'
+  import store from '@/store'
 
   @Component({
     name: 'NiaKeyboards',
@@ -58,8 +66,32 @@
     @Prop({required: true})
     devicesInfo!: Array<DeviceInfo>
 
+    @Prop({required: true})
+    selectedKey!: KeyboardKey
+
     $refs!: {
       tabs: HTMLDivElement;
+    }
+
+    switchHandler(deviceInfo: DeviceInfo, event: boolean): void {
+      if (event) {
+        this.$emit('define-keyboard', {
+          keyboardPath: deviceInfo.path,
+          keyboardName: deviceInfo.name,
+        })
+      } else {
+        this.$emit('remove-keyboard', {
+          keyboardPath: deviceInfo.path
+        })
+      }
+    }
+
+    clickKeyboardHandler(device: DeviceInfo): void {
+      this.$emit('click-keyboard', {keyboardPath: device.path})
+    }
+
+    clickKeyHandler(device: DeviceInfo, keyCode: number): void {
+      this.$emit('click-key', {keyboardPath: device.path, keyCode})
     }
 
     get noDevices(): boolean {
@@ -78,8 +110,12 @@
       return 42 // kek
     }
 
+    get switchButtonHeight(): number {
+      return 30
+    }
+
     get availableHeight(): number {
-      return this.totalHeight - this.tabTitlesHeight
+      return this.totalHeight - this.tabTitlesHeight - this.switchButtonHeight
     }
 
     get keyboardHeight(): number {

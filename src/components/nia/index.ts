@@ -4,36 +4,53 @@ import NiaButton from './NiaButton.vue'
 import NiaCodeEditor from './NiaCodeEditor.vue'
 import NiaColoredDiv from './NiaColoredDiv.vue'
 import NiaConsole from './NiaConsole.vue'
+import NiaDialog from './NiaDialog.vue'
+import NiaDialogFooterButton from './NiaDialogFooterButton.vue'
+import NiaForm from './NiaForm.vue'
 import NiaGridLayout from './NiaGridLayout.vue'
 import NiaGridItem from './NiaGridItem.vue'
 import NiaNavbar from './NiaNavbar.vue'
 import NiaNavbarBrand from './NiaNavbarBrand.vue'
 import NiaNavbarNav from './NiaNavbarNav.vue'
 import NiaNavItem from './NiaNavItem.vue'
+import NiaSwitchButton from './NiaSwitchButton.vue'
 import NiaTab from './NiaTab.vue'
+import NiaTable from './NiaTable.vue'
+import NiaTableHeaderRow from './NiaTableHeaderRow.vue'
+import NiaTableRow from './NiaTableRow.vue'
+import NiaTableRowItem from './NiaTableRowItem.vue'
 import NiaTabs from './NiaTabs.vue'
 import NiaToolbar from './NiaToolbar.vue'
 import NiaToolbarItem from './NiaToolbarItem.vue'
 
 import Vue from 'vue'
 
-export default {
-  install: function (_vue: typeof Vue, options: object) {
-    _vue.component('NiaAccordion', NiaAccordion)
-    _vue.component('NiaAccordionItem', NiaAccordionItem)
-    _vue.component('NiaButton', NiaButton)
-    _vue.component('NiaCodeEditor', NiaCodeEditor)
-    _vue.component('NiaColoredDiv', NiaColoredDiv)
-    _vue.component('NiaConsole', NiaConsole)
-    _vue.component('NiaGridLayout', NiaGridLayout)
-    _vue.component('NiaGridItem', NiaGridItem)
-    _vue.component('NiaNavbar', NiaNavbar)
-    _vue.component('NiaNavbarBrand', NiaNavbarBrand)
-    _vue.component('NiaNavbarNav', NiaNavbarNav)
-    _vue.component('NiaNavItem', NiaNavItem)
-    _vue.component('NiaTab', NiaTab)
-    _vue.component('NiaTabs', NiaTabs)
-    _vue.component('NiaToolbar', NiaToolbar)
-    _vue.component('NiaToolbarItem', NiaToolbarItem)
-  },
-}
+Vue.component('NiaAccordion', NiaAccordion)
+Vue.component('NiaAccordionItem', NiaAccordionItem)
+Vue.component('NiaButton', NiaButton)
+Vue.component('NiaCodeEditor', NiaCodeEditor)
+Vue.component('NiaColoredDiv', NiaColoredDiv)
+Vue.component('NiaConsole', NiaConsole)
+Vue.component('NiaDialog', NiaDialog)
+Vue.component('NiaDialogFooterButton', NiaDialogFooterButton)
+Vue.component('NiaForm', NiaForm)
+Vue.component('NiaGridLayout', NiaGridLayout)
+Vue.component('NiaGridItem', NiaGridItem)
+Vue.component('NiaNavbar', NiaNavbar)
+Vue.component('NiaNavbarBrand', NiaNavbarBrand)
+Vue.component('NiaNavbarNav', NiaNavbarNav)
+Vue.component('NiaNavItem', NiaNavItem)
+Vue.component('NiaSwitchButton', NiaSwitchButton)
+Vue.component('NiaTab', NiaTab)
+Vue.component('NiaTable', NiaTable)
+Vue.component('NiaTableHeaderRow', NiaTableHeaderRow)
+Vue.component('NiaTableRow', NiaTableRow)
+Vue.component('NiaTableRowItem', NiaTableRowItem)
+Vue.component('NiaTabs', NiaTabs)
+Vue.component('NiaToolbar', NiaToolbar)
+Vue.component('NiaToolbarItem', NiaToolbarItem)
+
+// export default {
+//   install: function (_vue: typeof Vue, options: object) {
+// },
+// }

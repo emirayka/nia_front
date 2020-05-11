@@ -2,6 +2,7 @@
   <div
     class="nia-keyboard-key"
     :style="style"
+    @click.stop="$emit('click', code)"
   >
     {{ mappedKeyCode }}
   </div>

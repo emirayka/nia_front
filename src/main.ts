@@ -4,11 +4,11 @@ import router from './router'
 
 import store from './store'
 
-import NiaComponents from '@/components/nia'
+import '@/components/nia'
 
 Vue.config.productionTip = false
 
-Vue.use(NiaComponents)
+// Vue.use(NiaComponents)
 
 const vue: Vue = new Vue({
   router,

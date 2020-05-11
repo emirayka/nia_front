@@ -1,26 +1,40 @@
 <template>
   <div
-    class="nia-keyboard-wrapper-wrapper"
-    :style="keyboardWrapperWrapperStyle"
+    class="top-wrapper"
+    :style="topWrapperStyle"
   >
+    <NiaSwitchButton
+      :isEnabled="defined"
+      @toggle="$emit('switch', $event)"
+    >
+    </NiaSwitchButton>
+
     <div
-      class="nia-keyboard-wrapper"
-      :style="keyboardWrapperStyle"
+      class="nia-keyboard-wrapper-wrapper"
+      :style="keyboardWrapperWrapperStyle"
     >
       <div
-        class="nia-keyboard"
-        :style="keyboardStyle"
+        class="nia-keyboard-wrapper"
+        :style="keyboardWrapperStyle"
       >
-        <NiaKeyboardKey
-          v-for="(key, index) in normalizedKeyboardKeys"
-          class="nia-keyboard__nia-keyboard-keys"
-          :x="key.x"
-          :y="key.y"
-          :width="key.width"
-          :height="key.height"
-          :code="key.code"
-          :key="index"
-        />
+        <div
+          class="nia-keyboard"
+          :style="keyboardStyle"
+          @click="clickKeyboardHandler($event)"
+        >
+          <NiaKeyboardKey
+            v-for="(key, index) in normalizedKeyboardKeys"
+            class="nia-keyboard__nia-keyboard-key"
+            :class="selectedKeyClass(key.code)"
+            :x="key.x"
+            :y="key.y"
+            :width="key.width"
+            :height="key.height"
+            :code="key.code"
+            :key="index"
+            @click="clickKeyHandler($event)"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -57,6 +71,29 @@
 
     @Prop({ required: true })
     keyboardWidth!: number
+
+    @Prop({ required: true })
+    defined!: boolean
+
+    @Prop({ default: false })
+    keySelected!: boolean
+
+    @Prop({ default: 0 })
+    selectedKeyCode!: number | null
+
+    selectedKeyClass(keyCode: number): object {
+      return {
+        'selected': this.keySelected && keyCode == this.selectedKeyCode,
+      }
+    }
+
+    clickKeyHandler(code: number): void {
+      this.$emit('click-key', code)
+    }
+
+    clickKeyboardHandler(): void {
+      this.$emit('click-keyboard')
+    }
 
     get keyboardModelWidth(): number {
       return this.model.width
@@ -111,6 +148,10 @@
       }
     }
 
+    get topWrapperStyle(): object {
+      return {}
+    }
+
     get normalizedKeyboardKeys(): object {
       const normalizedKeyboardKeys: Array<KeyDescription> = this.model.keys.map(keyboardKey => {
         return {
@@ -129,8 +170,21 @@
 
 <style
   scoped
-  lang="css"
+  lang="scss"
 >
+  .nia-keyboard__nia-keyboard-key.selected:before {
+    content: " ";
+    position: absolute;
+    z-index: 1;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border: 2px dotted gold;
+    border-radius: 10%;
+    background-color: #33FFDD03;
+  }
+
   .nia-keyboard {
     position: relative;
   }
@@ -150,5 +204,10 @@
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+
+  .top-wrapper {
+    width: 100%;
+    height: 100%;
   }
 </style>

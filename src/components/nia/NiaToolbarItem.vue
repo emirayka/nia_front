@@ -8,13 +8,8 @@
   import Vue from 'vue'
   import Component from 'vue-class-component'
 
-  import {NiaButton} from '@/components/nia'
-
   @Component({
     name: 'NiaToolbarItem',
-    components: {
-      NiaButton
-    }
   })
   export default class NiaToolbarItem extends Vue {
   }

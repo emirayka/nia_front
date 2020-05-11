@@ -1,10 +1,14 @@
 <template>
   <div id="app">
     <NiaAppNavbar @nav="handleNav"/>
+
     <keep-alive>
       <router-view
         @nav="handleNav"
         @execute="executeHandler($event)"
+        @define-keyboard="defineKeyboardHandler($event)"
+        @remove-keyboard="removeKeyboardHandler($event)"
+        @add-modifier="addModifierHandler($event)"
       />
     </keep-alive>
   </div>
@@ -17,9 +21,21 @@
 
   import NiaAppNavbar from '@/components/NiaAppNavbar.vue'
 
+  import store from '@/store'
+  import DeviceInfo from '@/store/models/device-info'
+  import ExecutionResult from '@/store/models/execution-result'
+  import NiaExecuteCodeEvent from '@/utils/event/events/execute-code-event'
+  import NiaDefineKeyboardEvent from '@/utils/event/events/define-keyboard-event'
+  import NiaRemoveKeyboardEvent from '@/utils/event/events/remove-keyboard-event'
+  import NiaDefineModifierEvent from '@/utils/event/events/define-modifier-event'
+  import NiaRemoveModifierEvent from '@/utils/event/events/remove-modifier-event'
+  import NiaSynchronizeEvent from '@/utils/event/events/synchronize-event'
+  import NiaEvent from '@/utils/event/events/event'
+  import * from '@/utils/event'
+
   export default {
     components: {
-      NiaAppNavbar
+      NiaAppNavbar,
     },
     data: () => ({
       devices: [],
@@ -34,39 +50,99 @@
           path: event
         })
       },
-      executeHandler: function (code: string) {
-        ipcRenderer.send('nia-server-execute-code-request', {
-          code
-        })
+
+      executeHandler: function (executeCodeEvent: NiaExecuteCodeEvent) {
+        const event: NiaEvent = executeCodeEvent.toEvent()
+
+        ipcRenderer.send('nia-server-event', event)
+      },
+
+      defineKeyboardHandler: function (defineKeyboardEvent: NiaDefineKeyboardEvent): void {
+        const event: NiaEvent = defineKeyboardEvent.toEvent()
+
+        ipcRenderer.send('nia-server-event', event)
+      },
+
+      removeKeyboardHandler: function (removeKeyboardEvent: NiaRemoveKeyboardEvent): void {
+        const event: NiaEvent = removeKeyboardEvent.toEvent()
+
+        ipcRenderer.send('nia-server-event', event)
+      },
+
+      defineModifierHandler: function (defineModifierEvent: NiaDefineModifierEvent): void {
+        const event: NiaEvent = defineModifierEvent.toEvent()
+
+        ipcRenderer.send('nia-server-event', event)
+      },
+      removeModifierEvent: function (removeModifierEvent: NiaRemoveModifierEvent): void {
+        const event: NiaEvent = removeModifierEvent.toEvent()
+
+        ipcRenderer.send('nia-server-event', event)
       },
     },
     mounted: function () {
-      const store = this.$store.direct
-
       if (this.$router.currentRoute.path !== '/Keyboards') {
         this.$router.push({
           path: '/Keyboards',
         })
       }
 
-      ipcRenderer.on('nia-server-handshake-result', (event, {version, info}) => {
-        store.commit.KeymappingModule.setVersion(version)
-        store.commit.KeymappingModule.setInfo(info)
-      })
+      // ipcRenderer.on('nia-server-handshake-result', (_, handshakeResult: NiaHandshakeResult) => {
+      //   const {
+      //     version,
+      //     info
+      //   } = handshakeResult
+      //
+      //   store.commit.KeymappingModule.setVersion(version)
+      //   store.commit.KeymappingModule.setInfo(info)
+      // })
+      //
+      // ipcRenderer.on('nia-server-get-devices-info-result', (_, getDeviceInfoResults: Array<NiaGetDeviceInfoResult>) => {
+      //   const devicesInfo: Array<DeviceInfo> = getDeviceInfoResults.map(
+      //     (getDeviceInfoResult: NiaGetDeviceInfoResult) => ({
+      //       path: getDeviceInfoResult.path,
+      //       name: getDeviceInfoResult.name,
+      //       model: getDeviceInfoResult.model,
+      //       defined: false
+      //     })
+      //   )
+      //
+      //   store.commit.KeymappingModule.setDevicesInfo(devicesInfo)
+      // })
+      //
+      // ipcRenderer.on('nia-server-execute-code-result', (_, executeCodeResult: NiaExecuteCodeResult) => {
+      //   const executionResult: ExecutionResult = executeCodeResult as ExecutionResult
+      //
+      //   store.commit.KeymappingModule.setExecutionResult(executionResult)
+      // })
+      //
+      // ipcRenderer.on('nia-server-define-keyboard-result', (_, defineKeyboardResult: NiaDefineKeyboardResult) => {
+      //   const {keyboardPath, result} = defineKeyboardResult
+      //
+      //   if (result.success) {
+      //     store.commit.KeymappingModule.makeKeyboardDefined(keyboardPath)
+      //   }
+      // })
+      //
+      // ipcRenderer.on('nia-server-remove-keyboard-result', (event, {keyboardPath, result}) => {
+      //   console.log(result)
+      //   if (result.success) {
+      //     store.commit.KeymappingModule.makeKeyboardRemoved(keyboardPath)
+      //   }
+      // })
+      //
+      // ipcRenderer.on('nia-server-add-modifier-result', (event, result) => {
+      //   console.log(result)
+      //
+      //   if (result.success) {
+      //     // store.commit.KeymappingModule.makeKeyboardRemoved(keyboardPath)
+      //   }
+      // })
 
-      ipcRenderer.on('nia-server-get-devices-result', (event, devices) => {
-        store.commit.KeymappingModule.setDevices(devices)
-      })
+      const synchronizeEvent: NiaSynchronizeEvent = new NiaSynchronizeEvent()
+      const event: NiaEvent = synchronizeEvent.toEvent()
 
-      ipcRenderer.on('nia-server-get-devices-info-result', (event, devicesInfo) => {
-        store.commit.KeymappingModule.setDevicesInfo(devicesInfo)
-      })
-
-      ipcRenderer.on('nia-server-execute-code-result', (event, executionResult) => {
-        store.commit.KeymappingModule.setExecutionResult(executionResult)
-      })
-
-      ipcRenderer.send('nia-app-mounted', {})
+      ipcRenderer.send('nia-server-event', event)
     },
   }
 </script>

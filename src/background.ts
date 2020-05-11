@@ -17,13 +17,19 @@ import {
 
 import {
   Protocol,
-} from './background-utils'
-import NiaHandshakeResponse from '@/background-utils/protocol/response/handshake-response.js'
-import NiaGetDeviceInfoResponse from '@/background-utils/protocol/response/get-device-info-response.js'
-import NiaGetDevicesResponse from '@/background-utils/protocol/response/get-devices-response.js'
-import NiaHandshakeResult from '@/background-utils/protocol/domain/handshake-result.js'
-import {NiaGetDeviceInfoResult, NiaGetDevicesResult} from '@/background-utils/protocol/domain'
-import NiaExecuteCodeResult from '@/background-utils/protocol/domain/execute-code-result.js'
+} from './utils'
+import NiaHandshakeResponse from '@/utils/protocol/response/handshake-response.js'
+import NiaGetDeviceInfoResponse from '@/utils/protocol/response/get-device-info-response.js'
+import NiaGetDevicesResponse from '@/utils/protocol/response/get-devices-response.js'
+import NiaHandshakeResult from '@/utils/protocol/result/handshake-result.js'
+import {NiaGetDeviceInfoResult, NiaGetDevicesResult} from '@/utils/protocol/result'
+import NiaExecuteCodeResult from '@/utils/protocol/result/execute-code-result.js'
+import NiaDefineKeyboardResult from '@/utils/protocol/result/define-keyboard-result'
+import DeviceInfo from '@/store/models/device-info'
+import NiaEvent from '@/utils/event/events/event'
+import NiaEventResponse from '@/utils/event/responses/response'
+import {NiaHandler, startHandler} from '@/utils/handle'
+import IpcMainEvent = Electron.IpcMainEvent
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -56,7 +62,6 @@ function createWindow() {
 (() => {
   protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }])
 
-
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
       app.quit()
@@ -74,7 +79,7 @@ function createWindow() {
       try {
         await installVueDevtools()
         BrowserWindow.addDevToolsExtension(
-          path.join(os.homedir(), '/.config/google-chrome/Default/Extensions/')
+          path.join(os.homedir(), '/.config/google-chrome/Default/Extensions/'),
         )
       } catch (e) {
         console.error('Vue Devtools failed to install:', e.toString())
@@ -99,50 +104,16 @@ function createWindow() {
   }
 })()
 
-let niaProtocol: Protocol | null = null
-
-ipcMain.once('nia-app-mounted', async () => {
+ipcMain.once('nia-server-event', async (_, event: NiaEvent) => {
   try {
     if (win === null) {
-      throw new Error('window is not ready')
+      throw new Error('Window is not ready')
     }
 
-    niaProtocol = new Protocol(12112)
-    await niaProtocol.is_ready()
+    const handler: NiaHandler = await startHandler(win, event)
 
-    const handshakeResult: NiaHandshakeResult = await niaProtocol.handshake()
-    win.webContents.send('nia-server-handshake-result', handshakeResult)
-
-    const getDevicesResponse: NiaGetDevicesResult = await niaProtocol.getDevices()
-    win.webContents.send('nia-server-get-devices-result', getDevicesResponse)
-
-    let devicesInfo: Array<NiaGetDeviceInfoResult> = await niaProtocol.getMultipleDeviceInfo(getDevicesResponse)
-
-    devicesInfo = devicesInfo.map(deviceInfo => {
-      let parsedModel = JSON.parse(deviceInfo.model)
-
-      const newDeviceInfo = {
-        ...deviceInfo,
-        model: parsedModel,
-      }
-
-      return newDeviceInfo
-    })
-
-    win.webContents.send('nia-server-get-devices-info-result', devicesInfo)
+    ipcMain.on('nia-server-event', handler)
   } catch (e) {
     console.error(e)
   }
-})
-
-ipcMain.on('nia-server-execute-code-request', async (_, event) => {
-  if (win === null || niaProtocol === null) {
-    return
-  }
-
-  await niaProtocol.is_ready()
-
-  const executionResult: NiaExecuteCodeResult = await niaProtocol.executeCode(event.code)
-
-  win.webContents.send('nia-server-execute-code-result', executionResult)
 })

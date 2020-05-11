@@ -1,8 +1,14 @@
 import {DeviceInfo, ExecutionResult} from '@/store/models'
+import NiaGetDevicesResult from '@/background-utils/protocol/domain/get-devices-result'
+import {Protocol} from '@/background-utils'
+import {NiaHandshakeResponse} from '@/background-utils/protocol'
+import Vue from 'vue'
+import KeyboardKey from '@/store/models/keyboard-key'
+import KeyDescription from '@/store/models/key-description'
 
 export interface KeymappingModuleState {
-  devices: Array<string>
   devicesInfo: Array<DeviceInfo>
+  modifiers: Array<KeyboardKey>,
   code: string
   log: Array<ExecutionResult>
   version: string
@@ -12,19 +18,15 @@ export interface KeymappingModuleState {
 export default {
   namespaced: true as true,
   state: {
-    devices: [],
     devicesInfo: [],
+    modifiers: [],
     code: '',
     log: [],
     version: '',
     info: '',
   } as KeymappingModuleState,
   mutations: {
-    setDevices(state: KeymappingModuleState, devices: Array<string>) {
-      state.devices = devices
-    },
     setDevicesInfo(state: KeymappingModuleState, devicesInfo: Array<DeviceInfo>) {
-      console.log(devicesInfo)
       state.devicesInfo = devicesInfo
     },
     setVersion(state: KeymappingModuleState, version: string) {
@@ -57,12 +59,83 @@ export default {
 
       state.log.push(logItem)
     },
+    makeKeyboardDefined(state: KeymappingModuleState, keyboardPath: string) {
+      for (let deviceInfo of state.devicesInfo) {
+        if (deviceInfo.path === keyboardPath) {
+          deviceInfo.defined = true
+          break
+        }
+      }
+    },
+    makeKeyboardRemoved(state: KeymappingModuleState, keyboardPath: string) {
+      for (let deviceInfo of state.devicesInfo) {
+        if (deviceInfo.path === keyboardPath) {
+          deviceInfo.defined = false
+          break
+        }
+      }
+    },
+    defineModifier: (state: KeymappingModuleState) => (keyboardPath: string, keyCode: number) => {
+
+    },
   },
   getters: {
-    getDevices: (state: KeymappingModuleState) => state.devices,
+    keyboards: (state: KeymappingModuleState) => state.devicesInfo,
+    modifiers: (state: KeymappingModuleState) => state.modifiers,
+    version: (state: KeymappingModuleState) => state.version,
+    info: (state: KeymappingModuleState) => state.info,
 
-    getDevicesInfo: (state: KeymappingModuleState) => state.devicesInfo,
-    getVersion: (state: KeymappingModuleState) => state.version,
-    getInfo: (state: KeymappingModuleState) => state.info,
+    keyboardNames: (state: KeymappingModuleState) => {
+      return state.devicesInfo
+        .map((deviceInfo: DeviceInfo) => deviceInfo.name)
+    },
+
+    getKeyboardPathByName: (state: KeymappingModuleState) => (keyboardName: string) => {
+      const filtered: Array<DeviceInfo> = state.devicesInfo
+        .filter((deviceInfo: DeviceInfo) => deviceInfo.name === keyboardName)
+
+      return filtered.length > 0
+        ? filtered[0].path
+        : null
+    },
+
+    getKeyboardByName: (state: KeymappingModuleState) => (keyboardName: string) => {
+      let filtered: Array<DeviceInfo> = state
+        .devicesInfo
+        .filter((deviceInfo: DeviceInfo) => deviceInfo.name === keyboardName)
+
+      return filtered.length > 0
+        ? filtered[0]
+        : null
+    },
+
+    getKeyboardByPath: (state: KeymappingModuleState) => (keyboardPath: string) => {
+      let filtered: Array<DeviceInfo> = state
+        .devicesInfo
+        .filter((deviceInfo: DeviceInfo) => deviceInfo.path === keyboardPath)
+
+      return filtered.length > 0
+        ? filtered[0]
+        : null
+    },
+
+    isKeyboardDefined: (state: KeymappingModuleState) => (keyboardPath: string) => {
+      for (let deviceInfo of state.devicesInfo) {
+        if (deviceInfo.path === keyboardPath) {
+          return deviceInfo.defined
+        }
+      }
+
+      return null
+    },
+    isModifierAlreadyDefined: (state: KeymappingModuleState) => (keyboardPath: string, keyCode: number) => {
+      for (const modifier of state.modifiers) {
+        if (modifier.keyCode === keyCode && modifier.keyboardPath == keyboardPath) {
+          return true
+        }
+      }
+
+      return false
+    },
   },
 }
