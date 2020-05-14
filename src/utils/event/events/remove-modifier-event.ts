@@ -1,28 +1,35 @@
 import {
-  NiaEvent
+  NiaEvent, NiaEventType,
 } from '@/utils/event'
-import SerializableObject from '../../serializableObj'
+import SerializableObject from '@/utils/serializable-object'
 
-export interface NiaRemoveModifierEventSerialized {
-  keyboardPath: string
+export interface NiaRemoveModifierEventObject {
+  deviceId: number
   keyCode: number
 }
 
+export type NiaRemoveModifierEventSerialized = NiaRemoveModifierEventObject
+
+
 export class NiaRemoveModifierEvent implements SerializableObject<NiaRemoveModifierEvent, NiaRemoveModifierEventSerialized> {
-  private readonly keyboardPath: string
+  private readonly deviceId: number
   private readonly keyCode: number
 
-  constructor(keyboardPath: string, keyCode: number) {
-    this.keyboardPath = keyboardPath
-    this.keyCode = keyCode
+  constructor(args: NiaRemoveModifierEventObject) {
+    this.deviceId = args.deviceId
+    this.keyCode = args.keyCode
   }
 
-  getKeyboardPath(): string {
-    return this.keyboardPath
+  getDeviceId(): number {
+    return this.deviceId
   }
 
   getKeyCode(): number {
     return this.keyCode
+  }
+
+  getEventType(): NiaEventType {
+    return NiaEventType.RemoveModifier
   }
 
   toEvent(): NiaEvent {
@@ -31,16 +38,15 @@ export class NiaRemoveModifierEvent implements SerializableObject<NiaRemoveModif
     return niaEvent
   }
 
-  static deserialize(b: NiaRemoveModifierEventSerialized): NiaRemoveModifierEvent {
-    return new NiaRemoveModifierEvent(
-      b.keyboardPath,
-      b.keyCode
-    );
+  static deserialize(serialized: NiaRemoveModifierEventSerialized): NiaRemoveModifierEvent {
+    const args: NiaRemoveModifierEventObject = serialized
+
+    return new NiaRemoveModifierEvent(args);
   }
 
   serialize(): NiaRemoveModifierEventSerialized {
     return {
-      keyboardPath: this.keyboardPath,
+      deviceId: this.deviceId,
       keyCode: this.keyCode,
     }
   }

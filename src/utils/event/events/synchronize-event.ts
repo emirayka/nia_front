@@ -1,13 +1,14 @@
 import {
-  NiaEvent
+  NiaEvent, NiaEventType,
 } from '@/utils/event'
-import SerializableObject from '../../serializableObj'
+import SerializableObject from '@/utils/serializable-object'
 
-export interface NiaSynchronizeEventSerialized {
-}
+export interface NiaSynchronizeEventObject {}
+export type NiaSynchronizeEventSerialized = NiaSynchronizeEventObject
 
-export class NiaSynchronizeEvent implements SerializableObject<NiaSynchronizeEvent, NiaSynchronizeEventSerialized> {
-  constructor() {}
+
+export class NiaSynchronizeEvent implements SerializableObject<NiaSynchronizeEvent, NiaSynchronizeEventObject> {
+  constructor(args: NiaSynchronizeEventObject) {}
 
   toEvent(): NiaEvent {
     const niaEvent = new NiaEvent(this)
@@ -15,8 +16,14 @@ export class NiaSynchronizeEvent implements SerializableObject<NiaSynchronizeEve
     return niaEvent
   }
 
-  static deserialize(_: NiaSynchronizeEventSerialized): NiaSynchronizeEvent {
-    return new NiaSynchronizeEvent()
+  getEventType(): NiaEventType {
+    return NiaEventType.Synchronize
+  }
+
+  static deserialize(obj: NiaSynchronizeEventSerialized): NiaSynchronizeEvent {
+    const args: NiaSynchronizeEventObject = obj
+
+    return new NiaSynchronizeEvent(obj)
   }
 
   serialize(): NiaSynchronizeEventSerialized {

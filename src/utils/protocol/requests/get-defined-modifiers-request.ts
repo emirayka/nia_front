@@ -2,7 +2,7 @@ import {
   Request,
   GetDefinedModifiersRequest,
 } from 'nia-protocol-js'
-import {NiaRequestType, SerializablePB} from '@/utils'
+import {NiaRequest, NiaRequestType, SerializablePB} from '@/utils'
 
 export class NiaGetDefinedModifiersRequest implements SerializablePB<NiaGetDefinedModifiersRequest, GetDefinedModifiersRequest> {
   constructor() {
@@ -10,6 +10,10 @@ export class NiaGetDefinedModifiersRequest implements SerializablePB<NiaGetDefin
 
   getType(): NiaRequestType {
     return NiaRequestType.GetDefinedModifiers
+  }
+
+  toRequest(): NiaRequest {
+    return new NiaRequest(this)
   }
 
   toPB(): GetDefinedModifiersRequest {

@@ -5,30 +5,28 @@ import BrowserWindow = Electron.BrowserWindow
 import {
   NiaEvent,
   NiaEventResponse,
-  NiaDefineKeyboardResult,
-  NiaExecuteCodeResult,
-  NiaGetDeviceInfoResult,
-  NiaGetDevicesResult,
-  NiaRemoveKeyboardByPathResponse,
-  NiaRemoveKeyboardByPathResult,
-  NiaHandshakeResult,
   NiaExecuteCodeEvent,
-  NiaDefineKeyboardEvent,
-  NiaRemoveKeyboardEvent,
+  NiaDefineDeviceEvent,
+  NiaRemoveDeviceEvent,
   NiaDefineModifierEvent,
   NiaRemoveModifierEvent,
   NiaExecuteCodeEventResponse,
-  NiaDefineKeyboardEventResponse,
-  NiaRemoveKeyboardEventResponse,
+  NiaDefineDeviceEventResponse,
+  NiaRemoveDeviceEventResponse,
   NiaSynchronizeEventResponse,
   NiaSynchronizeEvent,
   NiaEventSerialized,
   NiaDefineModifierEventResponse,
-  NiaDefineModifierResult,
-  NiaRemoveModifierEventResponse, NiaRemoveModifierResult, NiaGetDefinedModifiersResult,
+  NiaRemoveModifierEventResponse,
+  NiaHandshakeResponse,
+  NiaGetDevicesResponse,
+  NiaGetDefinedModifiersResponse,
+  NiaExecuteCodeResponse, NiaDefineModifierResponse, NiaRemoveModifierResponse,
 } from '@/utils'
 
 import {Protocol} from '@/utils/sockets'
+import {NiaDefineDeviceResponse} from '@/utils/protocol/responses/define-device-response'
+import {NiaRemoveDeviceByPathResponse} from '@/utils/protocol/responses/remove-device-by-path-response'
 
 const handleSynchronizeEvent = async (
   niaProtocol: Protocol,
@@ -36,18 +34,15 @@ const handleSynchronizeEvent = async (
 ): Promise<NiaEventResponse> => {
   await niaProtocol.isReady()
 
-  const handshakeResult: NiaHandshakeResult = await niaProtocol.handshake()
-  const getDevicesResult: NiaGetDevicesResult = await niaProtocol.getDevices()
-  const getDeviceInfoResults: Array<NiaGetDeviceInfoResult> = await niaProtocol.getMultipleDeviceInfo(
-    getDevicesResult,
-  )
-  const getDefinedModifiersResult: NiaGetDefinedModifiersResult = await niaProtocol.getDefinedModifiers()
+  const handshakeResponse: NiaHandshakeResponse = await niaProtocol.handshake()
+  const getDevicesResponse: NiaGetDevicesResponse = await niaProtocol.getDevices()
+  const getDefinedModifiersResponse: NiaGetDefinedModifiersResponse = await niaProtocol.getDefinedModifiers()
 
   const synchronizeEventResponse: NiaSynchronizeEventResponse = NiaSynchronizeEventResponse.from(
     event,
-    handshakeResult,
-    getDeviceInfoResults,
-    getDefinedModifiersResult
+    handshakeResponse,
+    getDevicesResponse,
+    getDefinedModifiersResponse
   );
 
   return synchronizeEventResponse.toEventResponse()
@@ -59,49 +54,48 @@ const handleExecuteCodeEvent = async (
 ): Promise<NiaEventResponse> => {
   await niaProtocol.isReady()
 
-  const executeCodeResult: NiaExecuteCodeResult = await niaProtocol.executeCode(event.getCode())
-  const executeCodeEventResponse: NiaExecuteCodeEventResponse = new NiaExecuteCodeEventResponse(
+  const executeCodeResponse: NiaExecuteCodeResponse = await niaProtocol.executeCode(event.getCode())
+  const executeCodeEventResponse: NiaExecuteCodeEventResponse = NiaExecuteCodeEventResponse.from(
     event,
-    executeCodeResult,
+    executeCodeResponse,
   )
 
   return executeCodeEventResponse.toEventResponse()
 }
 
-const handleDefineKeyboardEvent = async (
+const handleDefineDeviceEvent = async (
   niaProtocol: Protocol,
-  event: NiaDefineKeyboardEvent,
+  event: NiaDefineDeviceEvent,
 ): Promise<NiaEventResponse> => {
   await niaProtocol.isReady()
 
-  const keyboardPath: string = event.getKeyboardPath()
-  const keyboardName: string = event.getKeyboardName()
+  const deviceId: number = event.getDeviceId()
 
-  const result: NiaDefineKeyboardResult = await niaProtocol.defineKeyboard(keyboardPath, keyboardName)
+  const response: NiaDefineDeviceResponse = await niaProtocol.defineDevice(deviceId)
 
-  const defineKeyboardEventResponse: NiaDefineKeyboardEventResponse = new NiaDefineKeyboardEventResponse(
+  const defineDeviceEventResponse: NiaDefineDeviceEventResponse = NiaDefineDeviceEventResponse.from(
     event,
-    result,
+    response,
   )
 
-  return defineKeyboardEventResponse.toEventResponse()
+  return defineDeviceEventResponse.toEventResponse()
 }
 
-const handleRemoveKeyboardEvent = async (
+const handleRemoveDeviceEvent = async (
   niaProtocol: Protocol,
-  event: NiaRemoveKeyboardEvent,
+  event: NiaRemoveDeviceEvent,
 ): Promise<NiaEventResponse> => {
   await niaProtocol.isReady()
 
-  const keyboardPath = event.getKeyboardPath()
+  const keyboardPath = event.getDevicePath()
 
-  const result: NiaRemoveKeyboardByPathResult = await niaProtocol.removeKeyboardByPath(keyboardPath)
-  const removeKeyboardEventResponse: NiaRemoveKeyboardEventResponse = new NiaRemoveKeyboardEventResponse(
+  const result: NiaRemoveDeviceByPathResponse = await niaProtocol.removeDeviceByPath(keyboardPath)
+  const removeDeviceEventResponse: NiaRemoveDeviceEventResponse = NiaRemoveDeviceEventResponse.from(
     event,
     result,
   );
 
-  return removeKeyboardEventResponse.toEventResponse()
+  return removeDeviceEventResponse.toEventResponse()
 }
 
 const handleDefineModifierEvent = async (
@@ -110,19 +104,19 @@ const handleDefineModifierEvent = async (
 ): Promise<NiaEventResponse> => {
   await niaProtocol.isReady()
 
-  const keyboardPath = event.getKeyboardPath()
-  const keyCode = event.getKeyCode()
-  const modifierAlias = event.getModifierAlias()
+  const deviceId: number = event.getDeviceId()
+  const keyCode: number = event.getKeyCode()
+  const modifierAlias: string = event.getModifierAlias()
 
-  const result: NiaDefineModifierResult = await niaProtocol.defineModifier(
-    keyboardPath,
+  const response: NiaDefineModifierResponse = await niaProtocol.defineModifier(
+    deviceId,
     keyCode,
     modifierAlias,
   )
 
-  const defineModifierEventResponse: NiaDefineModifierEventResponse = new NiaDefineModifierEventResponse(
+  const defineModifierEventResponse: NiaDefineModifierEventResponse = NiaDefineModifierEventResponse.from(
     event,
-    result,
+    response,
   );
 
   return defineModifierEventResponse.toEventResponse()
@@ -134,19 +128,17 @@ const handleRemoveModifierEvent = async (
 ): Promise<NiaEventResponse> => {
   await niaProtocol.isReady()
 
-  const keyboardPath = event.getKeyboardPath()
-  const keyCode = event.getKeyCode()
+  const deviceId: number = event.getDeviceId()
+  const keyCode: number = event.getKeyCode()
 
-  console.log('Handler: Sent remove modifier event.')
-
-  const result: NiaRemoveModifierResult = await niaProtocol.removeModifier(
-    keyboardPath,
+  const result: NiaRemoveModifierResponse = await niaProtocol.removeModifier(
+    deviceId,
     keyCode,
   )
 
   console.log('Handler: Got remove modifier result.')
 
-  const removeModifierEventResponse: NiaRemoveModifierEventResponse = new NiaRemoveModifierEventResponse(
+  const removeModifierEventResponse: NiaRemoveModifierEventResponse = NiaRemoveModifierEventResponse.from(
     event,
     result,
   );
@@ -164,10 +156,10 @@ const handleEvent = async (
     return handleSynchronizeEvent(niaProtocol, event.takeSynchronizeEvent())
   } else if (event.isExecuteCodeEvent()) {
     return handleExecuteCodeEvent(niaProtocol, event.takeExecuteCodeEvent())
-  } else if (event.isDefineKeyboardEvent()) {
-    return handleDefineKeyboardEvent(niaProtocol, event.takeDefineKeyboardEvent())
-  } else if (event.isRemoveKeyboardEvent()) {
-    return handleRemoveKeyboardEvent(niaProtocol, event.takeRemoveKeyboardEvent())
+  } else if (event.isDefineDeviceEvent()) {
+    return handleDefineDeviceEvent(niaProtocol, event.takeDefineDeviceEvent())
+  } else if (event.isRemoveDeviceEvent()) {
+    return handleRemoveDeviceEvent(niaProtocol, event.takeRemoveDeviceEvent())
   } else if (event.isDefineModifierEvent()) {
     return handleDefineModifierEvent(niaProtocol, event.takeDefineModifierEvent())
   } else if (event.isRemoveModifierEvent()) {

@@ -1,6 +1,6 @@
 import {DefineDeviceRequest} from 'nia-protocol-js'
 import {SerializablePB} from '@/utils/serializable-pb'
-import {NiaRequestType} from '@/utils'
+import {NiaRequest, NiaRequestType} from '@/utils'
 
 export class NiaDefineDeviceRequest implements SerializablePB<NiaDefineDeviceRequest, DefineDeviceRequest> {
   private readonly deviceId: number
@@ -15,6 +15,10 @@ export class NiaDefineDeviceRequest implements SerializablePB<NiaDefineDeviceReq
 
   getType(): NiaRequestType {
     return NiaRequestType.DefineDevice
+  }
+
+  toRequest(): NiaRequest {
+    return new NiaRequest(this)
   }
 
   toPB(): DefineDeviceRequest {

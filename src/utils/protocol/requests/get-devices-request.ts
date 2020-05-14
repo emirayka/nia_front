@@ -2,13 +2,17 @@ import {
   Request,
   GetDevicesRequest,
 } from 'nia-protocol-js'
-import {NiaRequestType, SerializablePB} from '@/utils'
+import {NiaRequest, NiaRequestType, SerializablePB} from '@/utils'
 
 export class NiaGetDevicesRequest implements SerializablePB<NiaGetDevicesRequest, GetDevicesRequest> {
   constructor() {}
 
   getType(): NiaRequestType {
     return NiaRequestType.GetDevices
+  }
+
+  toRequest(): NiaRequest {
+    return new NiaRequest(this)
   }
 
   toPB(): GetDevicesRequest {

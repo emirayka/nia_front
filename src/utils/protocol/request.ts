@@ -123,5 +123,11 @@ export class NiaRequest implements SerializablePB<NiaRequest, Request> {
 
     return request
   }
+
+  toUint8Array(): Uint8Array {
+    let request: Request = this.toPB()
+
+    return request.serializeBinary()
+  }
 }
 

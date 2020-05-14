@@ -2,7 +2,7 @@ import {
   Request,
   RemoveDeviceByNameRequest
 } from 'nia-protocol-js'
-import {NiaRequestType, SerializablePB} from '@/utils'
+import {NiaRequest, NiaRequestType, SerializablePB} from '@/utils'
 
 export class NiaRemoveDeviceByNameRequest implements SerializablePB<NiaRemoveDeviceByNameRequest, RemoveDeviceByNameRequest> {
   private readonly keyboardName: string
@@ -17,6 +17,10 @@ export class NiaRemoveDeviceByNameRequest implements SerializablePB<NiaRemoveDev
 
   getType(): NiaRequestType {
     return NiaRequestType.RemoveDeviceByName
+  }
+
+  toRequest(): NiaRequest {
+    return new NiaRequest(this)
   }
 
   toPB(): RemoveDeviceByNameRequest {

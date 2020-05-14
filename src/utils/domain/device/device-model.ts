@@ -1,16 +1,29 @@
-import {NiaKeyDescription} from '@/utils/domain/device/key-description'
-import {SerializablePB} from '@/utils'
+import {NiaKeyDescription, NiaKeyDescriptionSerialized} from '@/utils/domain/device/key-description'
+import {NiaSynchronizeEventResponse, SerializablePB} from '@/utils'
 import {DeviceModel, KeyDescription} from 'nia-protocol-js'
+import SerializableObject from '@/utils/serializable-object'
 
-export class NiaDeviceModel implements SerializablePB<NiaDeviceModel, DeviceModel> {
+export interface NiaDeviceModelObject {
+  deviceWidth: number,
+  deviceHeight: number,
+  keyDescriptions: Array<NiaKeyDescription>
+}
+
+export interface NiaDeviceModelSerialized {
+  deviceWidth: number,
+  deviceHeight: number,
+  keyDescriptions: Array<NiaKeyDescriptionSerialized>
+}
+
+export class NiaDeviceModel implements SerializablePB<NiaDeviceModel, DeviceModel>, SerializableObject<NiaDeviceModel, NiaDeviceModelSerialized> {
   private readonly deviceWidth: number
   private readonly deviceHeight: number
   private readonly keyDescriptions: Array<NiaKeyDescription>
 
-  constructor(deviceWidth: number, deviceHeight: number, keyDescriptions: Array<NiaKeyDescription>) {
-    this.deviceWidth = deviceWidth
-    this.deviceHeight = deviceHeight
-    this.keyDescriptions = keyDescriptions
+  constructor(args: NiaDeviceModelObject) {
+    this.deviceWidth = args.deviceWidth
+    this.deviceHeight = args.deviceHeight
+    this.keyDescriptions = args.keyDescriptions
   }
 
   getDeviceWidth(): number {
@@ -23,6 +36,26 @@ export class NiaDeviceModel implements SerializablePB<NiaDeviceModel, DeviceMode
 
   getKeyDescriptions(): Array<NiaKeyDescription> {
     return this.keyDescriptions
+  }
+
+  serialize(): NiaDeviceModelSerialized {
+    return {
+      deviceWidth: this.deviceWidth,
+      deviceHeight: this.deviceHeight,
+      keyDescriptions: this.keyDescriptions.map((keyDescription) => keyDescription.serialize()),
+    }
+  }
+
+  static deserialize(serialized: NiaDeviceModelSerialized): NiaDeviceModel {
+    const args: NiaDeviceModelObject = {
+      deviceWidth: serialized.deviceWidth,
+      deviceHeight: serialized.deviceHeight,
+      keyDescriptions: serialized
+        .keyDescriptions
+        .map((keyDescriptionSerialized) => NiaKeyDescription.deserialize(keyDescriptionSerialized)),
+    }
+
+    return new NiaDeviceModel(args)
   }
 
   toPB(): DeviceModel {
@@ -45,6 +78,12 @@ export class NiaDeviceModel implements SerializablePB<NiaDeviceModel, DeviceMode
     const deviceWidth: number = deviceModelPB.getDeviceWidth()
     const deviceHeight: number = deviceModelPB.getDeviceHeight()
 
-    return new NiaDeviceModel(deviceWidth, deviceHeight, keyDescriptions)
+    const args: NiaDeviceModelObject = {
+      deviceWidth,
+      deviceHeight,
+      keyDescriptions
+    }
+
+    return new NiaDeviceModel(args)
   }
 }

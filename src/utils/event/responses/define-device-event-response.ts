@@ -1,66 +1,52 @@
 import {
-  NiaRemoveModifierEvent,
+  NiaDefineDeviceEvent,
   NiaEventResponse,
-  NiaRemoveModifierEventObject,
-  NiaModifierDescription,
-  NiaKey,
-  NiaRemoveModifierResponse,
-  NiaKeyObject,
+  NiaDefineDeviceEventObject,
 } from '@/utils'
-
+import serializable from '@/utils/serializable-object'
+import {NiaDefineDeviceResponse} from '@/utils/protocol/responses/define-device-response'
 import SerializableObject from '@/utils/serializable-object'
 
-export interface NiaRemoveModifierEventResponseObject {
+export interface NiaDefineKeyboardEventResponseObject {
   deviceId: number
-  keyCode: number
-
   message: string
   success: boolean
   error: boolean
   failure: boolean
 }
 
-export type NiaRemoveModifierEventResponseSerialized = NiaRemoveModifierEventResponseObject
+export type NiaDefineKeyboardEventResponseSerialized = NiaDefineKeyboardEventResponseObject
 
-export class NiaRemoveModifierEventResponse implements SerializableObject<NiaRemoveModifierEventResponse, NiaRemoveModifierEventResponseObject> {
+export class NiaDefineDeviceEventResponse implements SerializableObject<NiaDefineDeviceEventResponse, NiaDefineKeyboardEventResponseSerialized> {
   private readonly deviceId: number
-  private readonly keyCode: number
 
   private readonly message: string
   private readonly failure: boolean
   private readonly error: boolean
   private readonly success: boolean
 
-  constructor(args: NiaRemoveModifierEventResponseObject) {
+  constructor(args: NiaDefineKeyboardEventResponseObject) {
     this.deviceId = args.deviceId
-    this.keyCode = args.keyCode
-
     this.message = args.message
     this.failure = args.failure
     this.error = args.error
     this.success = args.success
   }
 
-  static from(event: NiaRemoveModifierEvent, response: NiaRemoveModifierResponse): NiaRemoveModifierEventResponse {
-    const args: NiaRemoveModifierEventResponseObject = {
+  static from(event: NiaDefineDeviceEvent, response: NiaDefineDeviceResponse): NiaDefineDeviceEventResponse {
+    const args: NiaDefineKeyboardEventResponseObject = {
       deviceId: event.getDeviceId(),
-      keyCode: event.getKeyCode(),
-
       message: response.getMessage(),
       success: response.isSuccess(),
       error: response.isError(),
       failure: response.isFailure(),
     }
 
-    return new NiaRemoveModifierEventResponse(args)
+    return new NiaDefineDeviceEventResponse(args)
   }
 
   getDeviceId(): number {
     return this.deviceId
-  }
-
-  getKeyCode(): number {
-    return this.keyCode
   }
 
   getMessage(): string {
@@ -85,21 +71,15 @@ export class NiaRemoveModifierEventResponse implements SerializableObject<NiaRem
     return niaEventResponse
   }
 
-  toModifier(): NiaKey {
-    return new NiaKey({
-      keyCode: this.keyCode,
-      deviceId: this.deviceId
-    })
+  static deserialize(obj: NiaDefineKeyboardEventResponseSerialized): NiaDefineDeviceEventResponse {
+    const args: NiaDefineKeyboardEventResponseObject = obj
+
+    return new NiaDefineDeviceEventResponse(args)
   }
 
-  static deserialize(obj: NiaRemoveModifierEventResponseObject): NiaRemoveModifierEventResponse {
-    return new NiaRemoveModifierEventResponse(obj)
-  }
-
-  serialize(): NiaRemoveModifierEventResponseSerialized {
+  serialize(): NiaDefineKeyboardEventResponseObject {
     return {
       deviceId: this.deviceId,
-      keyCode: this.keyCode,
       message: this.message,
       success: this.success,
       error: this.error,

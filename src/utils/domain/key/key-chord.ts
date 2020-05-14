@@ -12,7 +12,7 @@ export class NiaKeyChord implements SerializablePB<NiaKeyChord, KeyChord> {
   }
 
   getModifiers(): Array<NiaKey> {
-    return this.modifiers
+    return this.definedModifiers
   }
 
   getOrdinaryKey(): NiaKey {
@@ -20,7 +20,7 @@ export class NiaKeyChord implements SerializablePB<NiaKeyChord, KeyChord> {
   }
 
   toPB(): KeyChord {
-    const modifiersPB: Array<Key> = this.modifiers
+    const modifiersPB: Array<Key> = this.definedModifiers
       .map((modifier) => modifier.toPB())
 
     const ordinaryKeyPB: Key = this.ordinaryKey.toPB()

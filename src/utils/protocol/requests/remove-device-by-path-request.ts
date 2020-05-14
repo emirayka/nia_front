@@ -2,7 +2,7 @@ import {
   Request,
   RemoveDeviceByPathRequest
 } from 'nia-protocol-js'
-import {NiaRequestType, SerializablePB} from '@/utils'
+import {NiaRequest, NiaRequestType, SerializablePB} from '@/utils'
 
 export class NiaRemoveDeviceByPathRequest implements SerializablePB<NiaRemoveDeviceByPathRequest, RemoveDeviceByPathRequest> {
   private readonly devicePath: string
@@ -17,6 +17,10 @@ export class NiaRemoveDeviceByPathRequest implements SerializablePB<NiaRemoveDev
 
   getType(): NiaRequestType {
     return NiaRequestType.RemoveDeviceByPath
+  }
+
+  toRequest(): NiaRequest {
+    return new NiaRequest(this)
   }
 
   toPB(): RemoveDeviceByPathRequest {

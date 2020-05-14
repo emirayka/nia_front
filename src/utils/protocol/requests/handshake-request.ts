@@ -2,13 +2,17 @@ import {
   Request,
   HandshakeRequest, HandshakeResponse, GetDevicesRequest,
 } from 'nia-protocol-js'
-import {NiaRequestType, SerializablePB} from '@/utils'
+import {NiaRequest, NiaRequestType, SerializablePB} from '@/utils'
 
 export class NiaHandshakeRequest implements SerializablePB<NiaHandshakeRequest, HandshakeRequest> {
   constructor() {}
 
   getType(): NiaRequestType {
     return NiaRequestType.Handshake
+  }
+
+  toRequest(): NiaRequest {
+    return new NiaRequest(this)
   }
 
   toPB(): HandshakeRequest {

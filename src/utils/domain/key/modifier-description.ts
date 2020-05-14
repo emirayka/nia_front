@@ -1,14 +1,26 @@
 import {Key, ModifierDescription} from 'nia-protocol-js'
 
-import {NiaKey, SerializablePB} from '@/utils'
+import {NiaKey, NiaKeySerialized, SerializablePB} from '@/utils'
+import SerializableObject from '@/utils/serializable-object'
 
-export class NiaModifierDescription implements SerializablePB<NiaModifierDescription, ModifierDescription> {
+export interface NiaModifierDescriptionObject {
+  key: NiaKey,
+  alias: string
+}
+
+export interface NiaModifierDescriptionSerialized {
+  key: NiaKeySerialized,
+  alias: string
+}
+
+export class NiaModifierDescription implements SerializablePB<NiaModifierDescription, ModifierDescription>,
+SerializableObject<NiaModifierDescription, NiaModifierDescriptionSerialized> {
   private readonly key: NiaKey
   private readonly alias: string
 
-  constructor(key: NiaKey, alias: string) {
-    this.key = key
-    this.alias = alias
+  constructor(args: NiaModifierDescriptionObject) {
+    this.key = args.key
+    this.alias = args.alias
   }
 
   getKey(): NiaKey {
@@ -17,6 +29,26 @@ export class NiaModifierDescription implements SerializablePB<NiaModifierDescrip
 
   getAlias(): string {
     return this.alias
+  }
+
+  equals(other: NiaModifierDescription): boolean {
+    return this.key.equals(other.getKey())
+  }
+
+  serialize(): NiaModifierDescriptionSerialized {
+    return {
+      key: this.key.serialize(),
+      alias: this.alias
+    }
+  }
+
+  static deserialize(serialized: NiaModifierDescriptionSerialized): NiaModifierDescription {
+    const args: NiaModifierDescriptionObject = {
+      key: NiaKey.deserialize(serialized.key),
+      alias: serialized.alias
+    }
+
+    return new NiaModifierDescription(args)
   }
 
   toPB(): ModifierDescription {
@@ -40,6 +72,11 @@ export class NiaModifierDescription implements SerializablePB<NiaModifierDescrip
     const alias: string = modifierDescriptionPB.getAlias()
     const key: NiaKey = NiaKey.fromPB(keyPB)
 
-    return new NiaModifierDescription(key, alias)
+    const args: NiaModifierDescriptionObject = {
+      key,
+      alias
+    }
+
+    return new NiaModifierDescription(args)
   }
 }

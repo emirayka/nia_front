@@ -2,7 +2,7 @@ import {
   Request,
   RemoveModifierRequest
 } from 'nia-protocol-js'
-import {NiaRequestType, SerializablePB} from '@/utils'
+import {NiaRequest, NiaRequestType, SerializablePB} from '@/utils'
 
 export class NiaRemoveModifierRequest implements SerializablePB<NiaRemoveModifierRequest, RemoveModifierRequest> {
   private readonly deviceId: number
@@ -23,6 +23,10 @@ export class NiaRemoveModifierRequest implements SerializablePB<NiaRemoveModifie
 
   getType(): NiaRequestType {
     return NiaRequestType.RemoveModifier
+  }
+
+  toRequest(): NiaRequest {
+    return new NiaRequest(this)
   }
 
   toPB(): RemoveModifierRequest {

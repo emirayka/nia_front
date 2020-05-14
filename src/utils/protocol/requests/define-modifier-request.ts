@@ -2,7 +2,7 @@ import {
   Request,
   DefineModifierRequest,
 } from 'nia-protocol-js'
-import {NiaRequestType, SerializablePB} from '@/utils'
+import {NiaRequest, NiaRequestType, SerializablePB} from '@/utils'
 
 export class NiaDefineModifierRequest implements SerializablePB<NiaDefineModifierRequest, DefineModifierRequest> {
   private readonly deviceId: number
@@ -29,6 +29,10 @@ export class NiaDefineModifierRequest implements SerializablePB<NiaDefineModifie
 
   getType(): NiaRequestType {
     return NiaRequestType.DefineModifier
+  }
+
+  toRequest(): NiaRequest {
+    return new NiaRequest(this)
   }
 
   toPB(): DefineModifierRequest {

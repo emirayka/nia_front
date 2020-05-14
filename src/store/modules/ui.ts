@@ -1,10 +1,8 @@
-import KeyboardKey from '@/store/models/keyboard-key'
-import {DeviceInfo} from '@/store/models'
-import {Modifier} from '@/store/models/modifier'
+import {NiaKey, NiaModifierDescription} from '@/utils'
 
 export interface UIModuleState {
-  selectedKey: KeyboardKey | null,
-  selectedModifier: Modifier | null,
+  selectedKey: NiaKey | null,
+  selectedModifier: NiaModifierDescription | null,
 
   addModifierDialogIsShown: boolean,
   addModifierDialogSelectedKeyboard: string,
@@ -24,10 +22,10 @@ export default {
     addModifierDialogSelectedModifierAlias: '',
   } as UIModuleState,
   mutations: {
-    selectKey: (state: UIModuleState, keyboardKey: KeyboardKey) => state.selectedKey = keyboardKey,
+    selectKey: (state: UIModuleState, key: NiaKey) => state.selectedKey = key,
     unselectKey: (state: UIModuleState) => state.selectedKey = null,
 
-    selectModifier: (state: UIModuleState, modifier: Modifier) => state.selectedModifier = modifier,
+    selectModifier: (state: UIModuleState, modifier: NiaModifierDescription) => state.selectedModifier = modifier,
     unselectModifier: (state: UIModuleState) => state.selectedModifier = null,
 
     showAddModifierDialog: (state: UIModuleState) => state.addModifierDialogIsShown = true,

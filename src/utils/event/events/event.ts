@@ -1,33 +1,34 @@
 import {
-  NiaDefineKeyboardEvent, NiaDefineKeyboardEventSerialized,
-  NiaDefineModifierEvent, NiaDefineModifierEventSerialized,
-  NiaExecuteCodeEvent, NiaExecuteCodeEventSerialized,
-  NiaRemoveKeyboardEvent, NiaRemoveKeyboardEventSerialized,
-  NiaRemoveModifierEvent, NiaRemoveModifierEventSerialized,
-  NiaSynchronizeEvent, NiaSynchronizeEventSerialized,
+  NiaDefineDeviceEvent, NiaDefineDeviceEventObject, NiaDefineDeviceEventSerialized,
+  NiaDefineModifierEvent, NiaDefineModifierEventObject, NiaDefineModifierEventSerialized,
+  NiaExecuteCodeEvent, NiaExecuteCodeEventObject, NiaExecuteCodeEventSerialized,
+  NiaRemoveDeviceEvent, NiaRemoveDeviceEventObject, NiaRemoveDeviceEventSerialized,
+  NiaRemoveModifierEvent, NiaRemoveModifierEventObject, NiaRemoveModifierEventSerialized,
+  NiaSynchronizeEvent, NiaSynchronizeEventObject, NiaSynchronizeEventSerialized,
 } from './index'
-import SerializableObject from '../../serializableObj'
+
+import SerializableObject from '@/utils/serializable-object'
 
 export enum NiaEventType {
-  NiaDefineKeyboardEvent,
-  NiaDefineModifierEvent,
-  NiaExecuteCodeEvent,
-  NiaRemoveKeyboardEvent,
-  NiaRemoveModifierEvent,
-  NiaSynchronizeEvent
+  DefineDevice,
+  DefineModifier,
+  ExecuteCode,
+  RemoveDevice,
+  RemoveModifier,
+  Synchronize
 }
 
-export type NiaEventUnderlyingTypeSerialized = NiaDefineKeyboardEventSerialized |
+export type NiaEventUnderlyingTypeSerialized = NiaDefineDeviceEventSerialized |
   NiaDefineModifierEventSerialized |
   NiaExecuteCodeEventSerialized |
-  NiaRemoveKeyboardEventSerialized |
+  NiaRemoveDeviceEventSerialized |
   NiaRemoveModifierEventSerialized |
   NiaSynchronizeEventSerialized
 
-export type NiaEventUnderlyingType = NiaDefineKeyboardEvent |
+export type NiaEventUnderlyingType = NiaDefineDeviceEvent |
   NiaDefineModifierEvent |
   NiaExecuteCodeEvent |
-  NiaRemoveKeyboardEvent |
+  NiaRemoveDeviceEvent |
   NiaRemoveModifierEvent |
   NiaSynchronizeEvent
 
@@ -37,38 +38,40 @@ export interface NiaEventSerialized {
 }
 
 export class NiaEvent implements SerializableObject<NiaEvent, NiaEventSerialized> {
+  private readonly eventType: NiaEventType
   private readonly event: NiaEventUnderlyingType
 
   constructor(event: NiaEventUnderlyingType) {
+    this.eventType = event.getEventType()
     this.event = event
   }
 
-  isDefineKeyboardEvent(): boolean {
-    return this.event instanceof NiaDefineKeyboardEvent
+  isDefineDeviceEvent(): boolean {
+    return this.eventType === NiaEventType.DefineDevice
   }
 
   isDefineModifierEvent(): boolean {
-    return this.event instanceof NiaDefineModifierEvent
+    return this.eventType === NiaEventType.DefineModifier
   }
 
   isExecuteCodeEvent(): boolean {
-    return this.event instanceof NiaExecuteCodeEvent
+    return this.eventType === NiaEventType.ExecuteCode
   }
 
-  isRemoveKeyboardEvent(): boolean {
-    return this.event instanceof NiaRemoveKeyboardEvent
+  isRemoveDeviceEvent(): boolean {
+    return this.eventType === NiaEventType.RemoveDevice
   }
 
   isRemoveModifierEvent(): boolean {
-    return this.event instanceof NiaRemoveModifierEvent
+    return this.eventType === NiaEventType.RemoveModifier
   }
 
   isSynchronizeEvent(): boolean {
-    return this.event instanceof NiaSynchronizeEvent
+    return this.eventType === NiaEventType.Synchronize
   }
 
-  takeDefineKeyboardEvent(): NiaDefineKeyboardEvent {
-    return this.event as NiaDefineKeyboardEvent
+  takeDefineDeviceEvent(): NiaDefineDeviceEvent {
+    return this.event as NiaDefineDeviceEvent
   }
 
   takeDefineModifierEvent(): NiaDefineModifierEvent {
@@ -79,8 +82,8 @@ export class NiaEvent implements SerializableObject<NiaEvent, NiaEventSerialized
     return this.event as NiaExecuteCodeEvent
   }
 
-  takeRemoveKeyboardEvent(): NiaRemoveKeyboardEvent {
-    return this.event as NiaRemoveKeyboardEvent
+  takeRemoveDeviceEvent(): NiaRemoveDeviceEvent {
+    return this.event as NiaRemoveDeviceEvent
   }
 
   takeRemoveModifierEvent(): NiaRemoveModifierEvent {
@@ -93,33 +96,33 @@ export class NiaEvent implements SerializableObject<NiaEvent, NiaEventSerialized
 
   static deserialize(serialized: NiaEventSerialized): NiaEvent {
     switch (serialized.eventType) {
-      case NiaEventType.NiaDefineKeyboardEvent:
-        const defineKeyboardEventSerialized = serialized.event as NiaDefineKeyboardEventSerialized
-        const defineKeyboardEvent = NiaDefineKeyboardEvent.deserialize(defineKeyboardEventSerialized)
+      case NiaEventType.DefineDevice:
+        const defineKeyboardEventSerialized = serialized.event as NiaDefineDeviceEventObject
+        const defineKeyboardEvent = NiaDefineDeviceEvent.deserialize(defineKeyboardEventSerialized)
         return new NiaEvent(defineKeyboardEvent)
       
-      case NiaEventType.NiaDefineModifierEvent:
-        const defineModifierEventSerialized = serialized.event as NiaDefineModifierEventSerialized
+      case NiaEventType.DefineModifier:
+        const defineModifierEventSerialized = serialized.event as NiaDefineModifierEventObject
         const defineModifierEvent = NiaDefineModifierEvent.deserialize(defineModifierEventSerialized)
         return new NiaEvent(defineModifierEvent)
       
-      case NiaEventType.NiaExecuteCodeEvent:
-        const executeCodeEventSerialized = serialized.event as NiaExecuteCodeEventSerialized
+      case NiaEventType.ExecuteCode:
+        const executeCodeEventSerialized = serialized.event as NiaExecuteCodeEventObject
         const executeCodeEvent = NiaExecuteCodeEvent.deserialize(executeCodeEventSerialized)
         return new NiaEvent(executeCodeEvent)
       
-      case NiaEventType.NiaRemoveKeyboardEvent:
-        const removeKeyboardEventSerialized = serialized.event as NiaRemoveKeyboardEventSerialized
-        const removeKeyboardEvent = NiaRemoveKeyboardEvent.deserialize(removeKeyboardEventSerialized)
+      case NiaEventType.RemoveDevice:
+        const removeKeyboardEventSerialized = serialized.event as NiaRemoveDeviceEventObject
+        const removeKeyboardEvent = NiaRemoveDeviceEvent.deserialize(removeKeyboardEventSerialized)
         return new NiaEvent(removeKeyboardEvent)
       
-      case NiaEventType.NiaRemoveModifierEvent:
-        const removeModifierEventSerialized = serialized.event as NiaRemoveModifierEventSerialized
+      case NiaEventType.RemoveModifier:
+        const removeModifierEventSerialized = serialized.event as NiaRemoveModifierEventObject
         const removeModifierEvent = NiaRemoveModifierEvent.deserialize(removeModifierEventSerialized)
         return new NiaEvent(removeModifierEvent)
       
-      case NiaEventType.NiaSynchronizeEvent:
-        const synchronizeEventSerialized = serialized.event as NiaSynchronizeEventSerialized
+      case NiaEventType.Synchronize:
+        const synchronizeEventSerialized = serialized.event as NiaSynchronizeEventObject
         const synchronizeEvent = NiaSynchronizeEvent.deserialize(synchronizeEventSerialized)
         return new NiaEvent(synchronizeEvent)
       
@@ -129,39 +132,40 @@ export class NiaEvent implements SerializableObject<NiaEvent, NiaEventSerialized
   }
 
   serialize(): NiaEventSerialized {
-    // todo: probably remove type as type casting, because they may be unnecessary
-    if (this.event instanceof NiaDefineKeyboardEvent) {
-      return {
-        eventType: NiaEventType.NiaDefineKeyboardEvent,
-        event: (this.event as NiaDefineKeyboardEvent).serialize()
-      }
-    } else if (this.event instanceof NiaDefineModifierEvent) {
-      return {
-        eventType: NiaEventType.NiaDefineModifierEvent,
-        event: (this.event as NiaDefineModifierEvent).serialize()
-      }
-    } else if (this.event instanceof NiaExecuteCodeEvent) {
-      return {
-        eventType: NiaEventType.NiaExecuteCodeEvent,
-        event: (this.event as NiaExecuteCodeEvent).serialize()
-      }
-    } else if (this.event instanceof NiaRemoveKeyboardEvent) {
-      return {
-        eventType: NiaEventType.NiaRemoveKeyboardEvent,
-        event: (this.event as NiaRemoveKeyboardEvent).serialize()
-      }
-    } else if (this.event instanceof NiaRemoveModifierEvent) {
-      return {
-        eventType: NiaEventType.NiaRemoveModifierEvent,
-        event: (this.event as NiaRemoveModifierEvent).serialize()
-      }
-    } else if (this.event instanceof NiaSynchronizeEvent) {
-      return {
-        eventType: NiaEventType.NiaSynchronizeEvent,
-        event: (this.event as NiaSynchronizeEvent).serialize()
-      }
-    } else {
-      throw new Error('Unknown event to serialize.')
+    switch (this.eventType) {
+      case NiaEventType.DefineDevice:
+        return {
+          eventType: this.eventType,
+          event: (this.event as NiaDefineDeviceEvent).serialize()
+        }
+      case NiaEventType.DefineModifier:
+        return {
+          eventType: this.eventType,
+          event: (this.event as NiaDefineModifierEvent).serialize()
+        }
+      case NiaEventType.ExecuteCode:
+        return {
+          eventType: this.eventType,
+          event: (this.event as NiaExecuteCodeEvent).serialize()
+        }
+      case NiaEventType.RemoveDevice:
+        return {
+          eventType: this.eventType,
+          event: (this.event as NiaRemoveDeviceEvent).serialize()
+        }
+      case NiaEventType.RemoveModifier:
+        return {
+          eventType: this.eventType,
+          event: (this.event as NiaRemoveModifierEvent).serialize()
+        }
+      case NiaEventType.Synchronize:
+        return {
+          eventType: this.eventType,
+          event: (this.event as NiaSynchronizeEvent).serialize()
+        }
+
+      default:
+        throw new Error('Unknown event type')
     }
   }
 }

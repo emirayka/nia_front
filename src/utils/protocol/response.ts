@@ -48,6 +48,14 @@ export class NiaResponse {
     this.responseType = response.getType()
   }
 
+  getResponseType(): NiaResponseType {
+    return this.responseType
+  }
+
+  getResponse(): NiaResponseUnderlyingType {
+    return this.response
+  }
+
   static fromPB(responsePB: Response): NiaResponse {
     switch (responsePB.getResponseCase()) {
       case Response.ResponseCase.DEFINE_DEVICE_RESPONSE:
@@ -143,5 +151,11 @@ export class NiaResponse {
       default:
         throw new Error('Unknown response')
     }
+  }
+
+  static fromUint8Array(bytes: Uint8Array): NiaResponse {
+    let response: Response = Response.deserializeBinary(bytes)
+
+    return NiaResponse.fromPB(response)
   }
 }

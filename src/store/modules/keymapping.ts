@@ -1,10 +1,11 @@
-import {DeviceInfo, ExecutionResult} from '@/store/models'
-import {Modifier} from '@/store/models/modifier'
 import Vue from 'vue'
 
+import {ExecutionResult} from '@/store/models'
+import {NiaDeviceInfo, NiaModifierDescription} from '@/utils'
+
 export interface KeymappingModuleState {
-  devicesInfo: Array<DeviceInfo>
-  modifiers: Array<Modifier>,
+  devicesInfo: Array<NiaDeviceInfo>
+  definedModifiers: Array<NiaModifierDescription>,
   code: string
   log: Array<ExecutionResult>
   version: string
@@ -15,18 +16,18 @@ export default {
   namespaced: true as true,
   state: {
     devicesInfo: [],
-    modifiers: [],
+    definedModifiers: [],
     code: '',
     log: [],
     version: '',
     info: '',
   } as KeymappingModuleState,
   mutations: {
-    setModifiers(state: KeymappingModuleState, modifiers: Array<Modifier>) {
-      state.modifiers.splice(0)
-      state.modifiers.push(...modifiers)
+    setModifiers(state: KeymappingModuleState, modifiers: Array<NiaModifierDescription>) {
+      state.definedModifiers.splice(0)
+      state.definedModifiers.push(...modifiers)
     },
-    setDevicesInfo(state: KeymappingModuleState, devicesInfo: Array<DeviceInfo>) {
+    setDevicesInfo(state: KeymappingModuleState, devicesInfo: Array<NiaDeviceInfo>) {
       state.devicesInfo = devicesInfo
     },
     setVersion(state: KeymappingModuleState, version: string) {
@@ -59,87 +60,86 @@ export default {
 
       state.log.push(logItem)
     },
-    makeKeyboardDefined(state: KeymappingModuleState, keyboardPath: string) {
+    makeDeviceDefined(state: KeymappingModuleState, devicePath: string) {
       for (let deviceInfo of state.devicesInfo) {
-        if (deviceInfo.path === keyboardPath) {
-          deviceInfo.defined = true
+        if (deviceInfo.getDevicePath() === devicePath) {
+          deviceInfo.setDefined(true)
           break
         }
       }
     },
-    makeKeyboardRemoved(state: KeymappingModuleState, keyboardPath: string) {
+    makeDeviceRemoved(state: KeymappingModuleState, devicePath: string) {
       for (let deviceInfo of state.devicesInfo) {
-        if (deviceInfo.path === keyboardPath) {
-          deviceInfo.defined = false
+        if (deviceInfo.getDevicePath() === devicePath) {
+          deviceInfo.setDefined(true)
           break
         }
       }
     },
-    defineModifier: (state: KeymappingModuleState, modifier: Modifier) => {
+    defineModifier: (state: KeymappingModuleState, modifier: NiaModifierDescription) => {
       // todo: show error when modifier is already defined
-      state.modifiers.push(
+      state.definedModifiers.push(
         modifier
       )
     },
-    removeModifier: (state: KeymappingModuleState, selectedModifier: Modifier) => {
-      state.modifiers = state.modifiers.filter(
-        (modifier) => modifier.keyboardKey.keyCode != selectedModifier.keyboardKey.keyCode ||
-          modifier.keyboardKey.keyboardPath != selectedModifier.keyboardKey.keyboardPath
+    removeModifier: (state: KeymappingModuleState, selectedModifier: NiaModifierDescription) => {
+      state.definedModifiers = state.definedModifiers.filter(
+        (modifier) => !modifier.equals(selectedModifier)
       )
     },
   },
   getters: {
-    keyboards: (state: KeymappingModuleState) => state.devicesInfo,
-    modifiers: (state: KeymappingModuleState) => state.modifiers,
+    devices: (state: KeymappingModuleState) => state.devicesInfo,
+    definedModifiers: (state: KeymappingModuleState) => state.definedModifiers,
     version: (state: KeymappingModuleState) => state.version,
     info: (state: KeymappingModuleState) => state.info,
 
-    keyboardNames: (state: KeymappingModuleState) => {
+    deviceNames: (state: KeymappingModuleState) => {
       return state.devicesInfo
-        .map((deviceInfo: DeviceInfo) => deviceInfo.name)
+        .map((deviceInfo: NiaDeviceInfo) => deviceInfo.getDeviceName())
     },
 
-    getKeyboardPathByName: (state: KeymappingModuleState) => (keyboardName: string) => {
-      const filtered: Array<DeviceInfo> = state.devicesInfo
-        .filter((deviceInfo: DeviceInfo) => deviceInfo.name === keyboardName)
+    getDevicePathByName: (state: KeymappingModuleState) => (deviceName: string) => {
+      const filtered: Array<NiaDeviceInfo> = state.devicesInfo
+        .filter((deviceInfo: NiaDeviceInfo) => deviceInfo.getDeviceName() === deviceName)
 
       return filtered.length > 0
-        ? filtered[0].path
+        ? filtered[0].getDevicePath()
         : null
     },
 
-    getKeyboardByName: (state: KeymappingModuleState) => (keyboardName: string) => {
-      let filtered: Array<DeviceInfo> = state
+    getDeviceByName: (state: KeymappingModuleState) => (deviceName: string) => {
+      let filtered: Array<NiaDeviceInfo> = state
         .devicesInfo
-        .filter((deviceInfo: DeviceInfo) => deviceInfo.name === keyboardName)
+        .filter((deviceInfo: NiaDeviceInfo) => deviceInfo.getDeviceName() === deviceName)
 
       return filtered.length > 0
         ? filtered[0]
         : null
     },
 
-    getKeyboardByPath: (state: KeymappingModuleState) => (keyboardPath: string) => {
-      let filtered: Array<DeviceInfo> = state
+    getDeviceByPath: (state: KeymappingModuleState) => (deviceName: string) => {
+      let filtered: Array<NiaDeviceInfo> = state
         .devicesInfo
-        .filter((deviceInfo: DeviceInfo) => deviceInfo.path === keyboardPath)
+        .filter((deviceInfo: NiaDeviceInfo) => deviceInfo.getDevicePath() === deviceName)
 
       return filtered.length > 0
         ? filtered[0]
         : null
     },
 
-    isKeyboardDefined: (state: KeymappingModuleState) => (keyboardPath: string) => {
+    isDeviceDefined: (state: KeymappingModuleState) => (devicePath: string) => {
       for (let deviceInfo of state.devicesInfo) {
-        if (deviceInfo.path === keyboardPath) {
-          return deviceInfo.defined
+        if (deviceInfo.getDevicePath() === devicePath) {
+          return deviceInfo.isDefined
         }
       }
 
       return null
     },
-    isModifierAlreadyDefined: (state: KeymappingModuleState) => (keyboardPath: string, keyCode: number) => {
-      for (const modifier of state.modifiers) {
-        if (modifier.keyboardKey.keyCode === keyCode && modifier.keyboardKey.keyboardPath == keyboardPath) {
+    isModifierAlreadyDefined: (state: KeymappingModuleState) => (deviceId: number, keyCode: number) => {
+      for (const modifier of state.definedModifiers) {
+        if (modifier.getKey().getKeyCode() === keyCode && modifier.getKey().getDeviceId() == deviceId) {
           return true
         }
       }

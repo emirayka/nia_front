@@ -1,22 +1,27 @@
 import {
-  NiaEvent
+  NiaEvent, NiaEventType,
 } from '@/utils/event'
-import {NiaDefineModifierEventSerialized} from '@/utils/event/events/define-modifier-event'
-import SerializableObject from '../../serializableObj'
+import SerializableObject from '@/utils/serializable-object'
 
-export interface NiaExecuteCodeEventSerialized {
+export interface NiaExecuteCodeEventObject {
   code: string
 }
+
+export type NiaExecuteCodeEventSerialized = NiaExecuteCodeEventObject
 
 export class NiaExecuteCodeEvent implements SerializableObject<NiaExecuteCodeEvent, NiaExecuteCodeEventSerialized> {
   private readonly code: string
 
-  constructor(code: string) {
-    this.code = code
+  constructor(args: NiaExecuteCodeEventObject) {
+    this.code = args.code
   }
 
   getCode(): string {
     return this.code
+  }
+
+  getEventType(): NiaEventType {
+    return NiaEventType.ExecuteCode
   }
 
   toEvent(): NiaEvent {
@@ -32,8 +37,8 @@ export class NiaExecuteCodeEvent implements SerializableObject<NiaExecuteCodeEve
   }
 
   static deserialize(obj: NiaExecuteCodeEventSerialized): NiaExecuteCodeEvent {
-    return new NiaExecuteCodeEvent(
-      obj.code,
-    )
+    const args: NiaExecuteCodeEventObject = obj
+
+    return new NiaExecuteCodeEvent(args)
   }
 }

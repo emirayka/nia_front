@@ -1,28 +1,30 @@
 import {
-  NiaEvent
+  NiaEvent, NiaEventType,
 } from '@/utils/event'
 
-import SerializableObject from '../../serializableObj'
+import SerializableObject from '@/utils/serializable-object'
 
-export interface NiaDefineModifierEventSerialized {
-  keyboardPath: string
+export interface NiaDefineModifierEventObject {
+  keyboardId: number
   keyCode: number
   modifierAlias: string
 }
 
+export type NiaDefineModifierEventSerialized = NiaDefineModifierEventObject
+
 export class NiaDefineModifierEvent implements SerializableObject<NiaDefineModifierEvent, NiaDefineModifierEventSerialized> {
-  private readonly keyboardPath: string
+  private readonly keyboardId: number
   private readonly keyCode: number
   private readonly modifierAlias: string
 
-  constructor(keyboardPath: string, keyCode: number, modifierAlias: string) {
-    this.keyboardPath = keyboardPath
-    this.keyCode = keyCode
-    this.modifierAlias = modifierAlias
+  constructor(args: NiaDefineModifierEventObject) {
+    this.keyboardId = args.keyboardId
+    this.keyCode = args.keyCode
+    this.modifierAlias = args.modifierAlias
   }
 
-  getKeyboardPath(): string {
-    return this.keyboardPath
+  getDeviceId(): number {
+    return this.keyboardId
   }
 
   getKeyCode(): number {
@@ -33,25 +35,27 @@ export class NiaDefineModifierEvent implements SerializableObject<NiaDefineModif
     return this.modifierAlias
   }
 
+  getEventType(): NiaEventType {
+    return NiaEventType.DefineModifier
+  }
+
   toEvent(): NiaEvent {
     const niaEvent = new NiaEvent(this)
 
     return niaEvent
   }
 
-  serialize(): NiaDefineModifierEventSerialized {
+  serialize(): NiaDefineModifierEventObject {
     return {
-      keyboardPath: this.keyboardPath,
+      keyboardId: this.keyboardId,
       keyCode: this.keyCode,
-      modifierAlias: this.modifierAlias,
+      modifierAlias: this.modifierAlias
     }
   }
 
   static deserialize(obj: NiaDefineModifierEventSerialized): NiaDefineModifierEvent {
-    return new NiaDefineModifierEvent(
-      obj.keyboardPath,
-      obj.keyCode,
-      obj.modifierAlias,
-    )
+    const args: NiaDefineModifierEventObject = obj
+
+    return new NiaDefineModifierEvent(args)
   }
 }

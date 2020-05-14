@@ -2,7 +2,7 @@ import {
   Request,
   ExecuteCodeRequest,
 } from 'nia-protocol-js'
-import {NiaRequestType, SerializablePB} from '@/utils'
+import {NiaRequest, NiaRequestType, SerializablePB} from '@/utils'
 
 export class NiaExecuteCodeRequest implements SerializablePB<NiaExecuteCodeRequest, ExecuteCodeRequest> {
   private readonly code: string
@@ -17,6 +17,10 @@ export class NiaExecuteCodeRequest implements SerializablePB<NiaExecuteCodeReque
 
   getType(): NiaRequestType {
     return NiaRequestType.ExecuteCode
+  }
+
+  toRequest(): NiaRequest {
+    return new NiaRequest(this)
   }
 
   toPB(): ExecuteCodeRequest {

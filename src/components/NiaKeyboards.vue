@@ -55,7 +55,7 @@
 
   import {DeviceInfo, KeyboardKey} from '@/store/models'
   import store from '@/store'
-  import {NiaDefineKeyboardEvent, NiaRemoveKeyboardEvent} from '@/utils'
+  import {NiaDefineDeviceEvent, NiaRemoveDeviceEvent} from '@/utils'
 
   @Component({
     name: 'NiaKeyboards',
@@ -76,14 +76,14 @@
 
     switchHandler(deviceInfo: DeviceInfo, event: boolean): void {
       if (event) {
-        const defineKeyboardEvent: NiaDefineKeyboardEvent =  new NiaDefineKeyboardEvent(
+        const defineKeyboardEvent: NiaDefineDeviceEvent =  new NiaDefineDeviceEvent(
             deviceInfo.path,
             deviceInfo.name,
         )
 
         this.$emit('define-keyboard', defineKeyboardEvent)
       } else {
-        const removeKeyboardEvent: NiaRemoveKeyboardEvent =  new NiaRemoveKeyboardEvent(
+        const removeKeyboardEvent: NiaRemoveDeviceEvent =  new NiaRemoveDeviceEvent(
           deviceInfo.path,
         )
 
