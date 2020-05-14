@@ -1,7 +1,7 @@
 import WebSocket from 'ws'
 import {err, ok, Result} from 'neverthrow'
 
-import {InvalidResponseError} from '@/background-utils/error'
+import {InvalidResponseError} from '@/utils/error'
 
 import {
   NiaExecuteCodeResult,
@@ -21,12 +21,19 @@ import {
   NiaDefineKeyboardRequest,
   NiaDefineKeyboardResponse,
   NiaDefineKeyboardResult,
-  NiaRemoveKeyboardByPathRequest,
+  NiaRemoveDeviceByPathRequest,
   NiaRemoveKeyboardByPathResponse,
   NiaRemoveKeyboardByPathResult,
-  NiaRemoveKeyboardByNameResult, NiaRemoveKeyboardByNameResponse, NiaRemoveKeyboardByNameRequest,
-} from '@/background-utils/protocol'
-import NiaDefineModifierRequest from '@/background-utils/protocol/request/define-modifier-request'
+  NiaRemoveKeyboardByNameResult,
+  NiaRemoveKeyboardByNameResponse,
+  NiaRemoveDeviceByNameRequest,
+  NiaDefineModifierResponse,
+  NiaDefineModifierRequest,
+  NiaDefineModifierResult,
+  NiaRemoveModifierRequest,
+  NiaRemoveModifierResponse,
+  NiaRemoveModifierResult, NiaGetDefinedModifiersResult, NiaGetDefinedModifiersResponse, NiaGetDefinedModifiersRequest,
+} from '@/utils/protocol'
 
 export default class {
   private port: number
@@ -69,7 +76,7 @@ export default class {
       })
 
       const request: NiaHandshakeRequest = new NiaHandshakeRequest()
-      const data: Uint8Array = request.toRequest().serializeBinary()
+      const data: Uint8Array = request.toPB().serializeBinary()
       this.ws.send(data)
     })
   }
@@ -88,7 +95,7 @@ export default class {
       })
 
       const request: NiaGetDevicesRequest = new NiaGetDevicesRequest()
-      const data: Uint8Array = request.toResponse().serializeBinary()
+      const data: Uint8Array = request.toPB().serializeBinary()
       this.ws.send(data)
     })
   }
@@ -107,13 +114,13 @@ export default class {
       })
 
       const request = new NiaGetDeviceInfoRequest(devicePath)
-      const data: Uint8Array = request.to_request().serializeBinary()
+      const data: Uint8Array = request.toRequest().serializeBinary()
       this.ws.send(data)
     })
   }
 
   async getMultipleDeviceInfo(getDevicesResponse: NiaGetDevicesResult): Promise<Array<NiaGetDeviceInfoResult>> {
-    const devices: Array<string> = getDevicesResponse.devices;
+    const devices: Array<string> = getDevicesResponse.getDevices();
     const devicesInfo: Array<NiaGetDeviceInfoResult> = []
 
     for (let device of devices) {
@@ -138,7 +145,7 @@ export default class {
       })
 
       const request: NiaExecuteCodeRequest = new NiaExecuteCodeRequest(code)
-      const data: Uint8Array = request.toRequest().serializeBinary()
+      const data: Uint8Array = request.toPB().serializeBinary()
 
       this.ws.send(data)
     })
@@ -158,7 +165,7 @@ export default class {
       })
 
       const request: NiaDefineKeyboardRequest = new NiaDefineKeyboardRequest(keyboardPath, keyboardName)
-      const data: Uint8Array = request.toRequest().serializeBinary()
+      const data: Uint8Array = request.toPB().serializeBinary()
 
       this.ws.send(data)
     })
@@ -177,8 +184,8 @@ export default class {
         }
       })
 
-      const request: NiaRemoveKeyboardByPathRequest = new NiaRemoveKeyboardByPathRequest(keyboardPath)
-      const data: Uint8Array = request.toRequest().serializeBinary()
+      const request: NiaRemoveDeviceByPathRequest = new NiaRemoveDeviceByPathRequest(keyboardPath)
+      const data: Uint8Array = request.toPB().serializeBinary()
 
       this.ws.send(data)
     })
@@ -197,18 +204,18 @@ export default class {
         }
       })
 
-      const request: NiaRemoveKeyboardByNameRequest = new NiaRemoveKeyboardByNameRequest(keyboardName)
-      const data: Uint8Array = request.toRequest().serializeBinary()
+      const request: NiaRemoveDeviceByNameRequest = new NiaRemoveDeviceByNameRequest(keyboardName)
+      const data: Uint8Array = request.toPB().serializeBinary()
 
       this.ws.send(data)
     })
   }
 
-  addModifier(keyboardPath: string, keyCode: number, modifierAlias: string): Promise<NiaRemoveKeyboardByNameResult> {
+  getDefinedModifiers(): Promise<NiaGetDefinedModifiersResult> {
     return new Promise((resolve, reject) => {
       this.ws.once('message', message => {
         if (message instanceof Uint8Array) {
-          const response: Result<NiaRemoveKeyboardByNameResponse, InvalidResponseError> = NiaRemoveKeyboardByNameResponse.fromUInt8Array(message)
+          const response: Result<NiaGetDefinedModifiersResponse, InvalidResponseError> = NiaGetDefinedModifiersResponse.fromUInt8Array(message)
 
           response.andThen((response) => response.toResult())
             .match(resolve, reject)
@@ -217,10 +224,60 @@ export default class {
         }
       })
 
-      const request: NiaDefineModifierRequest = new NiaDefineModifierRequest(keyboardPath, keyCode)
-      const data: Uint8Array = request.toRequest().serializeBinary()
+      const request: NiaGetDefinedModifiersRequest = new NiaGetDefinedModifiersRequest()
+      const data: Uint8Array = request.toPB().serializeBinary()
 
       this.ws.send(data)
+    })
+  }
+
+  defineModifier(keyboardPath: string, keyCode: number, modifierAlias: string): Promise<NiaDefineModifierResult> {
+    return new Promise((resolve, reject) => {
+      this.ws.once('message', message => {
+        if (message instanceof Uint8Array) {
+          const response: Result<NiaDefineModifierResponse, InvalidResponseError> = NiaDefineModifierResponse.fromUInt8Array(message)
+          console.log(response)
+
+          response.andThen((response) => response.toResult())
+            .match(resolve, reject)
+        } else {
+          reject()
+        }
+      })
+
+      const request: NiaDefineModifierRequest = new NiaDefineModifierRequest(
+        keyboardPath,
+        keyCode,
+        modifierAlias
+      )
+      const data: Uint8Array = request.toPB().serializeBinary()
+
+      this.ws.send(data)
+    })
+  }
+
+  async removeModifier(keyboardPath: string, keyCode: number) : Promise<NiaRemoveModifierResult> {
+    return new Promise((resolve, reject) => {
+      this.ws.once('message', message => {
+        if (message instanceof Uint8Array) {
+          const response: Result<NiaRemoveModifierResponse, InvalidResponseError> = NiaRemoveModifierResponse.fromUInt8Array(message)
+          console.log(response)
+
+          response.andThen((response) => response.toResult())
+            .match(resolve, reject)
+        } else {
+          reject()
+        }
+      })
+
+      const request: NiaRemoveModifierRequest = new NiaRemoveModifierRequest(
+        keyboardPath,
+        keyCode,
+      )
+      const data: Uint8Array = request.toPB().serializeBinary()
+
+      this.ws.send(data)
+      console.log('Sent remove modifier request')
     })
   }
 }

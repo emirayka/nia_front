@@ -1,5 +1,8 @@
 <template>
-  <tr class="nia-table-row">
+  <tr
+    class="nia-table-row"
+    @click="$emit('click', $event)"
+  >
     <slot></slot>
   </tr>
 </template>

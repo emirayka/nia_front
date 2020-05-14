@@ -1,4 +1,4 @@
-export default interface ExecutionResult {
+export interface ExecutionResult {
   message: string
   success: boolean
   error: boolean

@@ -34,7 +34,9 @@
   import Component from 'vue-class-component'
 
   import store from '@/store'
-  import ExecutionResult from '@/store/models/execution-result'
+  import {
+    ExecutionResult
+  } from '@/store/models'
 
   @Component({
     name: "Editor",

@@ -1,6 +1,6 @@
-import KeyboardModel from '@/store/models/keyboard-model'
+import {KeyboardModel} from '@/store/models'
 
-export default interface DeviceInfo {
+export interface DeviceInfo {
   path: string
   name: string
   model: KeyboardModel

@@ -15,7 +15,7 @@
 
   import {
     mapKeyCodeToString,
-  } from '@/background-utils/utils'
+  } from '@/utils/utils'
 
   @Component({
     name: 'NiaKeyboardKey',

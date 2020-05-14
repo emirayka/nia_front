@@ -1,21 +1,8 @@
-import ExecuteCodeEventResponse from './execute-code-event-response'
+export * from './define-keyboard-event-response'
+export * from './define-modifier-event-response'
+export * from './execute-code-event-response'
+export * from './remove-keyboard-event-response'
+export * from './remove-modifier-event-response'
+export * from './synchronize-event-response'
 
-import DefineKeyboardEventResponse from './define-keyboard-event-response'
-import RemoveKeyboardEventResponse from './remove-keyboard-event-response'
-
-import DefineModifierEventResponse from './define-modifier-event-response'
-import RemoveModifierEventResponse from './remove-modifier-event-response'
-
-import NiaSynchronizeEventResponse from './synchronize-event-response'
-
-export {
-  ExecuteCodeEventResponse,
-
-  DefineKeyboardEventResponse,
-  RemoveKeyboardEventResponse,
-
-  DefineModifierEventResponse,
-  RemoveModifierEventResponse,
-
-  NiaSynchronizeEventResponse
-}
+export * from './event-response'

@@ -1,8 +1,17 @@
-import NiaRemoveModifierEvent from '@/utils/event/events/remove-modifier-event'
-import NiaRemoveModifierResult from '@/utils/protocol/result/remove-modifier-result'
-import NiaEventResponse from '@/utils/event/response/response'
+import {
+  NiaRemoveModifierEvent,
+  NiaRemoveModifierResult,
+  NiaEventResponse, NiaRemoveModifierEventSerialized, NiaRemoveModifierResultSerialized,
+} from '@/utils'
+import SerializableObject from '../../serializableObj'
+import {Modifier} from '@/store/models/modifier'
 
-export default class NiaRemoveModifierEventResponse {
+export interface NiaRemoveModifierEventResponseSerialized {
+  removeModifierEventSerialized: NiaRemoveModifierEventSerialized,
+  removeModifierResultSerialized: NiaRemoveModifierResultSerialized,
+}
+
+export class NiaRemoveModifierEventResponse implements SerializableObject<NiaRemoveModifierEventResponse, NiaRemoveModifierEventResponseSerialized> {
   private readonly keyboardPath: string
   private readonly keyCode: number
 
@@ -49,5 +58,40 @@ export default class NiaRemoveModifierEventResponse {
     const niaEventResponse = new NiaEventResponse(this)
 
     return niaEventResponse
+  }
+
+  toModifier(): Modifier {
+    return {
+      keyboardKey: {
+        keyboardPath: this.keyboardPath,
+        keyCode: this.keyCode
+      },
+      modifierAlias: '', // todo: fix?
+    }
+  }
+
+  static deserialize(serialized: NiaRemoveModifierEventResponseSerialized): NiaRemoveModifierEventResponse {
+    return new NiaRemoveModifierEventResponse(
+      NiaRemoveModifierEvent.deserialize(serialized.removeModifierEventSerialized),
+      NiaRemoveModifierResult.deserialize(serialized.removeModifierResultSerialized)
+    )
+  }
+
+  serialize(): NiaRemoveModifierEventResponseSerialized {
+    const removeModifierEventSerialized: NiaRemoveModifierEventSerialized = {
+      keyCode: this.keyCode,
+      keyboardPath: this.keyboardPath
+    }
+    const removeModifierResultSerialized: NiaRemoveModifierResultSerialized = {
+      message: this.message,
+      failure: this.failure,
+      error: this.error,
+      success: this.success,
+    }
+
+    return {
+      removeModifierEventSerialized,
+      removeModifierResultSerialized
+    }
   }
 }

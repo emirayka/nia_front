@@ -1,4 +1,4 @@
-export default interface KeyboardKey {
+export interface KeyboardKey {
   keyboardPath: string,
   keyCode: number
 }

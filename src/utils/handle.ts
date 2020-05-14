@@ -1,28 +1,34 @@
+import IpcMainEvent = Electron.IpcMainEvent
 import {ipcMain} from 'electron'
-
 import BrowserWindow = Electron.BrowserWindow
 
-import NiaEvent from '@/utils/event/events/event'
-import NiaEventResponse from '@/utils/event/responses/response'
-import {Protocol} from '@/utils/sockets'
-import NiaHandshakeResult from '@/utils/protocol/result/handshake-result'
 import {
+  NiaEvent,
+  NiaEventResponse,
   NiaDefineKeyboardResult,
   NiaExecuteCodeResult,
   NiaGetDeviceInfoResult,
-  NiaGetDevicesResult, NiaRemoveKeyboardByPathResponse, NiaRemoveKeyboardByPathResult,
-} from '@/utils/protocol'
-import NiaSynchronizeEvent from '@/utils/event/events/synchronize-event'
-import IpcMainEvent = Electron.IpcMainEvent
-import NiaExecuteCodeEvent from '@/utils/event/events/execute-code-event'
-import NiaDefineKeyboardEvent from '@/utils/event/events/define-keyboard-event'
-import NiaRemoveKeyboardEvent from '@/utils/event/events/remove-keyboard-event'
-import NiaDefineModifierEvent from '@/utils/event/events/define-modifier-event'
-import NiaRemoveModifierEvent from '@/utils/event/events/remove-modifier-event'
-import NiaExecuteCodeEventResponse from '@/utils/event/responses/execute-code-event-response'
-import NiaDefineKeyboardEventResponse from '@/utils/event/responses/define-keyboard-event-response'
-import NiaRemoveKeyboardEventResponse from '@/utils/event/responses/remove-keyboard-event-response'
-import NiaSynchronizeEventResponse from '@/utils/event/responses/synchronize-event-response'
+  NiaGetDevicesResult,
+  NiaRemoveKeyboardByPathResponse,
+  NiaRemoveKeyboardByPathResult,
+  NiaHandshakeResult,
+  NiaExecuteCodeEvent,
+  NiaDefineKeyboardEvent,
+  NiaRemoveKeyboardEvent,
+  NiaDefineModifierEvent,
+  NiaRemoveModifierEvent,
+  NiaExecuteCodeEventResponse,
+  NiaDefineKeyboardEventResponse,
+  NiaRemoveKeyboardEventResponse,
+  NiaSynchronizeEventResponse,
+  NiaSynchronizeEvent,
+  NiaEventSerialized,
+  NiaDefineModifierEventResponse,
+  NiaDefineModifierResult,
+  NiaRemoveModifierEventResponse, NiaRemoveModifierResult, NiaGetDefinedModifiersResult,
+} from '@/utils'
+
+import {Protocol} from '@/utils/sockets'
 
 const handleSynchronizeEvent = async (
   niaProtocol: Protocol,
@@ -33,13 +39,15 @@ const handleSynchronizeEvent = async (
   const handshakeResult: NiaHandshakeResult = await niaProtocol.handshake()
   const getDevicesResult: NiaGetDevicesResult = await niaProtocol.getDevices()
   const getDeviceInfoResults: Array<NiaGetDeviceInfoResult> = await niaProtocol.getMultipleDeviceInfo(
-    getDevicesResult
+    getDevicesResult,
   )
+  const getDefinedModifiersResult: NiaGetDefinedModifiersResult = await niaProtocol.getDefinedModifiers()
 
-  const synchronizeEventResponse: NiaSynchronizeEventResponse = new NiaSynchronizeEventResponse(
+  const synchronizeEventResponse: NiaSynchronizeEventResponse = NiaSynchronizeEventResponse.from(
     event,
     handshakeResult,
-    getDeviceInfoResults
+    getDeviceInfoResults,
+    getDefinedModifiersResult
   );
 
   return synchronizeEventResponse.toEventResponse()
@@ -73,7 +81,7 @@ const handleDefineKeyboardEvent = async (
 
   const defineKeyboardEventResponse: NiaDefineKeyboardEventResponse = new NiaDefineKeyboardEventResponse(
     event,
-    result
+    result,
   )
 
   return defineKeyboardEventResponse.toEventResponse()
@@ -90,28 +98,68 @@ const handleRemoveKeyboardEvent = async (
   const result: NiaRemoveKeyboardByPathResult = await niaProtocol.removeKeyboardByPath(keyboardPath)
   const removeKeyboardEventResponse: NiaRemoveKeyboardEventResponse = new NiaRemoveKeyboardEventResponse(
     event,
-    result
+    result,
   );
 
   return removeKeyboardEventResponse.toEventResponse()
 }
 
-// const handleDefineModifierEvent = async (
-//   niaProtocol: Protocol,
-//   event: NiaDefineModifierEvent,
-// ): Promise<NiaEventResponse> => {
-// }
-//
-// const handleRemoveModifierEvent = async (
-//   niaProtocol: Protocol,
-//   event: NiaRemoveModifierEvent,
-// ): Promise<NiaEventResponse> => {
-// }
+const handleDefineModifierEvent = async (
+  niaProtocol: Protocol,
+  event: NiaDefineModifierEvent,
+): Promise<NiaEventResponse> => {
+  await niaProtocol.isReady()
+
+  const keyboardPath = event.getKeyboardPath()
+  const keyCode = event.getKeyCode()
+  const modifierAlias = event.getModifierAlias()
+
+  const result: NiaDefineModifierResult = await niaProtocol.defineModifier(
+    keyboardPath,
+    keyCode,
+    modifierAlias,
+  )
+
+  const defineModifierEventResponse: NiaDefineModifierEventResponse = new NiaDefineModifierEventResponse(
+    event,
+    result,
+  );
+
+  return defineModifierEventResponse.toEventResponse()
+}
+
+const handleRemoveModifierEvent = async (
+  niaProtocol: Protocol,
+  event: NiaRemoveModifierEvent,
+): Promise<NiaEventResponse> => {
+  await niaProtocol.isReady()
+
+  const keyboardPath = event.getKeyboardPath()
+  const keyCode = event.getKeyCode()
+
+  console.log('Handler: Sent remove modifier event.')
+
+  const result: NiaRemoveModifierResult = await niaProtocol.removeModifier(
+    keyboardPath,
+    keyCode,
+  )
+
+  console.log('Handler: Got remove modifier result.')
+
+  const removeModifierEventResponse: NiaRemoveModifierEventResponse = new NiaRemoveModifierEventResponse(
+    event,
+    result,
+  );
+
+  return removeModifierEventResponse.toEventResponse()
+}
 
 const handleEvent = async (
   niaProtocol: Protocol,
   event: NiaEvent,
 ): Promise<NiaEventResponse> => {
+  console.log('Got event: ', event)
+
   if (event.isSynchronizeEvent()) {
     return handleSynchronizeEvent(niaProtocol, event.takeSynchronizeEvent())
   } else if (event.isExecuteCodeEvent()) {
@@ -120,37 +168,54 @@ const handleEvent = async (
     return handleDefineKeyboardEvent(niaProtocol, event.takeDefineKeyboardEvent())
   } else if (event.isRemoveKeyboardEvent()) {
     return handleRemoveKeyboardEvent(niaProtocol, event.takeRemoveKeyboardEvent())
-  // } else if (event.isDefineModifierEvent()) {
-  //   return handleDefineModifierEvent(niaProtocol, event.takeDefineModifierEvent())
-  // } else if (event.isRemoveModifierEvent()) {
-  //   return handleRemoveModifierEvent(niaProtocol, event.takeRemoveModifierEvent())
+  } else if (event.isDefineModifierEvent()) {
+    return handleDefineModifierEvent(niaProtocol, event.takeDefineModifierEvent())
+  } else if (event.isRemoveModifierEvent()) {
+    return handleRemoveModifierEvent(niaProtocol, event.takeRemoveModifierEvent())
   } else {
     throw new Error('Unknown event was passed')
   }
 }
 
-export type NiaHandler = (_: IpcMainEvent, event: NiaEvent) => void
+export type NiaHandler = (_: IpcMainEvent, serializedEvent: NiaEventSerialized) => void
 
 export const startHandler = async (
   win: BrowserWindow,
-  event: NiaEvent,
+  serializedEvent: NiaEventSerialized,
 ): Promise<NiaHandler> => {
-  if (!event.isSynchronizeEvent()) {
-    throw new Error('Expected synchronize event at first.')
-  }
+  try {
+    const event: NiaEvent = NiaEvent.deserialize(serializedEvent)
 
-  const niaProtocol: Protocol = new Protocol(12112)
-  await niaProtocol.isReady()
+    if (!event.isSynchronizeEvent()) {
+      throw new Error('Expected synchronize event at first.')
+    }
 
-  const eventResponse: NiaEventResponse = await handleSynchronizeEvent(
-    niaProtocol,
-    event.takeSynchronizeEvent()
-  )
-  win.webContents.send('nia-server-event-response', eventResponse)
+    const niaProtocol: Protocol = new Protocol(12112)
+    await niaProtocol.isReady()
 
-  return async (_: IpcMainEvent, event: NiaEvent) => {
-    const response = await handleEvent(niaProtocol, event)
+    const eventResponse: NiaEventResponse = await handleSynchronizeEvent(
+      niaProtocol,
+      event.takeSynchronizeEvent(),
+    )
+    const eventResponseSerialized = eventResponse.serialize()
+    win.webContents.send('nia-server-event-response', eventResponseSerialized)
 
-    win.webContents.send('nia-server-event-response', response)
+    return async (_: IpcMainEvent, serializedEvent: NiaEventSerialized) => {
+      try {
+        const event: NiaEvent = NiaEvent.deserialize(serializedEvent)
+        const eventResponse = await handleEvent(niaProtocol, event)
+        console.log('Got event response: ', eventResponse)
+
+        const eventResponseSerialized = eventResponse.serialize()
+        win.webContents.send('nia-server-event-response', eventResponseSerialized)
+      } catch (e) {
+        console.log('Error:')
+        console.log(e)
+      }
+    }
+  } catch (e) {
+    console.log('Error:')
+    console.log(e)
+    throw e
   }
 }

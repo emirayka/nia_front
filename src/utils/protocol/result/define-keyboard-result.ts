@@ -1,4 +1,13 @@
-export default class NiaDefineKeyboardResult {
+import SerializableObject from '../../serializableObj'
+
+export interface NiaDefineKeyboardResultSerialized {
+  message: string
+  failure: boolean
+  error: boolean
+  success: boolean
+}
+
+export class NiaDefineKeyboardResult implements SerializableObject<NiaDefineKeyboardResult, NiaDefineKeyboardResultSerialized> {
   private readonly message: string
   private readonly failure: boolean
   private readonly error: boolean
@@ -25,5 +34,23 @@ export default class NiaDefineKeyboardResult {
 
   getSuccess(): boolean {
     return this.success
+  }
+
+  static deserialize(serialized: NiaDefineKeyboardResultSerialized): NiaDefineKeyboardResult {
+    return new NiaDefineKeyboardResult(
+      serialized.message,
+      serialized.failure,
+      serialized.error,
+      serialized.success,
+    )
+  }
+
+  serialize(): NiaDefineKeyboardResultSerialized {
+    return {
+      message: this.message,
+      failure: this.failure,
+      error: this.error,
+      success: this.success,
+    }
   }
 }

@@ -1,21 +1,8 @@
-import ExecuteCodeEvent from './execute-code-event'
+export * from './define-keyboard-event'
+export * from './define-modifier-event'
+export * from './execute-code-event'
+export * from './remove-keyboard-event'
+export * from './remove-modifier-event'
+export * from './synchronize-event'
 
-import DefineKeyboardEvent from './define-keyboard-event'
-import RemoveKeyboardEvent from './remove-keyboard-event'
-
-import DefineModifierEvent from './define-modifier-event'
-import RemoveModifierEvent from './remove-modifier-event'
-
-import NiaSynchronizeEvent from './synchronize-event'
-
-export {
-  ExecuteCodeEvent,
-
-  DefineKeyboardEvent,
-  RemoveKeyboardEvent,
-
-  DefineModifierEvent,
-  RemoveModifierEvent,
-
-  NiaSynchronizeEvent
-}
+export * from './event'

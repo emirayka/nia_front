@@ -1,4 +1,6 @@
-import Theme from '@/store/models/theme'
+import {
+  Theme
+} from '@/store/models'
 
 export interface ThemeModuleState {
   theme: Theme

@@ -1,14 +1,10 @@
 import {DeviceInfo, ExecutionResult} from '@/store/models'
-import NiaGetDevicesResult from '@/background-utils/protocol/domain/get-devices-result'
-import {Protocol} from '@/background-utils'
-import {NiaHandshakeResponse} from '@/background-utils/protocol'
+import {Modifier} from '@/store/models/modifier'
 import Vue from 'vue'
-import KeyboardKey from '@/store/models/keyboard-key'
-import KeyDescription from '@/store/models/key-description'
 
 export interface KeymappingModuleState {
   devicesInfo: Array<DeviceInfo>
-  modifiers: Array<KeyboardKey>,
+  modifiers: Array<Modifier>,
   code: string
   log: Array<ExecutionResult>
   version: string
@@ -26,6 +22,10 @@ export default {
     info: '',
   } as KeymappingModuleState,
   mutations: {
+    setModifiers(state: KeymappingModuleState, modifiers: Array<Modifier>) {
+      state.modifiers.splice(0)
+      state.modifiers.push(...modifiers)
+    },
     setDevicesInfo(state: KeymappingModuleState, devicesInfo: Array<DeviceInfo>) {
       state.devicesInfo = devicesInfo
     },
@@ -75,8 +75,17 @@ export default {
         }
       }
     },
-    defineModifier: (state: KeymappingModuleState) => (keyboardPath: string, keyCode: number) => {
-
+    defineModifier: (state: KeymappingModuleState, modifier: Modifier) => {
+      // todo: show error when modifier is already defined
+      state.modifiers.push(
+        modifier
+      )
+    },
+    removeModifier: (state: KeymappingModuleState, selectedModifier: Modifier) => {
+      state.modifiers = state.modifiers.filter(
+        (modifier) => modifier.keyboardKey.keyCode != selectedModifier.keyboardKey.keyCode ||
+          modifier.keyboardKey.keyboardPath != selectedModifier.keyboardKey.keyboardPath
+      )
     },
   },
   getters: {
@@ -130,7 +139,7 @@ export default {
     },
     isModifierAlreadyDefined: (state: KeymappingModuleState) => (keyboardPath: string, keyCode: number) => {
       for (const modifier of state.modifiers) {
-        if (modifier.keyCode === keyCode && modifier.keyboardPath == keyboardPath) {
+        if (modifier.keyboardKey.keyCode === keyCode && modifier.keyboardKey.keyboardPath == keyboardPath) {
           return true
         }
       }

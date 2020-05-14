@@ -1,8 +1,18 @@
-import NiaDefineModifierResult from '@/utils/protocol/result/define-modifier-result'
-import NiaDefineModifierEvent from '@/utils/event/events/define-modifier-event'
-import NiaEventResponse from '@/utils/event/response/response'
+import {
+  NiaDefineKeyboardEvent, NiaDefineKeyboardResult,
+  NiaDefineModifierEvent, NiaDefineModifierEventSerialized,
+  NiaDefineModifierResult, NiaDefineModifierResultSerialized,
+  NiaEventResponse,
+} from '@/utils'
+import SerializableObject from '../../serializableObj'
+import {Modifier} from '@/store/models/modifier'
 
-export default class NiaDefineModifierEventResponse {
+export interface NiaDefineModifierEventResponseSerialized {
+  defineModifierEventSerialized: NiaDefineModifierEventSerialized,
+  defineModifierResultSerialized: NiaDefineModifierResultSerialized,
+}
+
+export class NiaDefineModifierEventResponse implements SerializableObject<NiaDefineModifierEventResponse, NiaDefineModifierEventResponseSerialized> {
   private readonly keyboardPath: string
   private readonly keyCode: number
   private readonly modifierAlias: string
@@ -12,10 +22,10 @@ export default class NiaDefineModifierEventResponse {
   private readonly error: boolean
   private readonly success: boolean
 
-  constructor(defineModifierRequest: NiaDefineModifierEvent, defineModifierResult: NiaDefineModifierResult) {
-    this.keyboardPath = defineModifierRequest.getKeyboardPath()
-    this.keyCode = defineModifierRequest.getKeyCode()
-    this.modifierAlias = defineModifierRequest.getModifierAlias()
+  constructor(defineModifierEvent: NiaDefineModifierEvent, defineModifierResult: NiaDefineModifierResult) {
+    this.keyboardPath = defineModifierEvent.getKeyboardPath()
+    this.keyCode = defineModifierEvent.getKeyCode()
+    this.modifierAlias = defineModifierEvent.getModifierAlias()
 
     this.message = defineModifierResult.getMessage()
     this.failure = defineModifierResult.getFailure()
@@ -55,5 +65,42 @@ export default class NiaDefineModifierEventResponse {
     const niaEventResponse = new NiaEventResponse(this)
 
     return niaEventResponse
+  }
+
+  toModifier(): Modifier {
+    return {
+      keyboardKey: {
+        keyboardPath: this.keyboardPath,
+        keyCode: this.keyCode
+      },
+      modifierAlias: this.modifierAlias
+    }
+  }
+
+  static deserialize(serialized: NiaDefineModifierEventResponseSerialized): NiaDefineModifierEventResponse {
+    return new NiaDefineModifierEventResponse(
+      NiaDefineModifierEvent.deserialize(serialized.defineModifierEventSerialized),
+      NiaDefineModifierResult.deserialize(serialized.defineModifierResultSerialized),
+    )
+  }
+
+  serialize(): NiaDefineModifierEventResponseSerialized {
+    const defineModifierEventSerialized: NiaDefineModifierEventSerialized = {
+      keyCode: this.keyCode,
+      keyboardPath: this.keyboardPath,
+      modifierAlias: this.modifierAlias
+    }
+
+    const defineModifierResultSerialized: NiaDefineModifierResultSerialized = {
+      message: this.message,
+      failure: this.failure,
+      error: this.error,
+      success: this.success
+    }
+
+    return {
+      defineModifierEventSerialized,
+      defineModifierResultSerialized
+    }
   }
 }

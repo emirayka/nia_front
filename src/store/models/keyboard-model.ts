@@ -1,6 +1,6 @@
 import {KeyDescription} from '@/store/models'
 
-export default interface KeyboardModel {
+export interface KeyboardModel {
   width: number
   height: number
   keys: Array<KeyDescription>

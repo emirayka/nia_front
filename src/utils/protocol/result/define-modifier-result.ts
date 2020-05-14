@@ -1,4 +1,13 @@
-export default class NiaDefineModifierResult {
+import SerializableObject from '../../serializableObj'
+
+export interface NiaDefineModifierResultSerialized {
+  message: string
+  failure: boolean
+  error: boolean
+  success: boolean
+}
+
+export class NiaDefineModifierResult implements SerializableObject<NiaDefineModifierResult, NiaDefineModifierResultSerialized> {
   private readonly message: string
   private readonly failure: boolean
   private readonly error: boolean
@@ -25,5 +34,23 @@ export default class NiaDefineModifierResult {
 
   getSuccess(): boolean {
     return this.success
+  }
+
+  static deserialize(serialized: NiaDefineModifierResultSerialized): NiaDefineModifierResult {
+    return new NiaDefineModifierResult(
+      serialized.message,
+      serialized.failure,
+      serialized.error,
+      serialized.success,
+    )
+  }
+
+  serialize(): NiaDefineModifierResultSerialized {
+    return {
+      message: this.message,
+      failure: this.failure,
+      error: this.error,
+      success: this.success,
+    }
   }
 }

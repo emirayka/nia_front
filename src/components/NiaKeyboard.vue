@@ -46,8 +46,10 @@
 
   import {Prop} from 'vue-property-decorator'
 
-  import KeyDescription from '@/store/models/key-description'
-  import KeyboardModel from '@/store/models/keyboard-model'
+  import {
+    KeyboardModel,
+    KeyDescription
+  } from '@/store/models'
   import NiaKeyboardKey from './NiaKeyboardKey.vue'
 
   const normalize = (value: number, min: number, max: number, multiplier: number): number => {

@@ -1,6 +1,14 @@
-import NiaEvent from '@/utils/event/events/event'
+import {
+  NiaEvent
+} from '@/utils/event'
+import SerializableObject from '../../serializableObj'
 
-export default class NiaDefineKeyboardEvent {
+export interface NiaDefineKeyboardEventSerialized {
+  keyboardPath: string
+  keyboardName: string
+}
+
+export class NiaDefineKeyboardEvent implements SerializableObject<NiaDefineKeyboardEvent, NiaDefineKeyboardEventSerialized> {
   private readonly keyboardPath: string
   private readonly keyboardName: string
 
@@ -21,5 +29,19 @@ export default class NiaDefineKeyboardEvent {
     const niaEvent = new NiaEvent(this)
 
     return niaEvent
+  }
+
+  serialize(): NiaDefineKeyboardEventSerialized {
+    return {
+      keyboardPath: this.keyboardPath,
+      keyboardName: this.keyboardName,
+    }
+  }
+
+  static deserialize(obj: NiaDefineKeyboardEventSerialized): NiaDefineKeyboardEvent {
+    return new NiaDefineKeyboardEvent(
+      obj.keyboardPath,
+      obj.keyboardName,
+    )
   }
 }

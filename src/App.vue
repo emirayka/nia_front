@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <NiaAppNavbar @nav="handleNav"/>
+    <NiaAppNavbar @nav="handleNav" />
 
     <keep-alive>
       <router-view
@@ -8,7 +8,8 @@
         @execute="executeHandler($event)"
         @define-keyboard="defineKeyboardHandler($event)"
         @remove-keyboard="removeKeyboardHandler($event)"
-        @add-modifier="addModifierHandler($event)"
+        @define-modifier="defineModifierHandler($event)"
+        @remove-modifier="removeModifierHandler($event)"
       />
     </keep-alive>
   </div>
@@ -22,16 +23,28 @@
   import NiaAppNavbar from '@/components/NiaAppNavbar.vue'
 
   import store from '@/store'
-  import DeviceInfo from '@/store/models/device-info'
-  import ExecutionResult from '@/store/models/execution-result'
-  import NiaExecuteCodeEvent from '@/utils/event/events/execute-code-event'
-  import NiaDefineKeyboardEvent from '@/utils/event/events/define-keyboard-event'
-  import NiaRemoveKeyboardEvent from '@/utils/event/events/remove-keyboard-event'
-  import NiaDefineModifierEvent from '@/utils/event/events/define-modifier-event'
-  import NiaRemoveModifierEvent from '@/utils/event/events/remove-modifier-event'
-  import NiaSynchronizeEvent from '@/utils/event/events/synchronize-event'
-  import NiaEvent from '@/utils/event/events/event'
-  import * from '@/utils/event'
+  import {
+    DeviceInfo,
+    ExecutionResult,
+  } from '@/store/models'
+
+  import {
+    NiaExecuteCodeEvent,
+    NiaDefineKeyboardEvent,
+    NiaRemoveKeyboardEvent,
+    NiaDefineModifierEvent,
+    NiaRemoveModifierEvent,
+    NiaSynchronizeEvent,
+    NiaEvent,
+    NiaEventResponseSerialized,
+    NiaEventResponse,
+    NiaSynchronizeEventResponse,
+    NiaExecuteCodeEventResponse,
+    NiaDefineKeyboardEventResponse,
+    NiaRemoveKeyboardEventResponse,
+    NiaDefineModifierResponse, NiaDefineModifierEventResponse, NiaRemoveModifierEventResponse,
+  } from './utils'
+  import {Modifier} from '@/store/models/modifier'
 
   export default {
     components: {
@@ -47,38 +60,94 @@
         }
 
         this.$router.replace({
-          path: event
+          path: event,
         })
       },
 
+      sendEvent: function(event: NiaEvent) {
+        ipcRenderer.send('nia-server-event', event.serialize())
+      },
+
       executeHandler: function (executeCodeEvent: NiaExecuteCodeEvent) {
+        console.log(executeCodeEvent)
         const event: NiaEvent = executeCodeEvent.toEvent()
 
-        ipcRenderer.send('nia-server-event', event)
+        this.sendEvent(event)
       },
 
       defineKeyboardHandler: function (defineKeyboardEvent: NiaDefineKeyboardEvent): void {
         const event: NiaEvent = defineKeyboardEvent.toEvent()
 
-        ipcRenderer.send('nia-server-event', event)
+        this.sendEvent(event)
       },
 
       removeKeyboardHandler: function (removeKeyboardEvent: NiaRemoveKeyboardEvent): void {
         const event: NiaEvent = removeKeyboardEvent.toEvent()
 
-        ipcRenderer.send('nia-server-event', event)
+        this.sendEvent(event)
       },
 
       defineModifierHandler: function (defineModifierEvent: NiaDefineModifierEvent): void {
         const event: NiaEvent = defineModifierEvent.toEvent()
 
-        ipcRenderer.send('nia-server-event', event)
+        this.sendEvent(event)
       },
-      removeModifierEvent: function (removeModifierEvent: NiaRemoveModifierEvent): void {
-        const event: NiaEvent = removeModifierEvent.toEvent()
 
-        ipcRenderer.send('nia-server-event', event)
+      removeModifierHandler: function (removeModifierEvent: NiaRemoveModifierEvent): void {
+        const event: NiaEvent = removeModifierEvent.toEvent()
+        console.log('Sent remove modifier event.')
+
+        this.sendEvent(event)
       },
+      handleSynchronizeEventResponse: function(response: NiaSynchronizeEventResponse): void {
+        const version: string = response.getVersion()
+        const info: string = response.getInfo()
+        const devicesInfo: Array<DeviceInfo> = response.getDevicesInfo()
+        const definedModifiers: Array<Modifier> = response.getDefinedModifiers()
+
+        store.commit.KeymappingModule.setVersion(version)
+        store.commit.KeymappingModule.setInfo(info)
+        store.commit.KeymappingModule.setDevicesInfo(devicesInfo)
+        store.commit.KeymappingModule.setModifiers(definedModifiers)
+      },
+      handleExecuteCodeEventResponse: function(response: NiaExecuteCodeEventResponse): void {
+        const executionResult: ExecutionResult = response.toExecutionResult()
+
+        store.commit.KeymappingModule.setExecutionResult(executionResult)
+      },
+      handleDefineKeyboardResponse: function(response: NiaDefineKeyboardEventResponse): void {
+        store.commit.KeymappingModule.makeKeyboardDefined(response.getKeyboardPath())
+      },
+      handleRemoveKeyboardResponse: function(response: NiaRemoveKeyboardEventResponse): void {
+        store.commit.KeymappingModule.makeKeyboardRemoved(response.getKeyboardPath())
+      },
+      handleDefineModifierResponse: function(response: NiaDefineModifierEventResponse): void {
+        const modifier: Modifier = response.toModifier()
+
+        store.commit.KeymappingModule.defineModifier(modifier)
+      },
+      handleRemoveModifierResponse: function(response: NiaRemoveModifierEventResponse): void {
+        const modifier: Modifier = response.toModifier()
+
+        store.commit.KeymappingModule.removeModifier(modifier)
+      },
+      handleEventResponse: function(response: NiaEventResponse): void {
+        if (response.isSynchronizeEventResponse()) {
+          this.handleSynchronizeEventResponse(response.takeSynchronizeEventResponse())
+        } else if (response.isExecuteCodeEventResponse()) {
+          this.handleExecuteCodeEventResponse(response.takeExecuteCodeEventResponse())
+        } else if (response.isDefineKeyboardEventResponse()) {
+          this.handleDefineKeyboardResponse(response.takeDefineKeyboardEventResponse())
+        } else if (response.isRemoveKeyboardEventResponse()) {
+          this.handleRemoveKeyboardResponse(response.takeRemoveKeyboardEventResponse())
+        } else if (response.isDefineModifierEventResponse()) {
+          this.handleDefineModifierResponse(response.takeDefineModifierEventResponse())
+        } else if (response.isRemoveModifierEventResponse()) {
+          this.handleRemoveModifierResponse(response.takeRemoveModifierEventResponse())
+        } else {
+          console.log('unknown')
+        }
+      }
     },
     mounted: function () {
       if (this.$router.currentRoute.path !== '/Keyboards') {
@@ -87,62 +156,16 @@
         })
       }
 
-      // ipcRenderer.on('nia-server-handshake-result', (_, handshakeResult: NiaHandshakeResult) => {
-      //   const {
-      //     version,
-      //     info
-      //   } = handshakeResult
-      //
-      //   store.commit.KeymappingModule.setVersion(version)
-      //   store.commit.KeymappingModule.setInfo(info)
-      // })
-      //
-      // ipcRenderer.on('nia-server-get-devices-info-result', (_, getDeviceInfoResults: Array<NiaGetDeviceInfoResult>) => {
-      //   const devicesInfo: Array<DeviceInfo> = getDeviceInfoResults.map(
-      //     (getDeviceInfoResult: NiaGetDeviceInfoResult) => ({
-      //       path: getDeviceInfoResult.path,
-      //       name: getDeviceInfoResult.name,
-      //       model: getDeviceInfoResult.model,
-      //       defined: false
-      //     })
-      //   )
-      //
-      //   store.commit.KeymappingModule.setDevicesInfo(devicesInfo)
-      // })
-      //
-      // ipcRenderer.on('nia-server-execute-code-result', (_, executeCodeResult: NiaExecuteCodeResult) => {
-      //   const executionResult: ExecutionResult = executeCodeResult as ExecutionResult
-      //
-      //   store.commit.KeymappingModule.setExecutionResult(executionResult)
-      // })
-      //
-      // ipcRenderer.on('nia-server-define-keyboard-result', (_, defineKeyboardResult: NiaDefineKeyboardResult) => {
-      //   const {keyboardPath, result} = defineKeyboardResult
-      //
-      //   if (result.success) {
-      //     store.commit.KeymappingModule.makeKeyboardDefined(keyboardPath)
-      //   }
-      // })
-      //
-      // ipcRenderer.on('nia-server-remove-keyboard-result', (event, {keyboardPath, result}) => {
-      //   console.log(result)
-      //   if (result.success) {
-      //     store.commit.KeymappingModule.makeKeyboardRemoved(keyboardPath)
-      //   }
-      // })
-      //
-      // ipcRenderer.on('nia-server-add-modifier-result', (event, result) => {
-      //   console.log(result)
-      //
-      //   if (result.success) {
-      //     // store.commit.KeymappingModule.makeKeyboardRemoved(keyboardPath)
-      //   }
-      // })
+      ipcRenderer.on('nia-server-event-response', (_, eventResponseSerialized: NiaEventResponseSerialized) => {
+        const eventResponse: NiaEventResponse = NiaEventResponse.deserialize(eventResponseSerialized)
+        this.handleEventResponse(eventResponse)
+      })
 
       const synchronizeEvent: NiaSynchronizeEvent = new NiaSynchronizeEvent()
       const event: NiaEvent = synchronizeEvent.toEvent()
+      console.log(event)
 
-      ipcRenderer.send('nia-server-event', event)
+      ipcRenderer.send('nia-server-event', event.serialize())
     },
   }
 </script>

@@ -1,8 +1,19 @@
-import NiaExecuteCodeEvent from '@/utils/event/events/execute-code-event'
-import NiaExecuteCodeResult from '@/utils/protocol/result/execute-code-result'
-import NiaEventResponse from '@/utils/event/response/response'
+import {
+  NiaExecuteCodeResult,
+  NiaExecuteCodeEvent,
+  NiaEventResponse, NiaExecuteCodeEventSerialized, NiaExecuteCodeResultSerialized,
+} from '@/utils'
+import {
+  ExecutionResult
+} from '@/store/models'
+import serializable from '../../serializableObj'
 
-export default class NiaExecuteCodeEventResponse {
+export interface NiaExecuteCodeEventResponseSerialized {
+  executeCodeEventSerialized: NiaExecuteCodeEventSerialized,
+  executeCodeResultSerialized: NiaExecuteCodeResultSerialized,
+}
+
+export class NiaExecuteCodeEventResponse implements serializable<NiaExecuteCodeEventResponse, NiaExecuteCodeEventResponseSerialized> {
   private readonly code: string
 
   private readonly message: string
@@ -43,5 +54,39 @@ export default class NiaExecuteCodeEventResponse {
     const niaEventResponse = new NiaEventResponse(this)
 
     return niaEventResponse
+  }
+
+  toExecutionResult(): ExecutionResult {
+    return {
+      message: this.message,
+      failure: this.failure,
+      error: this.error,
+      success: this.success,
+    } as ExecutionResult
+  }
+
+  static deserialize(serialized: NiaExecuteCodeEventResponseSerialized): NiaExecuteCodeEventResponse {
+    return new NiaExecuteCodeEventResponse(
+      NiaExecuteCodeEvent.deserialize(serialized.executeCodeEventSerialized),
+      NiaExecuteCodeResult.deserialize(serialized.executeCodeResultSerialized)
+    )
+  }
+
+  serialize(): NiaExecuteCodeEventResponseSerialized {
+    const executeCodeEventSerialized: NiaExecuteCodeEventSerialized = {
+      code: this.code,
+    }
+
+    const executeCodeResultSerialized: NiaExecuteCodeResultSerialized = {
+      message: this.message,
+      failure: this.failure,
+      error: this.error,
+      success: this.success,
+    }
+
+    return {
+      executeCodeEventSerialized,
+      executeCodeResultSerialized
+    }
   }
 }

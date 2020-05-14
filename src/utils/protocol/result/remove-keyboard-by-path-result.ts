@@ -1,4 +1,13 @@
-export default class NiaRemoveKeyboardByPathResult {
+import SerializableObject from '../../serializableObj'
+
+export interface NiaRemoveKeyboardByPathResultSerialized {
+  message: string
+  failure: boolean
+  error: boolean
+  success: boolean
+}
+
+export class NiaRemoveKeyboardByPathResult implements SerializableObject<NiaRemoveKeyboardByPathResult, NiaRemoveKeyboardByPathResultSerialized> {
   private readonly message: string
   private readonly failure: boolean
   private readonly error: boolean
@@ -25,5 +34,23 @@ export default class NiaRemoveKeyboardByPathResult {
 
   getSuccess(): boolean {
     return this.success
+  }
+
+  static deserialize(serialized: NiaRemoveKeyboardByPathResultSerialized): NiaRemoveKeyboardByPathResult {
+    return new NiaRemoveKeyboardByPathResult(
+      serialized.message,
+      serialized.failure,
+      serialized.error,
+      serialized.success,
+    )
+  }
+
+  serialize(): NiaRemoveKeyboardByPathResultSerialized {
+    return {
+      message: this.message,
+      failure: this.failure,
+      error: this.error,
+      success: this.success,
+    }
   }
 }

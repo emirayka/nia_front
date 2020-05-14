@@ -20,7 +20,9 @@
           >
             <NiaModifierTable
               :modifiers="getModifiers"
-              @add-modifier="showAddModifierDialog"
+              @add-modifier="showAddModifierDialogHandler()"
+              @select-modifier="selectModifierHandler($event)"
+              @remove-modifier="removeModifierHandler($event)"
             />
           </NiaAccordionItem>
           <NiaAccordionItem
@@ -89,18 +91,18 @@
   import Vue from 'vue'
   import Component from 'vue-class-component'
 
-  import {
-    mapGetters,
-  } from 'vuex'
-
   import NiaKeyboards from '@/components/NiaKeyboards.vue'
   import NiaModifierTable from '@/components/NiaModifierTable.vue'
   import NiaAddModifierDialog from '@/components/dialogs/NiaAddModifierDialog.vue'
   import {DeviceInfo} from '@/store/models'
 
   import store from '@/store'
-  import KeyboardKey from '@/store/models/keyboard-key'
-  import {mapStringToKeyCode} from '@/background-utils/utils'
+  import {
+    KeyboardKey
+  } from '@/store/models'
+  import {mapStringToKeyCode} from '@/utils/utils'
+  import {NiaDefineModifierEvent, NiaRemoveModifierEvent} from '@/utils'
+  import {Modifier} from '@/store/models/modifier'
 
   @Component({
     name: 'Keyboards',
@@ -111,7 +113,7 @@
     },
   })
   export default class Keyboards extends Vue {
-    showAddModifierDialog(): void {
+    showAddModifierDialogHandler(): void {
       store.commit.UIModule.showAddModifierDialog()
     }
 
@@ -132,11 +134,11 @@
         return
       }
 
-      this.$emit('add-modifier', {
-        keyboardName,
+      this.$emit('define-modifier', new NiaDefineModifierEvent(
+        keyboardPath,
         keyCode,
-        modifierAlias
-      })
+        modifierAlias,
+      ))
       store.commit.UIModule.hideAddModifierDialog()
     }
 
@@ -150,7 +152,7 @@
 
     addModifierDialogSelectKeyCodeHandler(keyCodeName: string): void {
       const keyCode: number = mapStringToKeyCode(keyCodeName)
-      
+
       if (Number.isInteger(keyCode)) {
         store.commit.UIModule.setAddModifierDialogSelectedKeyCode(keyCode)
       }
@@ -158,6 +160,23 @@
 
     addModifierDialogSelectModifierAliasHandler(modifierAlias: string): void {
       store.commit.UIModule.setAddModifierDialogSelectedModifierAlias(modifierAlias)
+    }
+
+    selectModifierHandler(modifier: Modifier): void {
+      console.log(modifier)
+      store.commit.UIModule.selectModifier(modifier)
+    }
+
+    removeModifierHandler(): void {
+      const selectedModifier: Modifier | null = store.getters.UIModule.getSelectedModifier
+
+      if (selectedModifier !== null) {
+        const removeModifierEvent: NiaRemoveModifierEvent = new NiaRemoveModifierEvent(
+          selectedModifier.keyboardKey.keyboardPath,
+          selectedModifier.keyboardKey.keyCode,
+        )
+        this.$emit('remove-modifier', removeModifierEvent)
+      }
     }
 
     clickKeyboardHandler(): void {
@@ -172,7 +191,7 @@
       return store.getters.UIModule.addModifierDialogIsShown
     }
 
-    get getModifiers(): Array<KeyboardKey> {
+    get getModifiers(): Array<Modifier> {
       return store.getters.KeymappingModule.modifiers
     }
 

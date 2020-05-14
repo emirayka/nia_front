@@ -1,6 +1,14 @@
-import NiaEvent from '@/utils/event/events/event'
+import {
+  NiaEvent
+} from '@/utils/event'
+import SerializableObject from '../../serializableObj'
 
-export default class NiaRemoveModifierEvent {
+export interface NiaRemoveModifierEventSerialized {
+  keyboardPath: string
+  keyCode: number
+}
+
+export class NiaRemoveModifierEvent implements SerializableObject<NiaRemoveModifierEvent, NiaRemoveModifierEventSerialized> {
   private readonly keyboardPath: string
   private readonly keyCode: number
 
@@ -21,5 +29,19 @@ export default class NiaRemoveModifierEvent {
     const niaEvent = new NiaEvent(this)
 
     return niaEvent
+  }
+
+  static deserialize(b: NiaRemoveModifierEventSerialized): NiaRemoveModifierEvent {
+    return new NiaRemoveModifierEvent(
+      b.keyboardPath,
+      b.keyCode
+    );
+  }
+
+  serialize(): NiaRemoveModifierEventSerialized {
+    return {
+      keyboardPath: this.keyboardPath,
+      keyCode: this.keyCode,
+    }
   }
 }

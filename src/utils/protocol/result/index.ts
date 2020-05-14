@@ -1,21 +1,10 @@
-import NiaDefineKeyboardResult from './define-keyboard-result'
-import NiaDefineModifierResult from './define-modifier-result'
-import NiaExecuteCodeResult from './execute-code-result'
-import NiaGetDeviceInfoResult from './get-device-info-result'
-import NiaGetDevicesResult from './get-devices-result'
-import NiaHandshakeResult from './handshake-result'
-import NiaRemoveKeyboardByNameResult from './remove-keyboard-by-name-result'
-import NiaRemoveKeyboardByPathResult from './remove-keyboard-by-path-result'
-import NiaRemoveModifierResult from './remove-modifier-result'
-
-export {
-  NiaDefineKeyboardResult,
-  NiaDefineModifierResult,
-  NiaExecuteCodeResult,
-  NiaGetDeviceInfoResult,
-  NiaGetDevicesResult,
-  NiaHandshakeResult,
-  NiaRemoveKeyboardByNameResult,
-  NiaRemoveKeyboardByPathResult,
-  NiaRemoveModifierResult,
-}
+export * from './define-keyboard-result'
+export * from './define-modifier-result'
+export * from './execute-code-result'
+export * from './get-defined-modifiers-result'
+export * from './get-device-info-result'
+export * from './get-devices-result'
+export * from './handshake-result'
+export * from './remove-keyboard-by-name-result'
+export * from './remove-keyboard-by-path-result'
+export * from './remove-modifier-result'

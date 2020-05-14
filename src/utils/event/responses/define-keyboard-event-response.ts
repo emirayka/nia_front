@@ -1,8 +1,18 @@
-import {NiaDefineKeyboardRequest, NiaDefineKeyboardResult} from '@/utils/protocol'
-import NiaDefineKeyboardEvent from '@/utils/event/events/define-keyboard-event'
-import NiaEventResponse from '@/utils/event/response/response'
+import {
+  NiaDefineKeyboardRequest,
+  NiaDefineKeyboardResult,
+  NiaDefineKeyboardEvent,
+  NiaEventResponse,
+  NiaDefineKeyboardEventSerialized, NiaDefineKeyboardResultSerialized,
+} from '@/utils'
+import serializable from '../../serializableObj'
 
-export default class NiaDefineKeyboardEventResponse {
+export interface NiaDefineKeyboardEventResponseSerialized {
+  defineKeyboardEventSerialized: NiaDefineKeyboardEventSerialized,
+  defineKeyboardResultSerialized: NiaDefineKeyboardResultSerialized,
+}
+
+export class NiaDefineKeyboardEventResponse implements serializable<NiaDefineKeyboardEventResponse, NiaDefineKeyboardEventResponseSerialized> {
   private readonly keyboardPath: string
   private readonly keyboardName: string
 
@@ -49,5 +59,30 @@ export default class NiaDefineKeyboardEventResponse {
     const niaEventResponse = new NiaEventResponse(this)
 
     return niaEventResponse
+  }
+
+  static deserialize(serialized: NiaDefineKeyboardEventResponseSerialized): NiaDefineKeyboardEventResponse {
+    return new NiaDefineKeyboardEventResponse(
+      NiaDefineKeyboardEvent.deserialize(serialized.defineKeyboardEventSerialized),
+      NiaDefineKeyboardResult.deserialize(serialized.defineKeyboardResultSerialized),
+    )
+  }
+
+  serialize(): NiaDefineKeyboardEventResponseSerialized {
+    const defineKeyboardEventSerialized: NiaDefineKeyboardEventSerialized = {
+      keyboardName: this.keyboardName,
+      keyboardPath: this.keyboardPath,
+    }
+    const defineKeyboardResultSerialized: NiaDefineKeyboardResultSerialized = {
+      message: this.message,
+      failure: this.failure,
+      success: this.success,
+      error: this.error,
+    }
+
+    return {
+      defineKeyboardEventSerialized,
+      defineKeyboardResultSerialized,
+    }
   }
 }

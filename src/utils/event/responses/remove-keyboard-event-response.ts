@@ -1,8 +1,16 @@
-import NiaRemoveKeyboardEvent from '@/utils/event/events/remove-keyboard-event'
-import {NiaRemoveKeyboardByPathResult} from '@/utils/protocol'
-import NiaEventResponse from '@/utils/event/response/response'
+import {
+  NiaRemoveKeyboardEvent,
+  NiaRemoveKeyboardByPathResult,
+  NiaEventResponse, NiaRemoveKeyboardEventSerialized, NiaRemoveKeyboardByPathResultSerialized,
+} from '@/utils'
+import SerializableObject from '../../serializableObj'
 
-export default class NiaRemoveKeyboardEventResponse {
+export interface NiaRemoveKeyboardEventResponseSerialized {
+  removeKeyboardEventSerialized: NiaRemoveKeyboardEventSerialized,
+  removeKeyboardByPathResultSerialized: NiaRemoveKeyboardByPathResultSerialized
+}
+
+export class NiaRemoveKeyboardEventResponse implements SerializableObject<NiaRemoveKeyboardEventResponse, NiaRemoveKeyboardEventResponseSerialized> {
   private readonly keyboardPath: string
 
   private readonly message: string
@@ -18,6 +26,7 @@ export default class NiaRemoveKeyboardEventResponse {
     this.error = removeKeyboardByPathResult.getError()
     this.success = removeKeyboardByPathResult.getSuccess()
   }
+
 
   getKeyboardPath(): string {
     return this.keyboardPath
@@ -43,5 +52,29 @@ export default class NiaRemoveKeyboardEventResponse {
     const niaEventResponse = new NiaEventResponse(this)
 
     return niaEventResponse
+  }
+
+  static deserialize(serialized: NiaRemoveKeyboardEventResponseSerialized): NiaRemoveKeyboardEventResponse {
+    return new NiaRemoveKeyboardEventResponse(
+      NiaRemoveKeyboardEvent.deserialize(serialized.removeKeyboardEventSerialized),
+      NiaRemoveKeyboardByPathResult.deserialize(serialized.removeKeyboardByPathResultSerialized)
+    )
+  }
+
+  serialize(): NiaRemoveKeyboardEventResponseSerialized {
+    const removeKeyboardEventSerialized: NiaRemoveKeyboardEventSerialized = {
+      keyboardPath: this.keyboardPath,
+    }
+    const removeKeyboardByPathResultSerialized: NiaRemoveKeyboardByPathResultSerialized = {
+      message: this.message,
+      failure: this.failure,
+      error: this.error,
+      success: this.success,
+    }
+
+    return {
+      removeKeyboardEventSerialized,
+      removeKeyboardByPathResultSerialized
+    }
   }
 }

@@ -1,4 +1,13 @@
-export default class NiaExecuteCodeResult {
+import SerializableObject from '../../serializableObj'
+
+export interface NiaExecuteCodeResultSerialized {
+  message: string
+  failure: boolean
+  error: boolean
+  success: boolean
+}
+
+export class NiaExecuteCodeResult implements SerializableObject<NiaExecuteCodeResult, NiaExecuteCodeResultSerialized> {
   private readonly message: string
   private readonly failure: boolean
   private readonly error: boolean
@@ -25,5 +34,23 @@ export default class NiaExecuteCodeResult {
 
   getSuccess(): boolean {
     return this.success
+  }
+
+  static deserialize(serialized: NiaExecuteCodeResultSerialized): NiaExecuteCodeResult {
+    return new NiaExecuteCodeResult(
+      serialized.message,
+      serialized.failure,
+      serialized.error,
+      serialized.success,
+    )
+  }
+
+  serialize(): NiaExecuteCodeResultSerialized {
+    return {
+      message: this.message,
+      failure: this.failure,
+      error: this.error,
+      success: this.success,
+    }
   }
 }

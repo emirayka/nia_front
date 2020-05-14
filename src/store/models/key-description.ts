@@ -1,4 +1,4 @@
-export default interface KeyDescription {
+export interface KeyDescription {
   x: number
   y: number
   width: number

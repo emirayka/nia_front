@@ -1,6 +1,6 @@
 import BasicError from './basic-error'
 
-export default class InvalidResponse extends BasicError {
+export default class InvalidResponseError extends BasicError {
   constructor(m: string) {
     super(m)
   }

@@ -9,27 +9,17 @@ import {
   BrowserWindow,
   ipcMain,
 } from 'electron'
+import IpcMainEvent = Electron.IpcMainEvent
 
 import {
   createProtocol,
   installVueDevtools,
 } from 'vue-cli-plugin-electron-builder/lib'
 
-import {
-  Protocol,
-} from './utils'
-import NiaHandshakeResponse from '@/utils/protocol/response/handshake-response.js'
-import NiaGetDeviceInfoResponse from '@/utils/protocol/response/get-device-info-response.js'
-import NiaGetDevicesResponse from '@/utils/protocol/response/get-devices-response.js'
-import NiaHandshakeResult from '@/utils/protocol/result/handshake-result.js'
-import {NiaGetDeviceInfoResult, NiaGetDevicesResult} from '@/utils/protocol/result'
-import NiaExecuteCodeResult from '@/utils/protocol/result/execute-code-result.js'
-import NiaDefineKeyboardResult from '@/utils/protocol/result/define-keyboard-result'
-import DeviceInfo from '@/store/models/device-info'
-import NiaEvent from '@/utils/event/events/event'
-import NiaEventResponse from '@/utils/event/responses/response'
+import { DeviceInfo } from '@/store/models'
+import {NiaEventSerialized, Protocol} from '@/utils'
+import { NiaEvent, } from '@/utils'
 import {NiaHandler, startHandler} from '@/utils/handle'
-import IpcMainEvent = Electron.IpcMainEvent
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -104,13 +94,12 @@ function createWindow() {
   }
 })()
 
-ipcMain.once('nia-server-event', async (_, event: NiaEvent) => {
+ipcMain.once('nia-server-event', async (_, serializedEvent: NiaEventSerialized) => {
   try {
     if (win === null) {
       throw new Error('Window is not ready')
     }
-
-    const handler: NiaHandler = await startHandler(win, event)
+    const handler: NiaHandler = await startHandler(win, serializedEvent)
 
     ipcMain.on('nia-server-event', handler)
   } catch (e) {

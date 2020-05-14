@@ -1,8 +1,8 @@
 <template>
   <div class="nia-modifier-table">
     <div class="nia-modifier-table__controls">
-      <NiaButton @click="addModifierHandler($event)">+</NiaButton>
-      <NiaButton>2</NiaButton>
+      <NiaButton @click.stop="addModifierHandler($event)">+</NiaButton>
+      <NiaButton @click.stop="removeModifierHandler($event)">-</NiaButton>
       <NiaButton>3</NiaButton>
     </div>
 
@@ -15,24 +15,25 @@
           Key code
         </NiaTableRowItem>
         <NiaTableRowItem>
-          Binding
+          Alias
         </NiaTableRowItem>
       </NiaTableHeaderRow>
 
       <NiaTableRow
         v-for="(modifier, index) in modifiers"
         :key="index"
+        @click.stop="selectModifierHandler(modifier)"
       >
         <NiaTableRowItem>
-          {{ getKeyboardName(modifier.keyboardPath) }}
+          {{ getKeyboardName(modifier.keyboardKey.keyboardPath) }}
         </NiaTableRowItem>
 
         <NiaTableRowItem>
-          {{ modifier.keyCode }}
+          {{ modifier.keyboardKey.keyCode }}
         </NiaTableRowItem>
 
         <NiaTableRowItem>
-          {{ 'unimplemented' }}
+          {{ modifier.modifierAlias }}
         </NiaTableRowItem>
       </NiaTableRow>
     </NiaTable>
@@ -45,21 +46,39 @@
   import {Prop} from 'vue-property-decorator'
 
   import store from '@/store'
-  import KeyboardKey from '@/store/models/keyboard-key'
+  import {
+    Modifier,
+    DeviceInfo
+  } from '@/store/models'
 
   @Component({
     name: 'NiaModifierTable',
   })
   export default class NiaModifierTable extends Vue {
     @Prop({ required: true })
-    modifiers: Array<KeyboardKey> = []
+    modifiers!: Array<Modifier>
 
     getKeyboardName(keyboardPath: string): string {
-      return store.getters.KeymappingModule.getKeyboardByPath()(keyboardPath)
+      const device: DeviceInfo | null = store.getters.KeymappingModule.getKeyboardByPath(keyboardPath)
+
+      if (device === null) {
+        return ''
+      }
+
+      return device.name
     }
 
     addModifierHandler(event: MouseEvent): void {
       this.$emit('add-modifier')
+    }
+
+    removeModifierHandler(event: MouseEvent): void {
+      this.$emit('remove-modifier')
+    }
+
+    selectModifierHandler(modifier: Modifier): void {
+      console.log('selected')
+      this.$emit('select-modifier', modifier)
     }
   }
 </script>
