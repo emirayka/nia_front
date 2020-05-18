@@ -44,23 +44,23 @@ export class NiaRemoveModifierResponse {
     return NiaResponseType.RemoveModifier
   }
 
-  static fromPB(removeDeviceByPathResponsePB: RemoveModifierResponse): NiaRemoveModifierResponse {
+  static fromPB(removeModifierResponsePB: RemoveModifierResponse): NiaRemoveModifierResponse {
     let message: string = ''
     let success: boolean = false
     let error: boolean = false
     let failure: boolean = false
 
-    switch (removeDeviceByPathResponsePB.getResultCase()) {
+    switch (removeModifierResponsePB.getResultCase()) {
       case RemoveModifierResponse.ResultCase.SUCCESS_RESULT:
-        message = removeDeviceByPathResponsePB.getSuccessResult()?.getMessage() ?? ''
+        message = removeModifierResponsePB.getSuccessResult()?.getMessage() ?? ''
         success = true
         break;
       case RemoveModifierResponse.ResultCase.ERROR_RESULT:
-        message = removeDeviceByPathResponsePB.getErrorResult()?.getMessage() ?? ''
+        message = removeModifierResponsePB.getErrorResult()?.getMessage() ?? ''
         error = true
         break;
       case RemoveModifierResponse.ResultCase.FAILURE_RESULT:
-        message = removeDeviceByPathResponsePB.getFailureResult()?.getMessage() ?? ''
+        message = removeModifierResponsePB.getFailureResult()?.getMessage() ?? ''
         failure = true
         break;
     }

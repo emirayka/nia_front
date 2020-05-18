@@ -7,16 +7,18 @@ import {
   NiaGetDefinedModifiersResponse,
   NiaGetDevicesResponse,
   NiaDeviceInfoSerialized,
-  NiaModifierDescriptionSerialized,
+  NiaModifierDescriptionSerialized, NiaAction, NiaActionSerialized,
 } from '@/utils'
 
 import SerializableObject from '@/utils/serializable-object'
+import {NiaGetDefinedActionsResponse} from '@/utils/protocol/responses/get-defined-actions-request'
 
 export interface NiaSynchronizeEventResponseObject {
   version: string,
   info: string,
   devicesInfo: Array<NiaDeviceInfo>,
   definedModifiers: Array<NiaModifierDescription>
+  definedActions: Array<NiaAction>
 }
 
 export interface NiaSynchronizeEventResponseSerialized {
@@ -24,6 +26,7 @@ export interface NiaSynchronizeEventResponseSerialized {
   info: string,
   devicesInfo: Array<NiaDeviceInfoSerialized>,
   definedModifiers: Array<NiaModifierDescriptionSerialized>
+  definedActions: Array<NiaActionSerialized>
 }
 
 export class NiaSynchronizeEventResponse implements SerializableObject<NiaSynchronizeEventResponse, NiaSynchronizeEventResponseSerialized> {
@@ -31,23 +34,29 @@ export class NiaSynchronizeEventResponse implements SerializableObject<NiaSynchr
   private readonly info: string
   private readonly devicesInfo: Array<NiaDeviceInfo>
   private readonly definedModifiers: Array<NiaModifierDescription>
+  private readonly definedActions: Array<NiaAction>
 
   constructor(args: NiaSynchronizeEventResponseObject) {
     this.version = args.version
     this.info = args.info
     this.devicesInfo = args.devicesInfo
     this.definedModifiers = args.definedModifiers
+    this.definedActions = args.definedActions
   }
 
   static from(synchronizeEvent: NiaSynchronizeEvent,
               handshakeResponse: NiaHandshakeResponse,
               getDevicesResponse: NiaGetDevicesResponse,
-              getDefinedModifiersResponse: NiaGetDefinedModifiersResponse): NiaSynchronizeEventResponse {
+              getDefinedModifiersResponse: NiaGetDefinedModifiersResponse,
+              getDefinedActionsResponse: NiaGetDefinedActionsResponse,
+  ): NiaSynchronizeEventResponse {
+
     const args: NiaSynchronizeEventResponseObject = {
       version: handshakeResponse.getVersion(),
       info: handshakeResponse.getInfo(),
       devicesInfo: getDevicesResponse.getDevices(),
       definedModifiers: getDefinedModifiersResponse.getModifierDescriptions(),
+      definedActions: getDefinedActionsResponse.getActions(),
     }
 
     return new NiaSynchronizeEventResponse(args)
@@ -69,6 +78,10 @@ export class NiaSynchronizeEventResponse implements SerializableObject<NiaSynchr
     return this.definedModifiers
   }
 
+  getDefinedActions(): Array<NiaAction> {
+    return this.definedActions
+  }
+
   toEventResponse(): NiaEventResponse {
     const niaEventResponse = new NiaEventResponse(this)
 
@@ -85,6 +98,9 @@ export class NiaSynchronizeEventResponse implements SerializableObject<NiaSynchr
       definedModifiers: obj
         .definedModifiers
         .map((modifier) => NiaModifierDescription.deserialize(modifier)),
+      definedActions: obj
+        .definedActions
+        .map((action) => NiaAction.deserialize(action)),
     }
 
     return new NiaSynchronizeEventResponse(args)
@@ -96,6 +112,7 @@ export class NiaSynchronizeEventResponse implements SerializableObject<NiaSynchr
       info: this.info,
       devicesInfo: this.devicesInfo.map((deviceInfo) => deviceInfo.serialize()),
       definedModifiers: this.definedModifiers.map((modifier) => modifier.serialize()),
+      definedActions: this.definedActions.map((action) => action.serialize()),
     }
   }
 }

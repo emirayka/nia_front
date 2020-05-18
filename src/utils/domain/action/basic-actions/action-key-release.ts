@@ -1,16 +1,24 @@
 import {ActionKeyRelease} from 'nia-protocol-js'
 
 import {
-  SerializablePB
+  NiaActionKeyPressSerialized,
+  SerializablePB,
 } from '@/utils'
 import {NiaAction} from '@/utils/domain/action/action'
 import {NiaActionType} from '@/utils/domain/action/action-type'
+import SerializableObject from '@/utils/serializable-object'
 
-export class NiaActionKeyRelease implements SerializablePB<NiaActionKeyRelease, ActionKeyRelease> {
+export interface NiaActionKeyReleaseObject {
+  keyCode: number
+}
+
+export type NiaActionKeyReleaseSerialized = NiaActionKeyReleaseObject
+
+export class NiaActionKeyRelease implements SerializablePB<NiaActionKeyRelease, ActionKeyRelease>, SerializableObject<NiaActionKeyRelease, NiaActionKeyReleaseSerialized> {
   private readonly keyCode: number
 
-  constructor(keyCode: number) {
-    this.keyCode = keyCode
+  constructor(args: NiaActionKeyReleaseObject) {
+    this.keyCode = args.keyCode
   }
 
   getActionType(): NiaActionType {
@@ -21,8 +29,11 @@ export class NiaActionKeyRelease implements SerializablePB<NiaActionKeyRelease, 
     return this.keyCode
   }
 
-  toAction(): NiaAction {
-    return new NiaAction(this)
+  toAction(name: string): NiaAction {
+    return new NiaAction({
+      actionName: name,
+      action: this,
+    })
   }
 
   toPB(): ActionKeyRelease {
@@ -34,10 +45,20 @@ export class NiaActionKeyRelease implements SerializablePB<NiaActionKeyRelease, 
   }
 
   static fromPB(actionKeyRelease: ActionKeyRelease): NiaActionKeyRelease {
-    const niaActionKeyRelease: NiaActionKeyRelease = new NiaActionKeyRelease(
-      actionKeyRelease.getKeyCode()
-    )
+    const niaActionKeyRelease: NiaActionKeyRelease = new NiaActionKeyRelease({
+      keyCode: actionKeyRelease.getKeyCode(),
+    })
 
     return niaActionKeyRelease
+  }
+
+  serialize(): NiaActionKeyReleaseSerialized {
+    return {
+      keyCode: this.keyCode
+    }
+  }
+
+  static deserialize(serialized: NiaActionKeyReleaseSerialized): NiaActionKeyRelease {
+    return new NiaActionKeyRelease(serialized)
   }
 }

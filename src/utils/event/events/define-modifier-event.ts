@@ -45,7 +45,7 @@ export class NiaDefineModifierEvent implements SerializableObject<NiaDefineModif
     return niaEvent
   }
 
-  serialize(): NiaDefineModifierEventObject {
+  serialize(): NiaDefineModifierEventSerialized {
     return {
       keyboardId: this.keyboardId,
       keyCode: this.keyCode,

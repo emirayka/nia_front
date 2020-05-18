@@ -5,17 +5,21 @@ import {
 import {NiaDefineDeviceResponse} from '@/utils/protocol/responses/define-device-response'
 import {NiaRemoveDeviceByNameResponse} from '@/utils/protocol/responses/remove-device-by-name-response'
 import {
+  DefineActionResponse,
   DefineDeviceResponse,
   DefineModifierResponse,
-  ExecuteCodeResponse,
+  ExecuteCodeResponse, GetDefinedActionsResponse,
   GetDefinedModifiersResponse,
   GetDevicesResponse,
-  HandshakeResponse,
+  HandshakeResponse, RemoveActionResponse,
   RemoveDeviceByNameResponse,
   RemoveDeviceByPathResponse, RemoveModifierResponse,
   Response,
 } from 'nia-protocol-js'
 import {NiaRemoveDeviceByPathResponse} from '@/utils/protocol/responses/remove-device-by-path-response'
+import {NiaGetDefinedActionsResponse} from '@/utils/protocol/responses/get-defined-actions-request'
+import {NiaDefineActionResponse} from '@/utils/protocol/responses/define-action-response'
+import {NiaRemoveActionResponse} from '@/utils/protocol/responses/remove-action-response'
 
 export type NiaResponseUnderlyingType = NiaDefineDeviceResponse |
   NiaDefineModifierResponse |
@@ -25,7 +29,10 @@ export type NiaResponseUnderlyingType = NiaDefineDeviceResponse |
   NiaHandshakeResponse |
   NiaRemoveDeviceByNameResponse |
   NiaRemoveDeviceByPathResponse |
-  NiaRemoveModifierResponse
+  NiaRemoveModifierResponse |
+  NiaGetDefinedActionsResponse |
+  NiaDefineActionResponse |
+  NiaRemoveActionResponse
 
 export enum NiaResponseType {
   DefineDevice,
@@ -37,6 +44,9 @@ export enum NiaResponseType {
   RemoveDeviceByName,
   RemoveDeviceByPath,
   RemoveModifier,
+  GetDefinedActions,
+  DefineAction,
+  RemoveAction,
 }
 
 export class NiaResponse {
@@ -147,6 +157,36 @@ export class NiaResponse {
 
         const removeModifierResponse: NiaRemoveModifierResponse = NiaRemoveModifierResponse.fromPB(removeModifierResponsePB)
         return new NiaResponse(removeModifierResponse)
+
+      case Response.ResponseCase.GET_DEFINED_ACTIONS_RESPONSE:
+        const getDefinedActionsResponsePB: GetDefinedActionsResponse | undefined = responsePB.getGetDefinedActionsResponse()
+
+        if (getDefinedActionsResponsePB === undefined) {
+          throw new Error('GetDefinedActionsResponse was not set')
+        }
+
+        const getDefinedActionsResponse: NiaGetDefinedActionsResponse = NiaGetDefinedActionsResponse.fromPB(getDefinedActionsResponsePB)
+        return new NiaResponse(getDefinedActionsResponse)
+
+      case Response.ResponseCase.DEFINE_ACTION_RESPONSE:
+        const defineActionResponsePB: DefineActionResponse | undefined = responsePB.getDefineActionResponse()
+
+        if (defineActionResponsePB === undefined) {
+          throw new Error('DefineActionResponse was not set')
+        }
+
+        const defineActionResponse: NiaDefineActionResponse = NiaDefineActionResponse.fromPB(defineActionResponsePB)
+        return new NiaResponse(defineActionResponse)
+
+      case Response.ResponseCase.REMOVE_ACTION_RESPONSE:
+        const removeActionResponsePB: RemoveActionResponse | undefined = responsePB.getRemoveActionResponse()
+
+        if (removeActionResponsePB === undefined) {
+          throw new Error('RemoveActionResponse was not set')
+        }
+
+        const removeActionResponse: NiaRemoveActionResponse = NiaRemoveActionResponse.fromPB(removeActionResponsePB)
+        return new NiaResponse(removeActionResponse)
 
       default:
         throw new Error('Unknown response')

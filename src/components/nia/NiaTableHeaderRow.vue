@@ -6,7 +6,7 @@
 
 <script>
   export default {
-    name: "NiaTableHeaderRow",
+    name: 'NiaTableHeaderRow',
   }
 </script>
 
@@ -15,6 +15,8 @@
   lang="scss"
 >
   th.nia-table-header-row {
+    width: 100%;
+
     line-height: 1.15;
     font-family: Montserrat, sans-serif;
     -webkit-font-smoothing: antialiased;

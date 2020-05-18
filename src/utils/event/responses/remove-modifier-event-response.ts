@@ -85,7 +85,7 @@ export class NiaRemoveModifierEventResponse implements SerializableObject<NiaRem
     return niaEventResponse
   }
 
-  toModifier(): NiaKey {
+  toModifierKey(): NiaKey {
     return new NiaKey({
       keyCode: this.keyCode,
       deviceId: this.deviceId

@@ -1,8 +1,11 @@
 <template>
   <div
     class="nia-keyboard-key"
+    :class="classes"
     :style="style"
     @click.stop="$emit('click', code)"
+    @mouseover="hover = true"
+    @mouseleave="hover = false"
   >
     {{ mappedKeyCode }}
   </div>
@@ -21,6 +24,8 @@
     name: 'NiaKeyboardKey',
   })
   export default class NiaKeyboardKey extends Vue {
+    hover = false
+
     @Prop({required: true})
     x!: number
 
@@ -36,6 +41,12 @@
     @Prop({required: true})
     code!: number
 
+    @Prop({default: false})
+    selected!: boolean
+
+    @Prop({default: false})
+    modifier!: boolean
+
     get style(): object {
       return {
         position: 'absolute',
@@ -44,6 +55,14 @@
         width: `${this.width + 5}px`,
         height: `${this.height + 5}px`,
         fontSize: this.fontSize,
+      }
+    }
+
+    get classes(): object {
+      return {
+        selected: this.selected,
+        modifier: this.modifier,
+        hover: this.hover,
       }
     }
 
@@ -76,6 +95,7 @@
   scoped
   lang="scss"
 >
+
   .nia-keyboard-key {
     box-sizing: content-box;
 
@@ -105,9 +125,15 @@
     display: flex;
     justify-content: center;
     align-items: center;
+
+    transition: 0.25s background;
   }
 
-  .nia-keyboard-key:hover {
+  .nia-keyboard__nia-keyboard-key.modifier {
+    background: mediumpurple;
+  }
+
+  .nia-keyboard-key.hover {
     background: #FFDD03;
     /*background: -moz-linear-gradient(top, gold, orange);*/
     /*background: -webkit-gradient(linear, orange, gold);*/
@@ -121,4 +147,18 @@
     font-weight: bold;
     text-shadow: -1px -1px 0 gold;
   }
+
+  .nia-keyboard__nia-keyboard-key.selected:before {
+    content: " ";
+    position: absolute;
+    z-index: 1;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border: 2px dotted gold;
+    border-radius: 10%;
+    background-color: #33FFDD03;
+  }
+
 </style>

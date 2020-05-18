@@ -4,7 +4,7 @@ import {
 import SerializableObject from '@/utils/serializable-object'
 
 export interface NiaRemoveModifierEventObject {
-  deviceId: number
+  deviceId: number | null
   keyCode: number
 }
 
@@ -12,7 +12,7 @@ export type NiaRemoveModifierEventSerialized = NiaRemoveModifierEventObject
 
 
 export class NiaRemoveModifierEvent implements SerializableObject<NiaRemoveModifierEvent, NiaRemoveModifierEventSerialized> {
-  private readonly deviceId: number
+  private readonly deviceId: number | null
   private readonly keyCode: number
 
   constructor(args: NiaRemoveModifierEventObject) {
@@ -20,7 +20,7 @@ export class NiaRemoveModifierEvent implements SerializableObject<NiaRemoveModif
     this.keyCode = args.keyCode
   }
 
-  getDeviceId(): number {
+  getDeviceId(): number | null{
     return this.deviceId
   }
 

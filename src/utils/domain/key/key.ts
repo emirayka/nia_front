@@ -28,6 +28,10 @@ export class NiaKey implements SerializablePB<NiaKey, Key>, SerializableObject<N
   }
 
   equals(other: NiaKey): boolean {
+    if (this.deviceId === null || other.deviceId === null) {
+      return this.keyCode === other.keyCode
+    }
+
     return this.deviceId === other.deviceId && this.keyCode === other.keyCode
   }
 

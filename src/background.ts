@@ -16,7 +16,6 @@ import {
   installVueDevtools,
 } from 'vue-cli-plugin-electron-builder/lib'
 
-import { DeviceInfo } from '@/store/models'
 import {NiaEventSerialized, Protocol} from '@/utils'
 import { NiaEvent, } from '@/utils'
 import {NiaHandler, startHandler} from '@/utils/handle'

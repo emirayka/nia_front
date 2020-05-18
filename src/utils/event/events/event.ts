@@ -8,6 +8,12 @@ import {
 } from './index'
 
 import SerializableObject from '@/utils/serializable-object'
+import {
+  NiaDefineActionEvent,
+  NiaDefineActionEventObject,
+  NiaDefineActionEventSerialized,
+} from '@/utils/event/events/define-action'
+import {NiaRemoveActionEvent, NiaRemoveActionEventSerialized} from '@/utils/event/events/remove-action'
 
 export enum NiaEventType {
   DefineDevice,
@@ -15,6 +21,8 @@ export enum NiaEventType {
   ExecuteCode,
   RemoveDevice,
   RemoveModifier,
+  DefineAction,
+  RemoveAction,
   Synchronize
 }
 
@@ -23,6 +31,8 @@ export type NiaEventUnderlyingTypeSerialized = NiaDefineDeviceEventSerialized |
   NiaExecuteCodeEventSerialized |
   NiaRemoveDeviceEventSerialized |
   NiaRemoveModifierEventSerialized |
+  NiaDefineActionEventSerialized |
+  NiaRemoveActionEventSerialized |
   NiaSynchronizeEventSerialized
 
 export type NiaEventUnderlyingType = NiaDefineDeviceEvent |
@@ -30,6 +40,8 @@ export type NiaEventUnderlyingType = NiaDefineDeviceEvent |
   NiaExecuteCodeEvent |
   NiaRemoveDeviceEvent |
   NiaRemoveModifierEvent |
+  NiaDefineActionEvent |
+  NiaRemoveActionEvent |
   NiaSynchronizeEvent
 
 export interface NiaEventSerialized {
@@ -66,6 +78,14 @@ export class NiaEvent implements SerializableObject<NiaEvent, NiaEventSerialized
     return this.eventType === NiaEventType.RemoveModifier
   }
 
+  isDefineActionEvent(): boolean {
+    return this.eventType === NiaEventType.DefineAction
+  }
+
+  isRemoveActionEvent(): boolean {
+    return this.eventType === NiaEventType.RemoveAction
+  }
+
   isSynchronizeEvent(): boolean {
     return this.eventType === NiaEventType.Synchronize
   }
@@ -90,6 +110,14 @@ export class NiaEvent implements SerializableObject<NiaEvent, NiaEventSerialized
     return this.event as NiaRemoveModifierEvent
   }
 
+  takeDefineActionEvent(): NiaDefineActionEvent {
+    return this.event as NiaDefineActionEvent
+  }
+
+  takeRemoveActionEvent(): NiaRemoveActionEvent {
+    return this.event as NiaRemoveActionEvent
+  }
+
   takeSynchronizeEvent(): NiaSynchronizeEvent {
     return this.event as NiaSynchronizeEvent
   }
@@ -97,30 +125,40 @@ export class NiaEvent implements SerializableObject<NiaEvent, NiaEventSerialized
   static deserialize(serialized: NiaEventSerialized): NiaEvent {
     switch (serialized.eventType) {
       case NiaEventType.DefineDevice:
-        const defineKeyboardEventSerialized = serialized.event as NiaDefineDeviceEventObject
+        const defineKeyboardEventSerialized = serialized.event as NiaDefineDeviceEventSerialized
         const defineKeyboardEvent = NiaDefineDeviceEvent.deserialize(defineKeyboardEventSerialized)
         return new NiaEvent(defineKeyboardEvent)
       
       case NiaEventType.DefineModifier:
-        const defineModifierEventSerialized = serialized.event as NiaDefineModifierEventObject
+        const defineModifierEventSerialized = serialized.event as NiaDefineModifierEventSerialized
         const defineModifierEvent = NiaDefineModifierEvent.deserialize(defineModifierEventSerialized)
         return new NiaEvent(defineModifierEvent)
       
       case NiaEventType.ExecuteCode:
-        const executeCodeEventSerialized = serialized.event as NiaExecuteCodeEventObject
+        const executeCodeEventSerialized = serialized.event as NiaExecuteCodeEventSerialized
         const executeCodeEvent = NiaExecuteCodeEvent.deserialize(executeCodeEventSerialized)
         return new NiaEvent(executeCodeEvent)
       
       case NiaEventType.RemoveDevice:
-        const removeKeyboardEventSerialized = serialized.event as NiaRemoveDeviceEventObject
+        const removeKeyboardEventSerialized = serialized.event as NiaRemoveDeviceEventSerialized
         const removeKeyboardEvent = NiaRemoveDeviceEvent.deserialize(removeKeyboardEventSerialized)
         return new NiaEvent(removeKeyboardEvent)
       
       case NiaEventType.RemoveModifier:
-        const removeModifierEventSerialized = serialized.event as NiaRemoveModifierEventObject
+        const removeModifierEventSerialized = serialized.event as NiaRemoveModifierEventSerialized
         const removeModifierEvent = NiaRemoveModifierEvent.deserialize(removeModifierEventSerialized)
         return new NiaEvent(removeModifierEvent)
-      
+
+      case NiaEventType.DefineAction:
+        const defineActionEventSerialized = serialized.event as NiaDefineActionEventSerialized
+        const defineActionEvent = NiaDefineActionEvent.deserialize(defineActionEventSerialized)
+        return new NiaEvent(defineActionEvent)
+
+      case NiaEventType.RemoveAction:
+        const removeActionEventSerialized = serialized.event as NiaRemoveActionEventSerialized
+        const removeActionEvent = NiaRemoveActionEvent.deserialize(removeActionEventSerialized)
+        return new NiaEvent(removeActionEvent)
+
       case NiaEventType.Synchronize:
         const synchronizeEventSerialized = serialized.event as NiaSynchronizeEventObject
         const synchronizeEvent = NiaSynchronizeEvent.deserialize(synchronizeEventSerialized)
@@ -157,6 +195,16 @@ export class NiaEvent implements SerializableObject<NiaEvent, NiaEventSerialized
         return {
           eventType: this.eventType,
           event: (this.event as NiaRemoveModifierEvent).serialize()
+        }
+      case NiaEventType.DefineAction:
+        return {
+          eventType: this.eventType,
+          event: (this.event as NiaDefineActionEvent).serialize()
+        }
+      case NiaEventType.RemoveAction:
+        return {
+          eventType: this.eventType,
+          event: (this.event as NiaRemoveActionEvent).serialize()
         }
       case NiaEventType.Synchronize:
         return {

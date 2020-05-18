@@ -2,7 +2,6 @@ import {
   GetDevicesResponse,
   HandshakeResponse, Response,
 } from 'nia-protocol-js'
-import {NiaHandshakeResult} from '@/utils/protocol'
 import {InvalidResponseError} from '@/utils'
 import {NiaResponseType} from '@/utils/protocol/response'
 

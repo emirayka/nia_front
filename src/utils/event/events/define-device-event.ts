@@ -2,21 +2,21 @@ import {NiaEvent, NiaEventType} from '@/utils/event'
 import SerializableObject from '@/utils/serializable-object'
 
 export interface NiaDefineDeviceEventObject {
-  keyboardId: number
+  deviceId: number
 }
 
 export type NiaDefineDeviceEventSerialized = NiaDefineDeviceEventObject
 
 
 export class NiaDefineDeviceEvent implements SerializableObject<NiaDefineDeviceEvent, NiaDefineDeviceEventSerialized> {
-  private readonly keyboardId: number
+  private readonly deviceId: number
 
   constructor(args: NiaDefineDeviceEventObject) {
-    this.keyboardId = args.keyboardId
+    this.deviceId = args.deviceId
   }
 
   getDeviceId(): number {
-    return this.keyboardId
+    return this.deviceId
   }
 
   getEventType(): NiaEventType {
@@ -29,9 +29,9 @@ export class NiaDefineDeviceEvent implements SerializableObject<NiaDefineDeviceE
     return niaEvent
   }
 
-  serialize(): NiaDefineDeviceEventObject {
+  serialize(): NiaDefineDeviceEventSerialized {
     return {
-      keyboardId: this.keyboardId
+      deviceId: this.deviceId
     }
   }
 

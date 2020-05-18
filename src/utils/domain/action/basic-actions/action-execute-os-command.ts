@@ -5,12 +5,19 @@ import {
 } from '@/utils'
 import {NiaAction} from '@/utils/domain/action/action'
 import {NiaActionType} from '@/utils/domain/action/action-type'
+import SerializableObject from '@/utils/serializable-object'
 
-export class NiaActionExecuteOSCommand implements SerializablePB<NiaActionExecuteOSCommand, ActionExecuteOSCommand> {
+export interface NiaActionExecuteOSCommandObject {
+  osCommand: string
+}
+
+export type NiaActionExecuteOSCommandSerialized = NiaActionExecuteOSCommandObject
+
+export class NiaActionExecuteOSCommand implements SerializablePB<NiaActionExecuteOSCommand, ActionExecuteOSCommand>, SerializableObject<NiaActionExecuteOSCommand, NiaActionExecuteOSCommandSerialized> {
   private readonly osCommand: string
 
-  constructor(osCommand: string) {
-    this.osCommand = osCommand
+  constructor(args: NiaActionExecuteOSCommandObject) {
+    this.osCommand = args.osCommand
   }
 
   getActionType(): NiaActionType {
@@ -21,8 +28,11 @@ export class NiaActionExecuteOSCommand implements SerializablePB<NiaActionExecut
     return this.osCommand
   }
 
-  toAction(): NiaAction {
-    return new NiaAction(this)
+  toAction(name: string): NiaAction {
+    return new NiaAction({
+      actionName: name,
+      action: this,
+    })
   }
 
   toPB(): ActionExecuteOSCommand {
@@ -34,10 +44,20 @@ export class NiaActionExecuteOSCommand implements SerializablePB<NiaActionExecut
   }
 
   static fromPB(actionExecuteOSCommand: ActionExecuteOSCommand): NiaActionExecuteOSCommand {
-    const niaActionExecuteOSCommand: NiaActionExecuteOSCommand = new NiaActionExecuteOSCommand(
-      actionExecuteOSCommand.getOsCommand()
-    )
+    const niaActionExecuteOSCommand: NiaActionExecuteOSCommand = new NiaActionExecuteOSCommand({
+      osCommand: actionExecuteOSCommand.getOsCommand()
+    })
 
     return niaActionExecuteOSCommand
+  }
+
+  serialize(): NiaActionExecuteOSCommandSerialized {
+    return {
+      osCommand: this.osCommand
+    }
+  }
+
+  static deserialize(serialized: NiaActionExecuteOSCommandSerialized): NiaActionExecuteOSCommand {
+    return new NiaActionExecuteOSCommand(serialized)
   }
 }

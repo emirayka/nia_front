@@ -25,12 +25,13 @@
           <NiaKeyboardKey
             v-for="(key, index) in normalizedKeyboardKeys"
             class="nia-keyboard__nia-keyboard-key"
-            :class="selectedKeyClass(key.code)"
             :x="key.x"
             :y="key.y"
             :width="key.width"
             :height="key.height"
             :code="key.code"
+            :selected="isKeySelected(key.code)"
+            :modifier="isKeyModifier(key.code)"
             :key="index"
             @click="clickKeyHandler($event)"
           />
@@ -43,14 +44,10 @@
 <script lang="ts">
   import Vue from 'vue'
   import Component from 'vue-class-component'
-
   import {Prop} from 'vue-property-decorator'
 
-  import {
-    KeyboardModel,
-    KeyDescription
-  } from '@/store/models'
   import NiaKeyboardKey from './NiaKeyboardKey.vue'
+  import {NiaDeviceModel, NiaKey, NiaModifierDescription} from '@/utils'
 
   const normalize = (value: number, min: number, max: number, multiplier: number): number => {
     const diff = max - min
@@ -66,7 +63,7 @@
   })
   export default class NiaKeyboard extends Vue {
     @Prop({ required: true })
-    model!: KeyboardModel
+    model!: NiaDeviceModel
 
     @Prop({ required: true })
     keyboardHeight!: number
@@ -77,17 +74,11 @@
     @Prop({ required: true })
     defined!: boolean
 
-    @Prop({ default: false })
-    keySelected!: boolean
+    @Prop({ required: true })
+    selectedKeys!: Array<NiaKey>
 
-    @Prop({ default: 0 })
-    selectedKeyCode!: number | null
-
-    selectedKeyClass(keyCode: number): object {
-      return {
-        'selected': this.keySelected && keyCode == this.selectedKeyCode,
-      }
-    }
+    @Prop({ required: true })
+    modifiers!: Array<NiaModifierDescription>
 
     clickKeyHandler(code: number): void {
       this.$emit('click-key', code)
@@ -97,12 +88,32 @@
       this.$emit('click-keyboard')
     }
 
+    isKeySelected(keyCode: number): boolean {
+      for (const selectedKey of this.selectedKeys) {
+        if (selectedKey.getKeyCode() === keyCode) {
+          return true
+        }
+      }
+
+      return false
+    }
+
+    isKeyModifier(keyCode: number): boolean {
+      for (const modifier of this.modifiers) {
+        if (modifier.getKey().getKeyCode() === keyCode) {
+          return true
+        }
+      }
+
+      return false
+    }
+
     get keyboardModelWidth(): number {
-      return this.model.width
+      return this.model.getDeviceWidth()
     }
 
     get keyboardModelHeight(): number {
-      return this.model.height
+      return this.model.getDeviceHeight()
     }
 
     get keyboardModelAspectRatio(): number {
@@ -155,13 +166,13 @@
     }
 
     get normalizedKeyboardKeys(): object {
-      const normalizedKeyboardKeys: Array<KeyDescription> = this.model.keys.map(keyboardKey => {
+      const normalizedKeyboardKeys: Array<object> = this.model.getKeyDescriptions().map(key => {
         return {
-          x: normalize(keyboardKey.x, 0, this.keyboardModelWidth, this.keyboardVisibleWidth - 90) + 30,
-          y: normalize(keyboardKey.y, 0, this.keyboardModelHeight, this.keyboardVisibleHeight - 90) + 30,
-          width: normalize(keyboardKey.width, 0, this.keyboardModelWidth, this.keyboardVisibleWidth - 90),
-          height: normalize(keyboardKey.height, 0, this.keyboardModelHeight, this.keyboardVisibleHeight - 90),
-          code: keyboardKey.code,
+          x: normalize(key.getX(), 0, this.keyboardModelWidth, this.keyboardVisibleWidth - 90) + 30,
+          y: normalize(key.getY(), 0, this.keyboardModelHeight, this.keyboardVisibleHeight - 90) + 30,
+          width: normalize(key.getWidth(), 0, this.keyboardModelWidth, this.keyboardVisibleWidth - 90),
+          height: normalize(key.getHeight(), 0, this.keyboardModelHeight, this.keyboardVisibleHeight - 90),
+          code: key.getKeyCode(),
         }
       })
 
@@ -174,18 +185,6 @@
   scoped
   lang="scss"
 >
-  .nia-keyboard__nia-keyboard-key.selected:before {
-    content: " ";
-    position: absolute;
-    z-index: 1;
-    top: -5px;
-    left: -5px;
-    right: -5px;
-    bottom: -5px;
-    border: 2px dotted gold;
-    border-radius: 10%;
-    background-color: #33FFDD03;
-  }
 
   .nia-keyboard {
     position: relative;

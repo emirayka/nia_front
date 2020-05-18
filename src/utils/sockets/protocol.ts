@@ -17,12 +17,19 @@ import {
   NiaRemoveDeviceByNameRequest,
   NiaRemoveDeviceByPathRequest,
   NiaRemoveModifierRequest,
-  NiaRemoveModifierResponse,
+  NiaRemoveModifierResponse, NiaRequest,
 } from '@/utils/protocol'
 import {NiaResponse, NiaResponseType} from '@/utils/protocol/response'
 import {NiaDefineDeviceResponse} from '@/utils/protocol/responses/define-device-response'
 import {NiaRemoveDeviceByPathResponse} from '@/utils/protocol/responses/remove-device-by-path-response'
 import {NiaRemoveDeviceByNameResponse} from '@/utils/protocol/responses/remove-device-by-name-response'
+import {NiaAction, NiaKey} from '@/utils'
+import {NiaGetDefinedActionsResponse} from '@/utils/protocol/responses/get-defined-actions-request'
+import {NiaDefineActionResponse} from '@/utils/protocol/responses/define-action-response'
+import {NiaGetDefinedActionsRequest} from '@/utils/protocol/requests/get-defined-actions-request'
+import {NiaDefineActionRequest} from '@/utils/protocol/requests/define-action-request'
+import {NiaRemoveActionResponse} from '@/utils/protocol/responses/remove-action-response'
+import {NiaRemoveActionRequest} from '@/utils/protocol/requests/remove-action-request'
 
 export default class {
   private port: number
@@ -68,8 +75,9 @@ export default class {
         }
       })
 
-      const request: NiaHandshakeRequest = new NiaHandshakeRequest()
-      const data: Uint8Array = request.toPB().serializeBinary()
+      const request: NiaRequest = new NiaHandshakeRequest().toRequest()
+      const data: Uint8Array = request.toUint8Array()
+
       this.ws.send(data)
     })
   }
@@ -90,8 +98,8 @@ export default class {
         }
       })
 
-      const request: NiaGetDevicesRequest = new NiaGetDevicesRequest()
-      const data: Uint8Array = request.toRequest().toUint8Array()
+      const request: NiaRequest = new NiaGetDevicesRequest().toRequest()
+      const data: Uint8Array = request.toUint8Array()
       this.ws.send(data)
     })
   }
@@ -112,8 +120,8 @@ export default class {
         }
       })
 
-      const request: NiaExecuteCodeRequest = new NiaExecuteCodeRequest(code)
-      const data: Uint8Array = request.toPB().serializeBinary()
+      const request: NiaRequest = new NiaExecuteCodeRequest(code).toRequest()
+      const data: Uint8Array = request.toUint8Array()
 
       this.ws.send(data)
     })
@@ -135,8 +143,8 @@ export default class {
         }
       })
 
-      const request: NiaDefineDeviceRequest = new NiaDefineDeviceRequest(keyboardId)
-      const data: Uint8Array = request.toPB().serializeBinary()
+      const request: NiaRequest = new NiaDefineDeviceRequest(keyboardId).toRequest()
+      const data: Uint8Array = request.toUint8Array()
 
       this.ws.send(data)
     })
@@ -158,8 +166,8 @@ export default class {
         }
       })
 
-      const request: NiaRemoveDeviceByPathRequest = new NiaRemoveDeviceByPathRequest(keyboardPath)
-      const data: Uint8Array = request.toPB().serializeBinary()
+      const request: NiaRequest = new NiaRemoveDeviceByPathRequest(keyboardPath).toRequest()
+      const data: Uint8Array = request.toUint8Array()
 
       this.ws.send(data)
     })
@@ -181,8 +189,8 @@ export default class {
         }
       })
 
-      const request: NiaRemoveDeviceByNameRequest = new NiaRemoveDeviceByNameRequest(keyboardName)
-      const data: Uint8Array = request.toPB().serializeBinary()
+      const request: NiaRequest = new NiaRemoveDeviceByNameRequest(keyboardName).toRequest()
+      const data: Uint8Array = request.toUint8Array()
 
       this.ws.send(data)
     })
@@ -204,8 +212,8 @@ export default class {
         }
       })
 
-      const request: NiaGetDefinedModifiersRequest = new NiaGetDefinedModifiersRequest()
-      const data: Uint8Array = request.toPB().serializeBinary()
+      const request: NiaRequest = new NiaGetDefinedModifiersRequest().toRequest()
+      const data: Uint8Array = request.toUint8Array()
 
       this.ws.send(data)
     })
@@ -227,18 +235,18 @@ export default class {
         }
       })
 
-      const request: NiaDefineModifierRequest = new NiaDefineModifierRequest(
+      const request: NiaRequest = new NiaDefineModifierRequest(
         keyboardId,
         keyCode,
         modifierAlias,
-      )
-      const data: Uint8Array = request.toPB().serializeBinary()
+      ).toRequest()
+      const data: Uint8Array = request.toUint8Array()
 
       this.ws.send(data)
     })
   }
 
-  async removeModifier(keyboardId: number, keyCode: number): Promise<NiaRemoveModifierResponse> {
+  async removeModifier(key: NiaKey): Promise<NiaRemoveModifierResponse> {
     return new Promise((resolve, reject) => {
       this.ws.once('message', message => {
         if (message instanceof Uint8Array) {
@@ -254,14 +262,90 @@ export default class {
         }
       })
 
-      const request: NiaRemoveModifierRequest = new NiaRemoveModifierRequest(
-        keyboardId,
-        keyCode,
-      )
-      const data: Uint8Array = request.toPB().serializeBinary()
+      const deviceId: number | null = key.getDeviceId()
+      const keyCode: number = key.getKeyCode()
+
+      if (deviceId === null) {
+        reject('Device is is not set')
+        return
+      }
+
+      const request: NiaRequest = new NiaRemoveModifierRequest(
+        deviceId,
+        keyCode
+      ).toRequest()
+      const data: Uint8Array = request.toUint8Array()
 
       this.ws.send(data)
-      console.log('Sent remove modifier request')
+    })
+  }
+
+  async getDefinedActions(): Promise<NiaGetDefinedActionsResponse> {
+    return new Promise((resolve, reject) => {
+      this.ws.once('message', message => {
+        if (message instanceof Uint8Array) {
+          const response: NiaResponse = NiaResponse.fromUint8Array(message)
+
+          if (response.getResponseType() == NiaResponseType.GetDefinedActions) {
+            resolve(response.getResponse() as NiaGetDefinedActionsResponse)
+          } else {
+            reject(new InvalidResponseError('Expected Get Defined Actions response.'))
+          }
+        } else {
+          reject()
+        }
+      })
+
+      const request: NiaRequest = new NiaGetDefinedActionsRequest().toRequest()
+      const data: Uint8Array = request.toUint8Array()
+
+      this.ws.send(data)
+    })
+  }
+
+  async defineAction(action: NiaAction): Promise<NiaDefineActionResponse> {
+    return new Promise((resolve, reject) => {
+      this.ws.once('message', message => {
+        if (message instanceof Uint8Array) {
+          const response: NiaResponse = NiaResponse.fromUint8Array(message)
+
+          if (response.getResponseType() == NiaResponseType.DefineAction) {
+            resolve(response.getResponse() as NiaDefineActionResponse)
+          } else {
+            reject(new InvalidResponseError('Expected Define Action response.'))
+          }
+        } else {
+          reject()
+        }
+      })
+
+      const request: NiaRequest = new NiaDefineActionRequest(action).toRequest()
+      const data: Uint8Array = request.toUint8Array()
+
+      this.ws.send(data)
+    })
+  }
+
+  async removeAction(actionName: string): Promise<NiaRemoveActionResponse> {
+    return new Promise((resolve, reject) => {
+      this.ws.once('message', message => {
+        if (message instanceof Uint8Array) {
+          const response: NiaResponse = NiaResponse.fromUint8Array(message)
+
+          if (response.getResponseType() == NiaResponseType.RemoveAction) {
+            resolve(response.getResponse() as NiaRemoveActionResponse)
+          } else {
+            reject(new InvalidResponseError('Expected Remove Action response.'))
+          }
+        } else {
+          reject()
+        }
+      })
+
+      const request: NiaRequest = new NiaRemoveActionRequest(actionName).toRequest()
+      const data: Uint8Array = request.toUint8Array()
+
+      this.ws.send(data)
     })
   }
 }

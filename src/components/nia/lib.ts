@@ -1,3 +1,4 @@
+// form
 export enum NiaFormEventType {
   Edit,
   Select,
@@ -43,3 +44,11 @@ export interface NiaFormSelectProperty extends NiaFormBasicProperty {
 }
 
 export type NiaFormProperty = NiaFormEditProperty | NiaFormSelectProperty
+
+
+// table
+export interface NiaTableColumnDefinition {
+  name: string;
+  width: number | string;
+  style?: object;
+}

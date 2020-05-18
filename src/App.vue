@@ -9,7 +9,7 @@
         @define-keyboard="defineKeyboardHandler($event)"
         @remove-keyboard="removeKeyboardHandler($event)"
         @define-modifier="defineModifierHandler($event)"
-        @remove-modifier="removeModifierHandler($event)"
+        @remove-selected-modifiers="removeSelectedModifiersHandler()"
       />
     </keep-alive>
   </div>
@@ -41,14 +41,15 @@
     NiaExecuteCodeEventResponse,
     NiaDefineDeviceEventResponse,
     NiaRemoveDeviceEventResponse,
-    NiaDefineModifierResponse,
     NiaDefineModifierEventResponse,
     NiaRemoveModifierEventResponse,
     NiaDeviceInfo,
     NiaModifierDescriptionObject,
-    NiaModifierDescription,
+    NiaModifierDescription, NiaKey, NiaAction,
   } from './utils'
-  import {Modifier} from '@/store/models/modifier'
+
+  import loggers from '@/utils/logger'
+  const logger = loggers('test')
 
   export default {
     components: {
@@ -68,7 +69,7 @@
         })
       },
 
-      sendEvent: function(event: NiaEvent) {
+      sendEvent: function (event: NiaEvent) {
         ipcRenderer.send('nia-server-event', event.serialize())
       },
 
@@ -97,45 +98,56 @@
         this.sendEvent(event)
       },
 
-      removeModifierHandler: function (removeModifierEvent: NiaRemoveModifierEvent): void {
-        const event: NiaEvent = removeModifierEvent.toEvent()
-        console.log('Sent remove modifier event.')
+      removeSelectedModifiersHandler: function (): void {
+        const selectedModifiers: Array<NiaModifierDescription> = store.getters.UIModule.getSelectedModifiers
 
-        this.sendEvent(event)
+        for (const selectedModifier of selectedModifiers) {
+          const removeModifierEvent: NiaRemoveModifierEvent = new NiaRemoveModifierEvent({
+            deviceId: selectedModifier.getKey().getDeviceId(),
+            keyCode: selectedModifier.getKey().getKeyCode(),
+          })
+          const event: NiaEvent = removeModifierEvent.toEvent()
+
+          this.sendEvent(event)
+        }
       },
-      handleSynchronizeEventResponse: function(response: NiaSynchronizeEventResponse): void {
+      handleSynchronizeEventResponse: function (response: NiaSynchronizeEventResponse): void {
         const version: string = response.getVersion()
         const info: string = response.getInfo()
         const devicesInfo: Array<NiaDeviceInfo> = response.getDevicesInfo()
         const definedModifiers: Array<NiaModifierDescription> = response.getDefinedModifiers()
+        const definedActions: Array<NiaAction> = response.getDefinedActions()
 
         store.commit.KeymappingModule.setVersion(version)
         store.commit.KeymappingModule.setInfo(info)
         store.commit.KeymappingModule.setDevicesInfo(devicesInfo)
         store.commit.KeymappingModule.setModifiers(definedModifiers)
+        store.commit.KeymappingModule.setActions(definedActions)
       },
-      handleExecuteCodeEventResponse: function(response: NiaExecuteCodeEventResponse): void {
+      handleExecuteCodeEventResponse: function (response: NiaExecuteCodeEventResponse): void {
         const executionResult: ExecutionResult = response.toExecutionResult()
 
         store.commit.KeymappingModule.setExecutionResult(executionResult)
       },
-      handleDefineKeyboardResponse: function(response: NiaDefineDeviceEventResponse): void {
-        store.commit.KeymappingModule.makeKeyboardDefined(response.getDeviceId())
+      handleDefineKeyboardResponse: function (response: NiaDefineDeviceEventResponse): void {
+        store.commit.KeymappingModule.makeDeviceDefined(response.getDeviceId())
       },
-      handleRemoveKeyboardResponse: function(response: NiaRemoveDeviceEventResponse): void {
-        store.commit.KeymappingModule.makeKeyboardRemoved(response.getKeyboardPath())
+      handleRemoveKeyboardResponse: function (response: NiaRemoveDeviceEventResponse): void {
+        store.commit.KeymappingModule.makeDeviceRemoved(response.getKeyboardPath())
       },
-      handleDefineModifierResponse: function(response: NiaDefineModifierEventResponse): void {
-        const modifier: Modifier = response.toModifier()
+      handleDefineModifierResponse: function (response: NiaDefineModifierEventResponse): void {
+        const modifier: NiaModifierDescription = response.toModifier()
 
         store.commit.KeymappingModule.defineModifier(modifier)
       },
-      handleRemoveModifierResponse: function(response: NiaRemoveModifierEventResponse): void {
-        const modifier: Modifier = response.toModifier()
+      handleRemoveModifierResponse: function (response: NiaRemoveModifierEventResponse): void {
+        const modifierKey: NiaKey = response.toModifierKey()
 
-        store.commit.KeymappingModule.removeModifier(modifier)
+        store.commit.KeymappingModule.removeModifier(modifierKey)
       },
-      handleEventResponse: function(response: NiaEventResponse): void {
+      handleEventResponse: function (response: NiaEventResponse): void {
+        logger.info('test')
+
         if (response.isSynchronizeEventResponse()) {
           this.handleSynchronizeEventResponse(response.takeSynchronizeEventResponse())
         } else if (response.isExecuteCodeEventResponse()) {
@@ -151,7 +163,7 @@
         } else {
           console.log('unknown')
         }
-      }
+      },
     },
     mounted: function () {
       if (this.$router.currentRoute.path !== '/Keyboards') {

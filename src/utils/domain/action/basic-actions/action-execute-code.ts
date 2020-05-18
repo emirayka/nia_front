@@ -5,12 +5,19 @@ import {
 } from '@/utils'
 import {NiaAction} from '@/utils/domain/action/action'
 import {NiaActionType} from '@/utils/domain/action/action-type'
+import SerializableObject from '@/utils/serializable-object'
 
-export class NiaActionExecuteCode implements SerializablePB<NiaActionExecuteCode, ActionExecuteCode> {
+export interface NiaActionExecuteCodeObject {
+  code: string
+}
+
+export type NiaActionExecuteCodeSerialized = NiaActionExecuteCodeObject
+
+export class NiaActionExecuteCode implements SerializablePB<NiaActionExecuteCode, ActionExecuteCode>, SerializableObject<NiaActionExecuteCode, NiaActionExecuteCodeSerialized> {
   private readonly code: string
 
-  constructor(code: string) {
-    this.code = code
+  constructor(args: NiaActionExecuteCodeObject) {
+    this.code = args.code
   }
 
   getActionType(): NiaActionType {
@@ -21,8 +28,11 @@ export class NiaActionExecuteCode implements SerializablePB<NiaActionExecuteCode
     return this.code
   }
 
-  toAction(): NiaAction {
-    return new NiaAction(this)
+  toAction(name: string): NiaAction {
+    return new NiaAction({
+      actionName: name,
+      action: this,
+    })
   }
 
   toPB(): ActionExecuteCode {
@@ -35,9 +45,21 @@ export class NiaActionExecuteCode implements SerializablePB<NiaActionExecuteCode
 
   static fromPB(actionExecuteCode: ActionExecuteCode): NiaActionExecuteCode {
     const niaActionExecuteCode: NiaActionExecuteCode = new NiaActionExecuteCode(
-      actionExecuteCode.getCode()
+      {
+        code: actionExecuteCode.getCode()
+      }
     )
 
     return niaActionExecuteCode
+  }
+
+  serialize(): NiaActionExecuteCodeSerialized {
+    return {
+      code: this.code
+    }
+  }
+
+  static deserialize(serialized: NiaActionExecuteCodeSerialized): NiaActionExecuteCode {
+    return new NiaActionExecuteCode(serialized)
   }
 }

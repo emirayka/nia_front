@@ -1,11 +1,12 @@
 import Vue from 'vue'
 
 import {ExecutionResult} from '@/store/models'
-import {NiaDeviceInfo, NiaModifierDescription} from '@/utils'
+import {NiaAction, NiaDeviceInfo, NiaKey, NiaModifierDescription} from '@/utils'
 
 export interface KeymappingModuleState {
   devicesInfo: Array<NiaDeviceInfo>
   definedModifiers: Array<NiaModifierDescription>,
+  definedActions: Array<NiaAction>,
   code: string
   log: Array<ExecutionResult>
   version: string
@@ -17,12 +18,17 @@ export default {
   state: {
     devicesInfo: [],
     definedModifiers: [],
+    definedActions: [],
     code: '',
     log: [],
     version: '',
     info: '',
   } as KeymappingModuleState,
   mutations: {
+    setActions(state: KeymappingModuleState, actions: Array<NiaAction>) {
+      state.definedActions.splice(0)
+      state.definedActions.push(...actions)
+    },
     setModifiers(state: KeymappingModuleState, modifiers: Array<NiaModifierDescription>) {
       state.definedModifiers.splice(0)
       state.definedModifiers.push(...modifiers)
@@ -60,9 +66,9 @@ export default {
 
       state.log.push(logItem)
     },
-    makeDeviceDefined(state: KeymappingModuleState, devicePath: string) {
+    makeDeviceDefined(state: KeymappingModuleState, deviceId: number) {
       for (let deviceInfo of state.devicesInfo) {
-        if (deviceInfo.getDevicePath() === devicePath) {
+        if (deviceInfo.getDeviceId() === deviceId) {
           deviceInfo.setDefined(true)
           break
         }
@@ -71,7 +77,7 @@ export default {
     makeDeviceRemoved(state: KeymappingModuleState, devicePath: string) {
       for (let deviceInfo of state.devicesInfo) {
         if (deviceInfo.getDevicePath() === devicePath) {
-          deviceInfo.setDefined(true)
+          deviceInfo.setDefined(false)
           break
         }
       }
@@ -82,15 +88,27 @@ export default {
         modifier
       )
     },
-    removeModifier: (state: KeymappingModuleState, selectedModifier: NiaModifierDescription) => {
+    removeModifier: (state: KeymappingModuleState, selectedModifierKey: NiaKey) => {
       state.definedModifiers = state.definedModifiers.filter(
-        (modifier) => !modifier.equals(selectedModifier)
+        (modifier) => !modifier.getKey().equals(selectedModifierKey)
+      )
+    },
+    defineAction: (state: KeymappingModuleState, action: NiaAction) => {
+      // todo: show error when action is already defined
+      state.definedActions.push(
+        action
+      )
+    },
+    removeAction: (state: KeymappingModuleState, selectedAction: NiaAction) => {
+      state.definedActions = state.definedActions.filter(
+        (action) => action.getActionName() !== selectedAction.getActionName()
       )
     },
   },
   getters: {
     devices: (state: KeymappingModuleState) => state.devicesInfo,
     definedModifiers: (state: KeymappingModuleState) => state.definedModifiers,
+    definedActions: (state: KeymappingModuleState) => state.definedActions,
     version: (state: KeymappingModuleState) => state.version,
     info: (state: KeymappingModuleState) => state.info,
 
@@ -105,6 +123,15 @@ export default {
 
       return filtered.length > 0
         ? filtered[0].getDevicePath()
+        : null
+    },
+    getDeviceById: (state: KeymappingModuleState) => (deviceId: number) => {
+      let filtered: Array<NiaDeviceInfo> = state
+        .devicesInfo
+        .filter((deviceInfo: NiaDeviceInfo) => deviceInfo.getDeviceId() === deviceId)
+
+      return filtered.length > 0
+        ? filtered[0]
         : null
     },
 

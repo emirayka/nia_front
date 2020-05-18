@@ -4,7 +4,6 @@ import {
   RemoveDeviceByPathResponse,
   Response,
 } from 'nia-protocol-js'
-import {NiaRemoveKeyboardByPathResult} from '@/utils/protocol'
 import InvalidResponse from '@/utils/error/invalid-response'
 import {NiaResponseType} from '@/utils/protocol/response'
 

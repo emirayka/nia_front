@@ -1,18 +1,27 @@
 import {ActionMouseRelativeMove} from 'nia-protocol-js'
 
 import {
-  SerializablePB
+  NiaActionMouseAbsoluteMoveSerialized,
+  SerializablePB,
 } from '@/utils'
 import {NiaAction} from '@/utils/domain/action/action'
 import {NiaActionType} from '@/utils/domain/action/action-type'
+import SerializableObject from '@/utils/serializable-object'
 
-export class NiaActionMouseRelativeMove implements SerializablePB<NiaActionMouseRelativeMove, ActionMouseRelativeMove> {
+export interface NiaActionMouseRelativeMoveObject {
+  dx: number
+  dy: number
+}
+
+export type NiaActionMouseRelativeMoveSerialized = NiaActionMouseRelativeMoveObject
+
+export class NiaActionMouseRelativeMove implements SerializablePB<NiaActionMouseRelativeMove, ActionMouseRelativeMove>, SerializableObject<NiaActionMouseRelativeMove, NiaActionMouseRelativeMoveSerialized> {
   private readonly dx: number
   private readonly dy: number
 
-  constructor(dx: number, dy: number) {
-    this.dx = dx
-    this.dy = dy
+  constructor(args: NiaActionMouseRelativeMoveObject) {
+    this.dx = args.dx
+    this.dy = args.dy
   }
 
   getActionType(): NiaActionType {
@@ -27,8 +36,11 @@ export class NiaActionMouseRelativeMove implements SerializablePB<NiaActionMouse
     return this.dy
   }
 
-  toAction(): NiaAction {
-    return new NiaAction(this)
+  toAction(name: string): NiaAction {
+    return new NiaAction({
+      actionName: name,
+      action: this,
+    })
   }
 
   toPB(): ActionMouseRelativeMove {
@@ -41,11 +53,22 @@ export class NiaActionMouseRelativeMove implements SerializablePB<NiaActionMouse
   }
 
   static fromPB(actionMouseRelativeMove: ActionMouseRelativeMove): NiaActionMouseRelativeMove {
-    const niaActionMouseRelativeMove: NiaActionMouseRelativeMove = new NiaActionMouseRelativeMove(
-      actionMouseRelativeMove.getDx(),
-      actionMouseRelativeMove.getDy(),
-    )
+    const niaActionMouseRelativeMove: NiaActionMouseRelativeMove = new NiaActionMouseRelativeMove({
+      dx: actionMouseRelativeMove.getDx(),
+      dy: actionMouseRelativeMove.getDy(),
+  })
 
     return niaActionMouseRelativeMove
+  }
+
+  serialize(): NiaActionMouseRelativeMoveSerialized {
+    return {
+      dx: this.dx,
+      dy: this.dy,
+    }
+  }
+
+  static deserialize(serialized: NiaActionMouseRelativeMoveSerialized): NiaActionMouseRelativeMove {
+    return new NiaActionMouseRelativeMove(serialized)
   }
 }

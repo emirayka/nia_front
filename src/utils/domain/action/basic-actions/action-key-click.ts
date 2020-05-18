@@ -1,16 +1,24 @@
 import {ActionKeyClick} from 'nia-protocol-js'
 
 import {
-  SerializablePB
+  NiaActionExecuteOSCommandSerialized,
+  SerializablePB,
 } from '@/utils'
 import {NiaAction} from '@/utils/domain/action/action'
 import {NiaActionType} from '@/utils/domain/action/action-type'
+import SerializableObject from '@/utils/serializable-object'
 
-export class NiaActionKeyClick implements SerializablePB<NiaActionKeyClick, ActionKeyClick> {
+export interface NiaActionKeyClickObject {
+  keyCode: number
+}
+
+export type NiaActionKeyClickSerialized = NiaActionKeyClickObject
+
+export class NiaActionKeyClick implements SerializablePB<NiaActionKeyClick, ActionKeyClick>, SerializableObject<NiaActionKeyClick, NiaActionKeyClickSerialized> {
   private readonly keyCode: number
 
-  constructor(keyCode: number) {
-    this.keyCode = keyCode
+  constructor(args: NiaActionKeyClickObject) {
+    this.keyCode = args.keyCode
   }
 
   getActionType(): NiaActionType {
@@ -21,8 +29,11 @@ export class NiaActionKeyClick implements SerializablePB<NiaActionKeyClick, Acti
     return this.keyCode
   }
 
-  toAction(): NiaAction {
-    return new NiaAction(this)
+  toAction(name: string): NiaAction {
+    return new NiaAction({
+      actionName: name,
+      action: this,
+    })
   }
 
   toPB(): ActionKeyClick {
@@ -34,10 +45,20 @@ export class NiaActionKeyClick implements SerializablePB<NiaActionKeyClick, Acti
   }
 
   static fromPB(actionKeyClick: ActionKeyClick): NiaActionKeyClick {
-    const niaActionKeyClick: NiaActionKeyClick = new NiaActionKeyClick(
-      actionKeyClick.getKeyCode()
-    )
+    const niaActionKeyClick: NiaActionKeyClick = new NiaActionKeyClick({
+      keyCode:actionKeyClick.getKeyCode()
+    })
 
     return niaActionKeyClick
+  }
+
+  serialize(): NiaActionKeyClickSerialized {
+    return {
+      keyCode: this.keyCode
+    }
+  }
+
+  static deserialize(serialized: NiaActionKeyClickSerialized): NiaActionKeyClick {
+    return new NiaActionKeyClick(serialized)
   }
 }

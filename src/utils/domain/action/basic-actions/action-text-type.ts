@@ -1,16 +1,24 @@
 import {ActionTextType} from 'nia-protocol-js'
 
 import {
-  SerializablePB
+  NiaActionExecuteFunctionSerialized,
+  SerializablePB,
 } from '@/utils'
 import {NiaAction} from '@/utils/domain/action/action'
 import {NiaActionType} from '@/utils/domain/action/action-type'
+import SerializableObject from '@/utils/serializable-object'
 
-export class NiaActionTextType implements SerializablePB<NiaActionTextType, ActionTextType> {
+export interface NiaActionTextTypeObject {
+  text: string
+}
+
+export type NiaActionTextTypeSerialized = NiaActionTextTypeObject
+
+export class NiaActionTextType implements SerializablePB<NiaActionTextType, ActionTextType>, SerializableObject<NiaActionTextType, NiaActionTextTypeSerialized> {
   private readonly text: string
 
-  constructor(text: string) {
-    this.text = text
+  constructor(args: NiaActionTextTypeObject) {
+    this.text = args.text
   }
 
   getActionType(): NiaActionType {
@@ -21,8 +29,11 @@ export class NiaActionTextType implements SerializablePB<NiaActionTextType, Acti
     return this.text
   }
 
-  toAction(): NiaAction {
-    return new NiaAction(this)
+  toAction(name: string): NiaAction {
+    return new NiaAction({
+      actionName: name,
+      action: this,
+    })
   }
 
   toPB(): ActionTextType {
@@ -34,10 +45,20 @@ export class NiaActionTextType implements SerializablePB<NiaActionTextType, Acti
   }
 
   static fromPB(actionTextType: ActionTextType): NiaActionTextType {
-    const niaActionTextType: NiaActionTextType = new NiaActionTextType(
-      actionTextType.getText()
-    )
+    const niaActionTextType: NiaActionTextType = new NiaActionTextType({
+      text: actionTextType.getText()
+  })
 
     return niaActionTextType
+  }
+
+  serialize(): NiaActionTextTypeSerialized {
+    return {
+      text: this.text
+    };
+  }
+
+  static deserialize(serialized: NiaActionTextTypeSerialized): NiaActionTextType {
+    return new NiaActionTextType(serialized)
   }
 }

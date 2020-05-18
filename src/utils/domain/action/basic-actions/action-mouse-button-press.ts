@@ -1,16 +1,24 @@
 import {ActionMouseButtonPress} from 'nia-protocol-js'
 
 import {
-  SerializablePB
+  NiaActionMouseButtonClickSerialized,
+  SerializablePB,
 } from '@/utils'
 import {NiaAction} from '@/utils/domain/action/action'
 import {NiaActionType} from '@/utils/domain/action/action-type'
+import SerializableObject from '@/utils/serializable-object'
 
-export class NiaActionMouseButtonPress implements SerializablePB<NiaActionMouseButtonPress, ActionMouseButtonPress> {
+export interface NiaActionMouseButtonPressObject {
+  buttonCode: number
+}
+
+export type NiaActionMouseButtonPressSerialized = NiaActionMouseButtonPressObject
+
+export class NiaActionMouseButtonPress implements SerializablePB<NiaActionMouseButtonPress, ActionMouseButtonPress>, SerializableObject<NiaActionMouseButtonPress, NiaActionMouseButtonPressSerialized> {
   private readonly buttonCode: number
 
-  constructor(buttonCode: number) {
-    this.buttonCode = buttonCode
+  constructor(args: NiaActionMouseButtonPressObject) {
+    this.buttonCode = args.buttonCode
   }
 
   getActionType(): NiaActionType {
@@ -21,8 +29,11 @@ export class NiaActionMouseButtonPress implements SerializablePB<NiaActionMouseB
     return this.buttonCode
   }
 
-  toAction(): NiaAction {
-    return new NiaAction(this)
+  toAction(name: string): NiaAction {
+    return new NiaAction({
+      actionName: name,
+      action: this,
+    })
   }
 
   toPB(): ActionMouseButtonPress {
@@ -34,10 +45,20 @@ export class NiaActionMouseButtonPress implements SerializablePB<NiaActionMouseB
   }
 
   static fromPB(actionMouseButtonPress: ActionMouseButtonPress): NiaActionMouseButtonPress {
-    const niaActionMouseButtonPress: NiaActionMouseButtonPress = new NiaActionMouseButtonPress(
-      actionMouseButtonPress.getButtonCode()
-    )
+    const niaActionMouseButtonPress: NiaActionMouseButtonPress = new NiaActionMouseButtonPress({
+      buttonCode: actionMouseButtonPress.getButtonCode()
+  })
 
     return niaActionMouseButtonPress
+  }
+
+  serialize(): NiaActionMouseButtonPressSerialized {
+    return {
+      buttonCode: this.buttonCode
+    }
+  }
+
+  static deserialize(serialized: NiaActionMouseButtonPressSerialized): NiaActionMouseButtonPress {
+    return new NiaActionMouseButtonPress(serialized)
   }
 }

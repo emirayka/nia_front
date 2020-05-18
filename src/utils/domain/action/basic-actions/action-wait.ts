@@ -1,16 +1,24 @@
 import {ActionWait} from 'nia-protocol-js'
 
 import {
-  SerializablePB
+  NiaActionTextTypeSerialized,
+  SerializablePB,
 } from '@/utils'
 import {NiaAction} from '@/utils/domain/action/action'
 import {NiaActionType} from '@/utils/domain/action/action-type'
+import SerializableObject from '@/utils/serializable-object'
 
-export class NiaActionWait implements SerializablePB<NiaActionWait, ActionWait> {
+export interface NiaActionWaitObject {
+  ms: number
+}
+
+export type NiaActionWaitSerialized = NiaActionWaitObject
+
+export class NiaActionWait implements SerializablePB<NiaActionWait, ActionWait>, SerializableObject<NiaActionWait, NiaActionWaitSerialized> {
   private readonly ms: number
 
-  constructor(ms: number) {
-    this.ms = ms
+  constructor(args: NiaActionWaitObject) {
+    this.ms = args.ms
   }
 
   getActionType(): NiaActionType {
@@ -21,8 +29,11 @@ export class NiaActionWait implements SerializablePB<NiaActionWait, ActionWait> 
     return this.ms
   }
 
-  toAction(): NiaAction {
-    return new NiaAction(this)
+  toAction(name: string): NiaAction {
+    return new NiaAction({
+      actionName: name,
+      action: this,
+    })
   }
 
   toPB(): ActionWait {
@@ -34,10 +45,20 @@ export class NiaActionWait implements SerializablePB<NiaActionWait, ActionWait> 
   }
 
   static fromPB(actionWait: ActionWait): NiaActionWait {
-    const niaActionWait: NiaActionWait = new NiaActionWait(
-      actionWait.getMs()
-    )
+    const niaActionWait: NiaActionWait = new NiaActionWait({
+      ms: actionWait.getMs()
+  })
 
     return niaActionWait
+  }
+
+  serialize(): NiaActionWaitSerialized {
+    return {
+      ms: this.ms
+    };
+  }
+
+  static deserialize(serialized: NiaActionWaitSerialized): NiaActionWait {
+    return new NiaActionWait(serialized)
   }
 }

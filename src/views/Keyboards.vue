@@ -9,31 +9,29 @@
       <NiaGridItem
         :x="1"
         :y="1"
-        :w="20"
+        :w="30"
         :h="100"
       >
         <NiaAccordion>
           <NiaAccordionItem
             :id="'111'"
-            :title="'title-1'"
+            :title="'Modifiers'"
             :multiple="false"
           >
             <NiaModifierTable
-              :modifiers="getModifiers"
+              :modifiers="getDefinedModifiers"
+              :selected-modifiers="getSelectedModifiers"
+              @toggle-modifier-selection="toggleModifierSelection($event)"
               @add-modifier="showAddModifierDialogHandler()"
-              @select-modifier="selectModifierHandler($event)"
-              @remove-modifier="removeModifierHandler($event)"
+              @remove-selected-modifiers="removeSelectedModifiersHandler()"
             />
           </NiaAccordionItem>
           <NiaAccordionItem
             :id="'112'"
-            :title="'title-2'"
+            :title="'Actions'"
             :multiple="false"
           >
-            <div>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid dolor dolore, ducimus exercitationem
-              facilis fugiat, harum, in ipsam iure laudantium officia officiis optio quod rem suscipit veniam veritatis
-              voluptas voluptates.
-            </div>
+            <NiaActionTable />
           </NiaAccordionItem>
           <NiaAccordionItem
             :id="'113'"
@@ -49,14 +47,15 @@
       </NiaGridItem>
 
       <NiaGridItem
-        :x="21"
+        :x="31"
         :y="1"
-        :w="80"
-        :h="70"
+        :w="70"
+        :h="60"
       >
         <NiaKeyboards
           :devices-info="getDevicesInfo"
-          :selected-key="getSelectedKey"
+          :selected-keys="getSelectedKeys"
+          :modifiers="getDefinedModifiers"
           @define-keyboard="$emit('define-keyboard', $event)"
           @remove-keyboard="$emit('remove-keyboard', $event)"
           @click-keyboard="clickKeyboardHandler($event)"
@@ -65,10 +64,10 @@
       </NiaGridItem>
 
       <NiaGridItem
-        :x="21"
-        :y="71"
-        :w="80"
-        :h="30"
+        :x="31"
+        :y="61"
+        :w="70"
+        :h="40"
       >
         <NiaColoredDiv>
           3
@@ -84,6 +83,12 @@
       @select-key-code="addModifierDialogSelectKeyCodeHandler($event)"
       @select-modifier-alias="addModifierDialogSelectModifierAliasHandler($event)"
     />
+
+    <NiaAddActionDialog
+      v-if="addActionDialogIsShown"
+      @add-action="addActionDialogAddActionHandler"
+      @cancel="addActionDialogCancelHandler"
+    />
   </div>
 </template>
 
@@ -93,35 +98,41 @@
 
   import NiaKeyboards from '@/components/NiaKeyboards.vue'
   import NiaModifierTable from '@/components/NiaModifierTable.vue'
+  import NiaActionTable from '@/components/NiaActionTable.vue'
   import NiaAddModifierDialog from '@/components/dialogs/NiaAddModifierDialog.vue'
-  import {DeviceInfo} from '@/store/models'
+  import NiaAddActionDialog from '@/components/dialogs/NiaAddActionDialog.vue'
 
   import store from '@/store'
-  import {
-    KeyboardKey
-  } from '@/store/models'
   import {mapStringToKeyCode} from '@/utils/utils'
-  import {NiaDefineModifierEvent, NiaRemoveModifierEvent} from '@/utils'
-  import {Modifier} from '@/store/models/modifier'
+  import {
+    NiaAction,
+    NiaDefineModifierEvent,
+    NiaDeviceInfo,
+    NiaKey,
+    NiaModifierDescription,
+  } from '@/utils'
 
   @Component({
     name: 'Keyboards',
     components: {
+      NiaActionTable,
       NiaKeyboards,
       NiaModifierTable,
       NiaAddModifierDialog,
+      NiaAddActionDialog,
     },
   })
   export default class Keyboards extends Vue {
+    // add modifier dialog
     showAddModifierDialogHandler(): void {
       store.commit.UIModule.showAddModifierDialog()
     }
 
     addModifierDialogAddModifierHandler(): void {
-      const keyboardName: string = store.getters.UIModule.addModifierDialogSelectedKeyboard
-      const keyboardPath: string | null = store.getters.KeymappingModule.getKeyboardPathByName(keyboardName)
+      const deviceName: string = store.getters.UIModule.addModifierDialogSelectedKeyboard
+      const device: NiaDeviceInfo | null = store.getters.KeymappingModule.getDeviceByName(deviceName)
 
-      if (keyboardPath === null) {
+      if (device === null) {
         // todo: show error here
         return
       }
@@ -129,16 +140,16 @@
       const keyCode: number = store.getters.UIModule.addModifierDialogSelectedKeyCode
       const modifierAlias: string = store.getters.UIModule.addModifierDialogSelectedModifierAlias
 
-      if (store.getters.KeymappingModule.isModifierAlreadyDefined(keyboardPath, keyCode)) {
+      if (store.getters.KeymappingModule.isModifierAlreadyDefined(device.getDeviceId(), keyCode)) {
         // todo: show error here
         return
       }
 
-      this.$emit('define-modifier', new NiaDefineModifierEvent(
-        keyboardPath,
+      this.$emit('define-modifier', new NiaDefineModifierEvent({
+        keyboardId: device.getDeviceId(),
         keyCode,
         modifierAlias,
-      ))
+      }))
       store.commit.UIModule.hideAddModifierDialog()
     }
 
@@ -162,45 +173,65 @@
       store.commit.UIModule.setAddModifierDialogSelectedModifierAlias(modifierAlias)
     }
 
-    selectModifierHandler(modifier: Modifier): void {
-      console.log(modifier)
-      store.commit.UIModule.selectModifier(modifier)
+    //
+    showAddActionDialogHandler(): void {
+      store.commit.UIModule.showAddActionDialog()
     }
 
-    removeModifierHandler(): void {
-      const selectedModifier: Modifier | null = store.getters.UIModule.getSelectedModifier
+    addActionDialogAddActionHandler(): void {
+      return
+    }
 
-      if (selectedModifier !== null) {
-        const removeModifierEvent: NiaRemoveModifierEvent = new NiaRemoveModifierEvent(
-          selectedModifier.keyboardKey.keyboardPath,
-          selectedModifier.keyboardKey.keyCode,
-        )
-        this.$emit('remove-modifier', removeModifierEvent)
-      }
+    addActionDialogCancelHandler(): void {
+      store.commit.UIModule.hideAddActionDialog()
+    }
+
+    toggleModifierSelection(modifier: NiaModifierDescription): void {
+      store.commit.UIModule.toggleModifierSelection(modifier)
+    }
+
+    removeSelectedModifiersHandler(): void {
+      this.$emit('remove-selected-modifiers')
     }
 
     clickKeyboardHandler(): void {
-      store.commit.UIModule.unselectKey()
+      store.commit.UIModule.unselectKeys()
     }
 
-    clickKeyHandler(keyboardKey: KeyboardKey): void {
-      store.commit.UIModule.selectKey(keyboardKey)
+    clickKeyHandler(key: NiaKey): void {
+      store.commit.UIModule.toggleKeySelection(key)
     }
 
     get addModifierDialogIsShown(): boolean {
       return store.getters.UIModule.addModifierDialogIsShown
     }
 
-    get getModifiers(): Array<Modifier> {
-      return store.getters.KeymappingModule.modifiers
+    get addActionDialogIsShown(): boolean {
+      return store.getters.UIModule.addActionDialogIsShown
     }
 
-    get getDevicesInfo(): Array<DeviceInfo> {
-      return store.getters.KeymappingModule.keyboards
+    get getDevicesInfo(): Array<NiaDeviceInfo> {
+      return store.getters.KeymappingModule.devices
     }
 
-    get getSelectedKey(): KeyboardKey | null {
-      return store.getters.UIModule.getSelectedKey
+    get getSelectedKeys(): Array<NiaKey> {
+      return store.getters.UIModule.getSelectedKeys
+    }
+
+    get getDefinedModifiers(): Array<NiaModifierDescription> {
+      return store.getters.KeymappingModule.definedModifiers
+    }
+
+    get getSelectedModifiers(): Array<NiaModifierDescription> {
+      return store.getters.UIModule.getSelectedModifiers
+    }
+
+    get getDefinedActions(): Array<NiaAction> {
+      return store.getters.KeymappingModule.definedActions
+    }
+
+    get getSelectedActions(): Array<NiaAction> {
+      return store.getters.UIModule.getSelectedActions
     }
   }
 </script>

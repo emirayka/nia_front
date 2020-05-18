@@ -1,16 +1,24 @@
 import {ActionMouseButtonRelease} from 'nia-protocol-js'
 
 import {
-  SerializablePB
+  NiaActionMouseButtonPressSerialized,
+  SerializablePB,
 } from '@/utils'
 import {NiaAction} from '@/utils/domain/action/action'
 import {NiaActionType} from '@/utils/domain/action/action-type'
+import SerializableObject from '@/utils/serializable-object'
 
-export class NiaActionMouseButtonRelease implements SerializablePB<NiaActionMouseButtonRelease, ActionMouseButtonRelease> {
+export interface NiaActionMouseButtonReleaseObject {
+  buttonCode: number
+}
+
+export type NiaActionMouseButtonReleaseSerialized = NiaActionMouseButtonReleaseObject
+
+export class NiaActionMouseButtonRelease implements SerializablePB<NiaActionMouseButtonRelease, ActionMouseButtonRelease>, SerializableObject<NiaActionMouseButtonRelease, NiaActionMouseButtonReleaseSerialized> {
   private readonly buttonCode: number
 
-  constructor(buttonCode: number) {
-    this.buttonCode = buttonCode
+  constructor(args: NiaActionMouseButtonReleaseObject) {
+    this.buttonCode = args.buttonCode
   }
 
   getActionType(): NiaActionType {
@@ -21,8 +29,11 @@ export class NiaActionMouseButtonRelease implements SerializablePB<NiaActionMous
     return this.buttonCode
   }
 
-  toAction(): NiaAction {
-    return new NiaAction(this)
+  toAction(name: string): NiaAction {
+    return new NiaAction({
+      actionName: name,
+      action: this,
+    })
   }
 
   toPB(): ActionMouseButtonRelease {
@@ -34,10 +45,20 @@ export class NiaActionMouseButtonRelease implements SerializablePB<NiaActionMous
   }
 
   static fromPB(actionMouseButtonRelease: ActionMouseButtonRelease): NiaActionMouseButtonRelease {
-    const niaActionMouseButtonRelease: NiaActionMouseButtonRelease = new NiaActionMouseButtonRelease(
-      actionMouseButtonRelease.getButtonCode()
-    )
+    const niaActionMouseButtonRelease: NiaActionMouseButtonRelease = new NiaActionMouseButtonRelease({
+      buttonCode: actionMouseButtonRelease.getButtonCode()
+  })
 
     return niaActionMouseButtonRelease
+  }
+
+  serialize(): NiaActionMouseButtonReleaseSerialized {
+    return {
+      buttonCode: this.buttonCode
+    }
+  }
+
+  static deserialize(serialized: NiaActionMouseButtonReleaseSerialized): NiaActionMouseButtonRelease {
+    return new NiaActionMouseButtonRelease(serialized)
   }
 }

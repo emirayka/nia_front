@@ -3,7 +3,6 @@ import {
   GetDevicesResponse,
   Response,
 } from 'nia-protocol-js'
-import {NiaGetDevicesResult} from '@/utils/protocol'
 import {InvalidResponseError} from '@/utils'
 import {NiaDeviceInfo} from '@/utils/domain/device/device-info'
 import {NiaResponseType} from '@/utils/protocol/response'

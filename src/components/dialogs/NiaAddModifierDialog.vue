@@ -13,11 +13,11 @@
     </template>
 
     <template v-slot:footer>
-      <NiaDialogFooterButton @click="addModifierHandler()">
+      <NiaDialogFooterButton @click="$emit('add-modifier')">
         Add
       </NiaDialogFooterButton>
 
-      <NiaDialogFooterButton @click="cancelHandler()">
+      <NiaDialogFooterButton @click="$emit('cancel')">
         Cancel
       </NiaDialogFooterButton>
     </template>
@@ -38,8 +38,7 @@
     NiaFormPropertyEvent,
     NiaFormPropertyType, NiaFormSelectEvent, NiaFormSelectProperty,
   } from '@/components/nia/lib'
-  import {DeviceInfo, KeyDescription} from '@/store/models'
-  import {mapKeyCodeToString} from '@/utils'
+  import {mapKeyCodeToString, NiaDeviceInfo} from '@/utils'
 
   const PROPERTY_KEYBOARD = 'Keyboard'
   const PROPERTY_KEY = 'Key'
@@ -51,16 +50,17 @@
   export default class NiaAddModifierDialog extends Vue {
     constructFormProperties() {
       const selectedKeyboardName = store.getters.UIModule.addModifierDialogSelectedKeyboard
-      const keyboardNames: Array<string> = store.getters.KeymappingModule.keyboardNames
+      const deviceNames: Array<string> = store.getters.KeymappingModule.deviceNames
       let keys: Array<string> = [];
 
       if (selectedKeyboardName !== null) {
-        const selectedKeyboard: DeviceInfo | null = store.getters.KeymappingModule.getKeyboardByName(selectedKeyboardName)
-        if (selectedKeyboard !== null) {
-          keys = selectedKeyboard
-            .model
-            .keys
-            .map((key) => mapKeyCodeToString(key.code))
+        const selectedDevice: NiaDeviceInfo | null = store.getters.KeymappingModule.getDeviceByName(selectedKeyboardName)
+
+        if (selectedDevice !== null) {
+          keys = selectedDevice
+            .getDeviceModel()
+            .getKeyDescriptions()
+            .map((key) => mapKeyCodeToString(key.getKeyCode()))
         }
       }
 
@@ -68,29 +68,21 @@
         {
           type: NiaFormPropertyType.Select,
           name: PROPERTY_KEYBOARD,
-          validator: (value: NiaFormEvent) => true,
-          selectValues: keyboardNames,
+          validator: () => true,
+          selectValues: deviceNames,
         } as NiaFormSelectProperty,
         {
           type: NiaFormPropertyType.Select,
           name: PROPERTY_KEY,
-          validator: (value: NiaFormEvent) => true,
+          validator: () => true,
           selectValues: keys,
         } as NiaFormSelectProperty,
         {
           type: NiaFormPropertyType.Edit,
           name: PROPERTY_MODIFIER_ALIAS,
-          validator: (value: NiaFormEvent) => true,
+          validator: () => true,
         } as NiaFormEditProperty,
       ]
-    }
-
-    addModifierHandler(): void {
-      this.$emit('add-modifier')
-    }
-
-    cancelHandler(): void {
-      this.$emit('cancel')
     }
 
     changeHandler(event: NiaFormPropertyEvent): void {

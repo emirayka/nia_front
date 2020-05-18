@@ -1,24 +1,24 @@
 import {
-  DefineModifierResponse,
+  DefineActionResponse,
   Response,
 } from 'nia-protocol-js'
 import InvalidResponse from '@/utils/error/invalid-response'
 import {NiaResponseType} from '@/utils/protocol/response'
 
-export interface NiaDefineModifierResponseObject {
+export interface NiaDefineActionResponseObject {
   message: string
   success: boolean
   error: boolean
   failure: boolean
 }
 
-export class NiaDefineModifierResponse {
+export class NiaDefineActionResponse {
   private readonly message: string
   private readonly success: boolean
   private readonly error: boolean
   private readonly failure: boolean
 
-  constructor(args: NiaDefineModifierResponseObject) {
+  constructor(args: NiaDefineActionResponseObject) {
     this.message = args.message
     this.success = args.success
     this.error = args.error
@@ -42,37 +42,37 @@ export class NiaDefineModifierResponse {
   }
 
   getType(): NiaResponseType {
-    return NiaResponseType.DefineModifier
+    return NiaResponseType.DefineAction
   }
 
-  static fromPB(defineModifierResponsePB: DefineModifierResponse): NiaDefineModifierResponse {
+  static fromPB(defineActionResponsePB: DefineActionResponse): NiaDefineActionResponse {
     let message: string = ''
     let success: boolean = true
     let error: boolean = true
     let failure: boolean = true
 
-    switch (defineModifierResponsePB.getResultCase()) {
-      case DefineModifierResponse.ResultCase.SUCCESS_RESULT:
-        message = defineModifierResponsePB.getSuccessResult()?.getMessage() ?? ''
+    switch (defineActionResponsePB.getResultCase()) {
+      case DefineActionResponse.ResultCase.SUCCESS_RESULT:
+        message = defineActionResponsePB.getSuccessResult()?.getMessage() ?? ''
         success = true
         break;
-      case DefineModifierResponse.ResultCase.ERROR_RESULT:
-        message = defineModifierResponsePB.getErrorResult()?.getMessage() ?? ''
+      case DefineActionResponse.ResultCase.ERROR_RESULT:
+        message = defineActionResponsePB.getErrorResult()?.getMessage() ?? ''
         error = true
         break;
-      case DefineModifierResponse.ResultCase.FAILURE_RESULT:
-        message = defineModifierResponsePB.getFailureResult()?.getMessage() ?? ''
+      case DefineActionResponse.ResultCase.FAILURE_RESULT:
+        message = defineActionResponsePB.getFailureResult()?.getMessage() ?? ''
         failure = true
         break;
     }
 
-    const args: NiaDefineModifierResponseObject = {
+    const args: NiaDefineActionResponseObject = {
       message,
       success,
       error,
       failure
     }
 
-    return new NiaDefineModifierResponse(args)
+    return new NiaDefineActionResponse(args)
   }
 }

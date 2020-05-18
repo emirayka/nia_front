@@ -10,15 +10,15 @@
         class="nia-keyboards__nia-tabs__nia-tab"
         v-for="(device, index) of devicesInfo"
         :key="index"
-        :title="device.name"
+        :title="device.getDeviceName()"
       >
         <NiaKeyboard
-          :model="device.model"
-          :defined="device.defined"
+          :model="device.getDeviceModel()"
+          :defined="device.isDefined()"
           :keyboard-height="keyboardHeight"
           :keyboard-width="keyboardWidth"
-          :key-selected="selectedKey !== null && device.path === selectedKey.keyboardPath"
-          :selected-key-code="selectedKey !== null && selectedKey.keyCode"
+          :selected-keys="getDeviceSelectedKeys(device.getDeviceId())"
+          :modifiers="getDeviceModifiers(device.getDeviceId())"
           @switch="switchHandler(device, $event)"
           @click-key="clickKeyHandler(device, $event)"
           @click-keyboard="clickKeyboardHandler(device)"
@@ -48,14 +48,18 @@
 <script lang="ts">
   import Vue from 'vue'
   import Component from 'vue-class-component'
-  import {mapGetters} from 'vuex'
 
   import NiaKeyboard from '@/components/NiaKeyboard.vue'
   import {Prop} from 'vue-property-decorator'
 
-  import {DeviceInfo, KeyboardKey} from '@/store/models'
-  import store from '@/store'
-  import {NiaDefineDeviceEvent, NiaRemoveDeviceEvent} from '@/utils'
+  import {
+    NiaDefineDeviceEvent,
+    NiaDefineDeviceEventObject,
+    NiaDeviceInfo,
+    NiaKey, NiaModifierDescription,
+    NiaRemoveDeviceEvent,
+    NiaRemoveDeviceEventObject,
+  } from '@/utils'
 
   @Component({
     name: 'NiaKeyboards',
@@ -64,39 +68,63 @@
     },
   })
   export default class NiaKeyboards extends Vue {
-    @Prop({required: true})
-    devicesInfo!: Array<DeviceInfo>
+    @Prop({ required: true })
+    devicesInfo!: Array<NiaDeviceInfo>
 
-    @Prop({required: true})
-    selectedKey!: KeyboardKey
+    @Prop({ required: true })
+    selectedKeys!: Array<NiaKey>
+
+    @Prop({ required: true })
+    modifiers!: Array<NiaModifierDescription>
 
     $refs!: {
       tabs: HTMLDivElement;
     }
 
-    switchHandler(deviceInfo: DeviceInfo, event: boolean): void {
-      if (event) {
-        const defineKeyboardEvent: NiaDefineDeviceEvent =  new NiaDefineDeviceEvent(
-            deviceInfo.path,
-            deviceInfo.name,
+    switchHandler(deviceInfo: NiaDeviceInfo, needToDefine: boolean): void {
+      if (needToDefine) {
+        const args: NiaDefineDeviceEventObject = {
+          deviceId: deviceInfo.getDeviceId(),
+        }
+        const defineKeyboardEvent: NiaDefineDeviceEvent = new NiaDefineDeviceEvent(
+          args,
         )
 
         this.$emit('define-keyboard', defineKeyboardEvent)
       } else {
-        const removeKeyboardEvent: NiaRemoveDeviceEvent =  new NiaRemoveDeviceEvent(
-          deviceInfo.path,
+        const args: NiaRemoveDeviceEventObject = {
+          devicePath: deviceInfo.getDevicePath(),
+        }
+
+        const removeKeyboardEvent: NiaRemoveDeviceEvent = new NiaRemoveDeviceEvent(
+          args,
         )
 
         this.$emit('remove-keyboard', removeKeyboardEvent)
       }
     }
 
-    clickKeyboardHandler(device: DeviceInfo): void {
-      this.$emit('click-keyboard', {keyboardPath: device.path})
+    clickKeyboardHandler(device: NiaDeviceInfo): void {
+      this.$emit('click-keyboard', { keyboardPath: device.getDevicePath() })
     }
 
-    clickKeyHandler(device: DeviceInfo, keyCode: number): void {
-      this.$emit('click-key', {keyboardPath: device.path, keyCode})
+    clickKeyHandler(device: NiaDeviceInfo, keyCode: number): void {
+      const key: NiaKey = new NiaKey({
+        deviceId: device.getDeviceId(),
+        keyCode: keyCode,
+      })
+
+      this.$emit('click-key', key)
+    }
+
+    getDeviceModifiers(deviceId: number): Array<NiaModifierDescription> {
+      return this.modifiers
+        .filter((selectedModifier) => selectedModifier.getKey().getDeviceId() == deviceId)
+    }
+
+    getDeviceSelectedKeys(deviceId: number): Array<NiaKey> {
+      return this.selectedKeys
+        .filter((selectedKey) => selectedKey.getDeviceId() == deviceId)
     }
 
     get noDevices(): boolean {

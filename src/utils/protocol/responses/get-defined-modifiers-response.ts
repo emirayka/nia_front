@@ -3,10 +3,8 @@ import {
   GetDefinedModifiersResponse, ModifierDescription, Response,
 } from 'nia-protocol-js'
 import {
-  NiaGetDefinedModifiersResult,
   InvalidResponseError, NiaModifierDescription,
 } from '@/utils'
-import {Modifier} from '@/store/models/modifier'
 import {NiaResponseType} from '@/utils/protocol/response'
 
 export interface NiaGetDefinedModifiersResponseObject {
@@ -90,7 +88,6 @@ export class NiaGetDefinedModifiersResponse {
     }
 
     return new NiaGetDefinedModifiersResponse(args)
-
   }
 }
 

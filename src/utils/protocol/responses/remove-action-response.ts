@@ -1,27 +1,23 @@
 import {
-  ExecuteCodeResponse,
+  RemoveActionResponse,
   Response,
 } from 'nia-protocol-js'
-
-import {
-  InvalidResponseError,
-} from '@/utils'
 import {NiaResponseType} from '@/utils/protocol/response'
 
-export interface NiaExecuteCodeResponseObject {
+export interface NiaRemoveActionResponseObject {
   message: string
   success: boolean
   error: boolean
   failure: boolean
 }
 
-export class NiaExecuteCodeResponse {
+export class NiaRemoveActionResponse {
   private readonly message: string
   private readonly success: boolean
   private readonly error: boolean
   private readonly failure: boolean
 
-  constructor(args: NiaExecuteCodeResponseObject) {
+  constructor(args: NiaRemoveActionResponseObject) {
     this.message = args.message
     this.success = args.success
     this.error = args.error
@@ -45,38 +41,37 @@ export class NiaExecuteCodeResponse {
   }
 
   getType(): NiaResponseType {
-    return NiaResponseType.ExecuteCode
+    return NiaResponseType.RemoveAction
   }
 
-  static fromPB(executeCodeResponsePB: ExecuteCodeResponse): NiaExecuteCodeResponse {
+  static fromPB(removeActionResponsePB: RemoveActionResponse): NiaRemoveActionResponse {
     let message: string = ''
     let success: boolean = false
     let error: boolean = false
     let failure: boolean = false
 
-    switch (executeCodeResponsePB.getResultCase()) {
-      case ExecuteCodeResponse.ResultCase.SUCCESS_RESULT:
-        message = executeCodeResponsePB.getSuccessResult()?.getMessage() ?? ''
+    switch (removeActionResponsePB.getResultCase()) {
+      case RemoveActionResponse.ResultCase.SUCCESS_RESULT:
+        message = removeActionResponsePB.getSuccessResult()?.getMessage() ?? ''
         success = true
         break;
-      case ExecuteCodeResponse.ResultCase.ERROR_RESULT:
-        message = executeCodeResponsePB.getErrorResult()?.getMessage() ?? ''
+      case RemoveActionResponse.ResultCase.ERROR_RESULT:
+        message = removeActionResponsePB.getErrorResult()?.getMessage() ?? ''
         error = true
         break;
-      case ExecuteCodeResponse.ResultCase.FAILURE_RESULT:
-        message = executeCodeResponsePB.getFailureResult()?.getMessage() ?? ''
+      case RemoveActionResponse.ResultCase.FAILURE_RESULT:
+        message = removeActionResponsePB.getFailureResult()?.getMessage() ?? ''
         failure = true
         break;
     }
 
-    const args: NiaExecuteCodeResponseObject = {
+    const args: NiaRemoveActionResponseObject = {
       message,
       success,
       error,
       failure
     }
 
-    return new NiaExecuteCodeResponse(args)
+    return new NiaRemoveActionResponse(args)
   }
 }
-
