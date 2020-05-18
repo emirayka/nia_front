@@ -1,1 +1,1 @@
-export {default as Protocol} from './protocol'
+export * from './protocol'

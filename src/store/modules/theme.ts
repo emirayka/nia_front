@@ -1,6 +1,7 @@
 import {
   Theme
 } from '@/store/models'
+import {defineModule} from 'direct-vuex'
 
 export interface ThemeModuleState {
   theme: Theme
@@ -40,7 +41,7 @@ const defaultTheme: ThemeMaker = () => ({
   fgSuccess2: 'black',
 })
 
-export default {
+const ThemeModule = defineModule({
   namespaced: true as true,
   state: {
     theme: defaultTheme()
@@ -76,4 +77,6 @@ export default {
     getBackgroundColorSuccess2: (state: ThemeModuleState) => state.theme.bgSuccess2,
     getForegroundColorSuccess2: (state: ThemeModuleState) => state.theme.fgSuccess2,
   },
-}
+})
+
+export default ThemeModule

@@ -3,12 +3,10 @@ import Vuex from 'vuex'
 import {createDirectStore} from 'direct-vuex'
 
 import {
-  KeymappingModuleState,
-  KeymappingModule,
-  ThemeModuleState,
-  ThemeModule,
-  UIModuleState,
-  UIModule,
+  Connection,
+  Keymapping,
+  Theme,
+  UI,
 } from './modules'
 
 Vue.use(Vuex)
@@ -21,9 +19,10 @@ const {
   moduleGetterContext,
 } = createDirectStore({
   modules: {
-    KeymappingModule,
-    ThemeModule,
-    UIModule,
+    Connection,
+    Keymapping,
+    Theme,
+    UI,
   },
 })
 

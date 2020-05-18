@@ -49,8 +49,7 @@
   import Vue from 'vue'
   import Component from 'vue-class-component'
 
-  import NiaKeyboard from '@/components/NiaKeyboard.vue'
-  import {Prop} from 'vue-property-decorator'
+  import NiaKeyboard from './nia-keyboards/NiaKeyboard.vue'
 
   import {
     NiaDefineDeviceEvent,
@@ -61,6 +60,8 @@
     NiaRemoveDeviceEventObject,
   } from '@/utils'
 
+  import store from '@/store'
+
   @Component({
     name: 'NiaKeyboards',
     components: {
@@ -68,15 +69,6 @@
     },
   })
   export default class NiaKeyboards extends Vue {
-    @Prop({ required: true })
-    devicesInfo!: Array<NiaDeviceInfo>
-
-    @Prop({ required: true })
-    selectedKeys!: Array<NiaKey>
-
-    @Prop({ required: true })
-    modifiers!: Array<NiaModifierDescription>
-
     $refs!: {
       tabs: HTMLDivElement;
     }
@@ -125,6 +117,18 @@
     getDeviceSelectedKeys(deviceId: number): Array<NiaKey> {
       return this.selectedKeys
         .filter((selectedKey) => selectedKey.getDeviceId() == deviceId)
+    }
+
+    get modifiers(): Array<NiaModifierDescription> {
+      return store.getters.Keymapping.Modifiers.definedModifiers
+    }
+
+    get devicesInfo(): Array<NiaDeviceInfo> {
+      return store.getters.Keymapping.DevicesInfo.devices
+    }
+
+    get selectedKeys(): Array<NiaKey> {
+      return store.getters.UI.General.selectedKeys
     }
 
     get noDevices(): boolean {

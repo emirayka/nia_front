@@ -1,7 +1,4 @@
-export * from './keymapping'
-export * from './theme'
-export * from './ui'
-
-export {default as KeymappingModule} from './keymapping'
-export {default as ThemeModule} from './theme'
-export {default as UIModule} from './ui'
+export {default as Connection} from './connection'
+export {default as Keymapping} from './keymapping'
+export {default as Theme} from './theme'
+export {default as UI} from './ui'

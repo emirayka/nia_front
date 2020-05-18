@@ -24,7 +24,7 @@ import {
   NiaExecuteCodeResponse, NiaDefineModifierResponse, NiaRemoveModifierResponse, NiaKey,
 } from '@/utils'
 
-import {Protocol} from '@/utils/sockets'
+import {NiaProtocol} from '@/utils'
 import {NiaDefineDeviceResponse} from '@/utils/protocol/responses/define-device-response'
 import {NiaRemoveDeviceByPathResponse} from '@/utils/protocol/responses/remove-device-by-path-response'
 import {NiaGetDefinedActionsResponse} from '@/utils/protocol/responses/get-defined-actions-request'
@@ -33,7 +33,7 @@ import loggers from '@/utils/logger'
 const logger  = loggers('handle')
 
 const handleSynchronizeEvent = async (
-  niaProtocol: Protocol,
+  niaProtocol: NiaProtocol,
   event: NiaSynchronizeEvent,
 ): Promise<NiaEventResponse> => {
   await niaProtocol.isReady()
@@ -79,7 +79,7 @@ const handleSynchronizeEvent = async (
 }
 
 const handleExecuteCodeEvent = async (
-  niaProtocol: Protocol,
+  niaProtocol: NiaProtocol,
   event: NiaExecuteCodeEvent,
 ): Promise<NiaEventResponse> => {
   await niaProtocol.isReady()
@@ -94,7 +94,7 @@ const handleExecuteCodeEvent = async (
 }
 
 const handleDefineDeviceEvent = async (
-  niaProtocol: Protocol,
+  niaProtocol: NiaProtocol,
   event: NiaDefineDeviceEvent,
 ): Promise<NiaEventResponse> => {
   await niaProtocol.isReady()
@@ -112,7 +112,7 @@ const handleDefineDeviceEvent = async (
 }
 
 const handleRemoveDeviceEvent = async (
-  niaProtocol: Protocol,
+  niaProtocol: NiaProtocol,
   event: NiaRemoveDeviceEvent,
 ): Promise<NiaEventResponse> => {
   await niaProtocol.isReady()
@@ -129,7 +129,7 @@ const handleRemoveDeviceEvent = async (
 }
 
 const handleDefineModifierEvent = async (
-  niaProtocol: Protocol,
+  niaProtocol: NiaProtocol,
   event: NiaDefineModifierEvent,
 ): Promise<NiaEventResponse> => {
   await niaProtocol.isReady()
@@ -153,7 +153,7 @@ const handleDefineModifierEvent = async (
 }
 
 const handleRemoveModifierEvent = async (
-  niaProtocol: Protocol,
+  niaProtocol: NiaProtocol,
   event: NiaRemoveModifierEvent,
 ): Promise<NiaEventResponse> => {
   await niaProtocol.isReady()
@@ -179,7 +179,7 @@ const handleRemoveModifierEvent = async (
 
 
 const handleEvent = async (
-  niaProtocol: Protocol,
+  niaProtocol: NiaProtocol,
   event: NiaEvent,
 ): Promise<NiaEventResponse> => {
   console.log('Got event: ', event)
@@ -219,7 +219,7 @@ export const startHandler = async (
     }
 
     logger.info('Connecting to server...')
-    const niaProtocol: Protocol = new Protocol(12112)
+    const niaProtocol: NiaProtocol = new NiaProtocol(12112)
     logger.info('Connected..')
 
     await niaProtocol.isReady()

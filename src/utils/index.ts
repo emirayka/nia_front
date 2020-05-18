@@ -1,5 +1,5 @@
 export * from './domain'
-export {Protocol} from './sockets'
+export * from './sockets'
 
 export {
   keyChordPartToString,
@@ -14,5 +14,6 @@ export {
   InvalidResponseError
 } from './error'
 
+export * from './sockets'
 export * from './protocol'
 export * from './event'

@@ -63,7 +63,7 @@ export class NiaEventResponse implements SerializableObject<NiaEventResponse, Ni
     this.event = event
   }
 
-  isDefineKeyboardEventResponse(): boolean {
+  isDefineDeviceEventResponse(): boolean {
     return this.event instanceof NiaDefineDeviceEventResponse
   }
 
@@ -75,7 +75,7 @@ export class NiaEventResponse implements SerializableObject<NiaEventResponse, Ni
     return this.event instanceof NiaExecuteCodeEventResponse
   }
 
-  isRemoveKeyboardEventResponse(): boolean {
+  isRemoveDeviceEventResponse(): boolean {
     return this.event instanceof NiaRemoveDeviceEventResponse
   }
 
@@ -95,7 +95,7 @@ export class NiaEventResponse implements SerializableObject<NiaEventResponse, Ni
     return this.event instanceof NiaSynchronizeEventResponse
   }
 
-  takeDefineKeyboardEventResponse(): NiaDefineDeviceEventResponse {
+  takeDefineDeviceEventResponse(): NiaDefineDeviceEventResponse {
     return this.event as NiaDefineDeviceEventResponse
   }
 
@@ -107,7 +107,7 @@ export class NiaEventResponse implements SerializableObject<NiaEventResponse, Ni
     return this.event as NiaExecuteCodeEventResponse
   }
 
-  takeRemoveKeyboardEventResponse(): NiaRemoveDeviceEventResponse {
+  takeRemoveDeviceEventResponse(): NiaRemoveDeviceEventResponse {
     return this.event as NiaRemoveDeviceEventResponse
   }
 

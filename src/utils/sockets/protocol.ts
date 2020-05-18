@@ -31,7 +31,7 @@ import {NiaDefineActionRequest} from '@/utils/protocol/requests/define-action-re
 import {NiaRemoveActionResponse} from '@/utils/protocol/responses/remove-action-response'
 import {NiaRemoveActionRequest} from '@/utils/protocol/requests/remove-action-request'
 
-export default class {
+export class NiaProtocol {
   private port: number
   private ws: WebSocket
   private ready: boolean
