@@ -18,6 +18,9 @@
 
   import store from '@/store'
 
+  import loggers from '@/utils/logger'
+  const logger = loggers('App')
+
   @Component({
     components: {
       NiaAppNavbar,
@@ -34,12 +37,17 @@
       })
     }
     mounted() {
+      logger.debug('App mounted.')
+
       if (this.$router.currentRoute.path !== '/Keyboards') {
         this.$router.push({
           path: '/Keyboards',
         })
+
+        logger.debug('Switched to route "/Keyboards".')
       }
 
+      logger.debug('Attempted to connect to the server.')
       store.dispatch.Connection.connect()
     }
   }

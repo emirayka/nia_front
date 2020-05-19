@@ -55,6 +55,10 @@ export class NiaRemoveActionEventResponse implements SerializableObject<NiaRemov
     return new NiaRemoveActionEventResponse(args)
   }
 
+  getActionName(): string {
+    return this.actionName
+  }
+
   getMessage(): string {
     return this.message
   }

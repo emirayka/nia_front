@@ -78,26 +78,19 @@
         const args: NiaDefineDeviceEventObject = {
           deviceId: deviceInfo.getDeviceId(),
         }
-        const defineKeyboardEvent: NiaDefineDeviceEvent = new NiaDefineDeviceEvent(
-          args,
-        )
 
-        this.$emit('define-keyboard', defineKeyboardEvent)
+        store.dispatch.Connection.defineDevice(args)
       } else {
         const args: NiaRemoveDeviceEventObject = {
           devicePath: deviceInfo.getDevicePath(),
         }
 
-        const removeKeyboardEvent: NiaRemoveDeviceEvent = new NiaRemoveDeviceEvent(
-          args,
-        )
-
-        this.$emit('remove-keyboard', removeKeyboardEvent)
+        store.dispatch.Connection.removeDevice(args)
       }
     }
 
     clickKeyboardHandler(device: NiaDeviceInfo): void {
-      this.$emit('click-keyboard', { keyboardPath: device.getDevicePath() })
+      store.commit.UI.General.unselectKeys()
     }
 
     clickKeyHandler(device: NiaDeviceInfo, keyCode: number): void {
@@ -106,7 +99,7 @@
         keyCode: keyCode,
       })
 
-      this.$emit('click-key', key)
+      store.commit.UI.General.toggleKeySelection(key)
     }
 
     getDeviceModifiers(deviceId: number): Array<NiaModifierDescription> {

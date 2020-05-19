@@ -1,8 +1,8 @@
 <template>
   <div class="nia-modifier-table">
     <div class="nia-modifier-table__controls">
-      <NiaButton @click.stop="$emit('add-modifier')">+</NiaButton>
-      <NiaButton @click.stop="$emit('remove-selected-modifiers')">-</NiaButton>
+      <NiaButton @click.stop="addModifierHandler()">+</NiaButton>
+      <NiaButton @click.stop="removeSelectedModifiersHandler()">-</NiaButton>
       <NiaButton>3</NiaButton>
     </div>
 
@@ -12,11 +12,11 @@
     >
 
       <NiaTableRow
-        v-for="(modifier, index) in modifiers"
+        v-for="(modifier, index) in definedModifiers"
         class="nia-modifier-table__modifiers__modifier"
         :class="modifierRowClasses(modifier)"
         :key="index"
-        @click.stop="$emit('toggle-modifier-selection', modifier)"
+        @click.stop="toggleModifierSelectionHandler(modifier)"
         @hover="hoverHandler(modifier, $event)"
       >
         <NiaTableRowItem>
@@ -56,17 +56,14 @@
   import {mapKeyCodeToString, NiaDeviceInfo, NiaModifierDescription} from '@/utils'
   import {NiaTableColumnDefinition} from '@/components/nia/lib'
 
+  import loggers from '@/utils/logger'
+  const logger = loggers('NiaModifierTable')
+
   @Component({
     name: 'NiaModifierTable',
   })
   export default class NiaModifierTable extends Vue {
     private hoverModifier: NiaModifierDescription | null = null
-
-    @Prop({ required: true })
-    modifiers!: Array<NiaModifierDescription>
-
-    @Prop({ required: true })
-    selectedModifiers!: Array<NiaModifierDescription>
 
     get columns(): Array<NiaTableColumnDefinition> {
       return [
@@ -85,8 +82,16 @@
       ]
     }
 
+    get selectedModifiers(): Array<NiaModifierDescription> {
+      return store.getters.UI.General.selectedModifiers
+    }
+
+    get definedModifiers(): Array<NiaModifierDescription> {
+      return store.getters.Keymapping.Modifiers.definedModifiers
+    }
+
     getDeviceName(deviceId: number): string {
-      const device: NiaDeviceInfo | null = store.getters.KeymappingModule.getDeviceById(deviceId)
+      const device: NiaDeviceInfo | null = store.getters.Keymapping.DevicesInfo.getDeviceById(deviceId)
 
       if (device === null) {
         return ''
@@ -99,14 +104,6 @@
       return mapKeyCodeToString(keyCode)
     }
 
-    hoverHandler(modifier: NiaModifierDescription, hover: boolean): void {
-      if (hover) {
-        this.hoverModifier = modifier
-      } else {
-        this.hoverModifier = null
-      }
-    }
-
     modifierRowClasses(modifier: NiaModifierDescription): object {
       for (const selectedModifier of this.selectedModifiers) {
         if (modifier.equals(selectedModifier)) {
@@ -117,22 +114,67 @@
       }
 
       return {
-        hover: this.hoverModifier === modifier,
+        hover: this.hoverModifier?.equals(modifier) ?? false,
+      }
+    }
+
+    hoverHandler(modifier: NiaModifierDescription, hover: boolean): void {
+      if (hover) {
+        this.hoverModifier = modifier
+        logger.debug('Hover modifier event. Hovered modifier:')
+        logger.debug(this.hoverModifier)
+      } else {
+        this.hoverModifier = null
+        logger.debug('Hover modifier event. No modifier is hovered.')
+      }
+
+    }
+
+    toggleModifierSelectionHandler(modifier: NiaModifierDescription): void {
+      logger.debug('Sending toggle modifier mutation:')
+      logger.debug(modifier)
+
+      store.commit.UI.General.toggleModifierSelection(modifier)
+    }
+
+    addModifierHandler(): void {
+      store.commit.UI.AddModifierDialog.show()
+    }
+
+    removeSelectedModifiersHandler(): void {
+      const selectedModifiers: Array<NiaModifierDescription> = this.selectedModifiers
+
+      store.commit.UI.General.unselectModifiers()
+
+      for (const selectedModifier of selectedModifiers) {
+        store.dispatch.Connection.removeModifier({
+          deviceId: selectedModifier.getKey().getDeviceId(),
+          keyCode: selectedModifier.getKey().getKeyCode(),
+        })
       }
     }
   }
 </script>
 
 <style scoped>
+  .nia-modifier-table__modifiers__modifier.selected {
+    background-color: lightgoldenrodyellow;
+    color: black;
+  }
+
+  .nia-modifier-table__modifiers__modifier.hover {
+    background-color: #444444;
+  }
+
   .nia-modifier-table__modifiers__modifier__device-id {
     user-select: none;
   }
 
   .nia-modifier-table__modifiers__modifier__key-name {
-    user-select: none; /* Standard */
+    user-select: none;
   }
 
   .nia-modifier-table__modifiers__modifier__alias {
-    user-select: none; /* Standard */
+    user-select: none;
   }
 </style>

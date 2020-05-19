@@ -19,8 +19,8 @@
   export default class NiaNavbar extends Vue {
     get style(): object {
       return {
-        backgroundColor: store.getters.ThemeModule.getBackgroundColor,
-        color: store.getters.ThemeModule.getForegroundColor,
+        backgroundColor: store.getters.Theme.getBackgroundColor,
+        color: store.getters.Theme.getForegroundColor,
       }
     }
   }

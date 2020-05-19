@@ -44,7 +44,7 @@ export class NiaRemoveDeviceEventResponse implements SerializableObject<NiaRemov
     return new NiaRemoveDeviceEventResponse(args)
   }
 
-  getKeyboardPath(): string {
+  getDevicePath(): string {
     return this.devicePath
   }
 

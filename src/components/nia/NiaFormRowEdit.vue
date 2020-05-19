@@ -51,10 +51,10 @@
     get inputStyle(): object {
       return {
         width: `${(100 - this.propertyNamePercents)}%`,
-        backgroundColor: `${store.getters.ThemeModule.getBackgroundColor}`,
-        color: `${store.getters.ThemeModule.getForegroundColor}`,
-        outline: `${store.getters.ThemeModule.getForegroundColorAccent1}`,
-        border: `1px solid ${store.getters.ThemeModule.getForegroundColorAccent1}`,
+        backgroundColor: `${store.getters.Theme.getBackgroundColor}`,
+        color: `${store.getters.Theme.getForegroundColor}`,
+        outline: `${store.getters.Theme.getForegroundColorAccent1}`,
+        border: `1px solid ${store.getters.Theme.getForegroundColorAccent1}`,
       }
     }
 

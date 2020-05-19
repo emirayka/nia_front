@@ -96,10 +96,10 @@
 
     niaTabsTabsListItemStyle(isSelected: boolean, isHovered: boolean): object {
       const backgroundColor: string = isSelected
-        ? store.getters.ThemeModule.getBackgroundColorAccent2
+        ? store.getters.Theme.getBackgroundColorAccent2
         : isHovered
-          ? store.getters.ThemeModule.getBackgroundColorAccentLight
-          : store.getters.ThemeModule.getBackgroundColorAccent1
+          ? store.getters.Theme.getBackgroundColorAccentLight
+          : store.getters.Theme.getBackgroundColorAccent1
 
       return {
         backgroundColor,
@@ -108,10 +108,10 @@
 
     niaTabsTabsListItemLinkStyle(isSelected: boolean, isHovered: boolean): object {
       const color: string = isSelected
-        ? store.getters.ThemeModule.getForegroundColorAccent2
+        ? store.getters.Theme.getForegroundColorAccent2
         : isHovered
-          ? store.getters.ThemeModule.getForegroundColorAccentLight
-          : store.getters.ThemeModule.getForegroundColorAccent1
+          ? store.getters.Theme.getForegroundColorAccentLight
+          : store.getters.Theme.getForegroundColorAccent1
 
       return {
         color,

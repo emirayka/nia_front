@@ -27,9 +27,9 @@ const ActionsModule = defineModule({
         action,
       )
     },
-    removeAction: (state: ActionsModuleState, selectedAction: NiaAction) => {
+    removeAction: (state: ActionsModuleState, actionName: string) => {
       state.definedActions = state.definedActions.filter(
-        (action) => action.getActionName() !== selectedAction.getActionName(),
+        (action) => action.getActionName() !== actionName,
       )
     },
   },

@@ -72,11 +72,11 @@
     }
 
     get definedActions(): Array<NiaAction> {
-      return store.getters.KeymappingModule.definedActions
+      return store.getters.Keymapping.Actions.definedActions
     }
 
     get selectedActions(): Array<NiaAction> {
-      return store.getters.UIModule.getSelectedActions
+      return store.getters.UI.General.selectedActions
     }
 
     // handlers
@@ -89,22 +89,37 @@
     }
 
     addActionHandler() {
-      store.commit.UIModule.showAddActionDialog()
+      store.commit.UI.AddActionDialog.show()
     }
 
     removeSelectedActionsHandler() {
-      const selectedActions: Array<NiaAction> = store.getters.UIModule.getSelectedActions
+      const selectedActions: Array<NiaAction> = store.getters.UI.General.selectedActions
 
+      for (const selectedAction of selectedActions) {
+        store.dispatch.Connection.removeAction({
+          actionName: selectedAction.getActionName()
+        })
+      }
 
+      store.commit.UI.General.unselectActions()
     }
 
     toggleActionSelectionHandler(action: NiaAction) {
-      store.commit.UIModule.toggleActionSelection(action)
+      store.commit.UI.General.toggleActionSelection(action)
     }
   }
 </script>
 
 <style scoped>
+  .nia-action-table__actions__action.selected {
+    background-color: lightgoldenrodyellow;
+    color: black;
+  }
+
+  .nia-action-table__actions__action.hover {
+    background-color: #444444;
+  }
+
   .nia-action-table__actions__action__action-name {
     user-select: none;
   }

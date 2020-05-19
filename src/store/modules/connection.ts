@@ -2,7 +2,7 @@ import Vue from 'vue'
 import {defineModule} from 'direct-vuex'
 
 const {
-  ipcRenderer
+  ipcRenderer,
 } = window.require("electron");
 
 import {moduleActionContext, moduleGetterContext, rootActionContext} from '@/store'
@@ -25,6 +25,10 @@ import {
   NiaSynchronizeEvent, NiaSynchronizeEventResponse,
 } from '@/utils'
 import {ExecutionResult} from '@/store/models'
+import {NiaRemoveActionEvent, NiaRemoveActionEventObject} from '@/utils/event/events/remove-action'
+import {NiaDefineActionEvent, NiaDefineActionEventObject} from '@/utils/event/events/define-action'
+import {NiaRemoveActionEventResponse} from '@/utils/event/responses/remove-action-event-response'
+import {NiaDefineActionEventResponse} from '@/utils/event/responses/define-action-event-response'
 
 type IPCListener = (_: any, eventResponse: NiaEventResponseSerialized) => void;
 
@@ -53,7 +57,7 @@ const ConnectionModule = defineModule({
   actions: {
     // connectors
     connect(context, payload: undefined): void {
-      const { commit, dispatch, getters} = ConnectionModuleActionContext(context)
+      const { commit, dispatch, getters } = ConnectionModuleActionContext(context)
 
       if (getters.isConnected) {
         return
@@ -76,7 +80,7 @@ const ConnectionModule = defineModule({
     },
 
     disconnect(context, payload: undefined): void {
-      const {commit, getters} = ConnectionModuleActionContext(context)
+      const { commit, getters } = ConnectionModuleActionContext(context)
 
       if (!getters.isConnected) {
         return
@@ -92,7 +96,7 @@ const ConnectionModule = defineModule({
       ipcRenderer.send('nia-server-event', event.serialize())
     },
     executeCode(context, args: NiaExecuteCodeEventObject): void {
-      const {dispatch} = ConnectionModuleActionContext(context)
+      const { dispatch } = ConnectionModuleActionContext(context)
 
       const executeCodeEvent: NiaExecuteCodeEvent = new NiaExecuteCodeEvent(args)
       const event: NiaEvent = executeCodeEvent.toEvent()
@@ -101,7 +105,7 @@ const ConnectionModule = defineModule({
     },
 
     defineDevice(context, args: NiaDefineDeviceEventObject): void {
-      const {dispatch} = ConnectionModuleActionContext(context)
+      const { dispatch } = ConnectionModuleActionContext(context)
 
       const defineDeviceEvent: NiaDefineDeviceEvent = new NiaDefineDeviceEvent(args)
       const event: NiaEvent = defineDeviceEvent.toEvent()
@@ -110,7 +114,7 @@ const ConnectionModule = defineModule({
     },
 
     removeDevice(context, args: NiaRemoveDeviceEventObject): void {
-      const {dispatch} = ConnectionModuleActionContext(context)
+      const { dispatch } = ConnectionModuleActionContext(context)
 
       const removeDeviceEvent: NiaRemoveDeviceEvent = new NiaRemoveDeviceEvent(args)
       const event: NiaEvent = removeDeviceEvent.toEvent()
@@ -119,7 +123,7 @@ const ConnectionModule = defineModule({
     },
 
     defineModifier(context, args: NiaDefineModifierEventObject): void {
-      const {dispatch} = ConnectionModuleActionContext(context)
+      const { dispatch } = ConnectionModuleActionContext(context)
 
       const defineModifierEvent: NiaDefineModifierEvent = new NiaDefineModifierEvent(args)
       const event: NiaEvent = defineModifierEvent.toEvent()
@@ -128,7 +132,7 @@ const ConnectionModule = defineModule({
     },
 
     removeModifier(context, args: NiaRemoveModifierEventObject): void {
-      const {dispatch} = ConnectionModuleActionContext(context)
+      const { dispatch } = ConnectionModuleActionContext(context)
 
       const removeModifierEvent = new NiaRemoveModifierEvent(args)
       const event: NiaEvent = removeModifierEvent.toEvent()
@@ -136,9 +140,27 @@ const ConnectionModule = defineModule({
       dispatch.sendEvent(event)
     },
 
+    defineAction(context, args: NiaDefineActionEventObject): void {
+      const { dispatch } = ConnectionModuleActionContext(context)
+
+      const defineActionEvent = new NiaDefineActionEvent(args)
+      const event: NiaEvent = defineActionEvent.toEvent()
+
+      dispatch.sendEvent(event)
+    },
+
+    removeAction(context, args: NiaRemoveActionEventObject): void {
+      const { dispatch } = ConnectionModuleActionContext(context)
+
+      const removeActionEvent = new NiaRemoveActionEvent(args)
+      const event: NiaEvent = removeActionEvent.toEvent()
+
+      dispatch.sendEvent(event)
+    },
+
     // event response handlers
     handleSynchronizeEventResponse(context, response: NiaSynchronizeEventResponse): void {
-      const {rootCommit} = rootActionContext(context)
+      const { rootCommit } = rootActionContext(context)
 
       const version: string = response.getVersion()
       const info: string = response.getInfo()
@@ -153,38 +175,60 @@ const ConnectionModule = defineModule({
       rootCommit.Keymapping.Actions.setActions(definedActions)
     },
     handleExecuteCodeEventResponse(context, response: NiaExecuteCodeEventResponse): void {
-      const {rootCommit} = ConnectionModuleActionContext(context)
+      const { rootCommit } = ConnectionModuleActionContext(context)
 
       const executionResult: ExecutionResult = response.toExecutionResult()
-      //
-      // rootCommit.KeymappingModule.(executionResult)
+
+      rootCommit.Keymapping.ExecutionLog.addExecutionResult(executionResult)
     },
     handleDefineDeviceResponse(context, response: NiaDefineDeviceEventResponse): void {
-      const {rootCommit} = ConnectionModuleActionContext(context)
+      const { rootCommit } = ConnectionModuleActionContext(context)
 
-      // store.commit.ConnectionModule.makeDeviceDefined(response.getDeviceId())
+      rootCommit.Keymapping.DevicesInfo.makeDeviceDefined(response.getDeviceId())
     },
     handleRemoveDeviceResponse(context, response: NiaRemoveDeviceEventResponse): void {
-      const {rootCommit} = ConnectionModuleActionContext(context)
+      const { rootCommit } = ConnectionModuleActionContext(context)
 
-      // store.commit.ConnectionModule.makeDeviceRemoved(response.getDevicePath())
+      rootCommit.Keymapping.DevicesInfo.makeDeviceRemoved(response.getDevicePath())
     },
     handleDefineModifierResponse(context, response: NiaDefineModifierEventResponse): void {
-      const {rootCommit} = ConnectionModuleActionContext(context)
+      const { rootCommit } = ConnectionModuleActionContext(context)
 
       const modifier: NiaModifierDescription = response.toModifier()
 
-      // store.commit.ConnectionModule.defineModifier(modifier)
+      rootCommit.Keymapping.Modifiers.defineModifier(modifier)
     },
     handleRemoveModifierResponse(context, response: NiaRemoveModifierEventResponse): void {
-      const {rootCommit} = ConnectionModuleActionContext(context)
+      const { rootCommit } = ConnectionModuleActionContext(context)
 
-      const modifierKey: NiaKey = response.toModifierKey()
+      if (response.isSuccess()) {
+        const modifierKey: NiaKey = response.toModifierKey()
+        rootCommit.Keymapping.Modifiers.removeModifier(modifierKey)
+      } else if (response.isError()) {
+        // show error
+      } else {
+        // show failure
+      }
+    },
+    handleDefineActionResponse(context, response: NiaDefineActionEventResponse): void {
+      const { rootCommit } = ConnectionModuleActionContext(context)
 
-      // store.commit.ConnectionModule.removeModifier(modifierKey)
+      if (response.isSuccess()) {
+        rootCommit.Keymapping.Actions.defineAction(response.getAction())
+        rootCommit.UI.AddActionDialog.hide()
+      } else if (response.isError()) {
+        // show error
+      } else {
+        // show failure
+      }
+    },
+    handleRemoveActionResponse(context, response: NiaRemoveActionEventResponse): void {
+      const { rootCommit } = ConnectionModuleActionContext(context)
+
+      rootCommit.Keymapping.Actions.removeAction(response.getActionName())
     },
     handleEventResponse(context, response: NiaEventResponse): void {
-      const {dispatch} = ConnectionModuleActionContext(context)
+      const { dispatch } = ConnectionModuleActionContext(context)
 
       if (response.isSynchronizeEventResponse()) {
         dispatch.handleSynchronizeEventResponse(response.takeSynchronizeEventResponse())
@@ -198,6 +242,10 @@ const ConnectionModule = defineModule({
         dispatch.handleDefineModifierResponse(response.takeDefineModifierEventResponse())
       } else if (response.isRemoveModifierEventResponse()) {
         dispatch.handleRemoveModifierResponse(response.takeRemoveModifierEventResponse())
+      } else if (response.isDefineActionEventResponse()) {
+        dispatch.handleDefineActionResponse(response.takeDefineActionEventResponse())
+      } else if (response.isRemoveActionEventResponse()) {
+        dispatch.handleRemoveActionResponse(response.takeRemoveActionEventResponse())
       } else {
         console.log('unknown')
       }

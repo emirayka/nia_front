@@ -36,8 +36,8 @@
 
     get listItemStyle(): object {
       const backgroundColor: string = this.hover
-        ? store.getters.ThemeModule.getBackgroundColorAccent2
-        : store.getters.ThemeModule.getBackgroundColor
+        ? store.getters.Theme.getBackgroundColorAccent2
+        : store.getters.Theme.getBackgroundColor
 
       return {
         backgroundColor,
@@ -46,12 +46,12 @@
 
     get linkStyle(): object {
       const backgroundColor: string = this.hover
-        ? store.getters.ThemeModule.getBackgroundColorAccent2
-        : store.getters.ThemeModule.getBackgroundColor
+        ? store.getters.Theme.getBackgroundColorAccent2
+        : store.getters.Theme.getBackgroundColor
 
       const color: string = this.hover
-        ? store.getters.ThemeModule.getForegroundColorAccent2
-        : store.getters.ThemeModule.getForegroundColor
+        ? store.getters.Theme.getForegroundColorAccent2
+        : store.getters.Theme.getForegroundColor
 
       return {
         backgroundColor,

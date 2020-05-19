@@ -16,8 +16,7 @@ import {
   installVueDevtools,
 } from 'vue-cli-plugin-electron-builder/lib'
 
-import {NiaEventSerialized, Protocol} from '@/utils'
-import { NiaEvent, } from '@/utils'
+import {NiaEventSerialized} from '@/utils'
 import {NiaHandler, startHandler} from '@/utils/handle'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'

@@ -62,16 +62,16 @@ export class NiaDefineActionEventResponse implements SerializableObject<NiaDefin
     return this.message
   }
 
-  getFailure(): boolean {
-    return this.failure
+  isSuccess(): boolean {
+    return this.success
   }
 
-  getError(): boolean {
+  isError(): boolean {
     return this.error
   }
 
-  getSuccess(): boolean {
-    return this.success
+  isFailure(): boolean {
+    return this.error
   }
 
   toEventResponse(): NiaEventResponse {

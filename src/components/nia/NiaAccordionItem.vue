@@ -96,28 +96,28 @@
 
     get accordionItemStyle(): object {
       return {
-        backgroundColor: store.getters.ThemeModule.getBackgroundColor,
-        color: store.getters.ThemeModule.getForegroundColor,
+        backgroundColor: store.getters.Theme.getBackgroundColor,
+        color: store.getters.Theme.getForegroundColor,
       }
     }
 
     get accordionItemTriggerStyle(): object {
       return {
-        backgroundColor: store.getters.ThemeModule.getBackgroundColor,
-        color: store.getters.ThemeModule.getForegroundColor,
+        backgroundColor: store.getters.Theme.getBackgroundColor,
+        color: store.getters.Theme.getForegroundColor,
       }
     }
 
     get accordionItemTitleTextStyle(): object {
       return {
-        backgroundColor: store.getters.ThemeModule.getBackgroundColor,
-        color: store.getters.ThemeModule.getForegroundColor,
+        backgroundColor: store.getters.Theme.getBackgroundColor,
+        color: store.getters.Theme.getForegroundColor,
       }
     }
 
     get accordionItemTriggerIconStyle(): object {
       return {
-        backgroundColor: store.getters.ThemeModule.getBackgroundColorAccent2,
+        backgroundColor: store.getters.Theme.getBackgroundColorAccent2,
       }
     }
   }

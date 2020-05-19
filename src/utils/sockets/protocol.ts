@@ -31,6 +31,9 @@ import {NiaDefineActionRequest} from '@/utils/protocol/requests/define-action-re
 import {NiaRemoveActionResponse} from '@/utils/protocol/responses/remove-action-response'
 import {NiaRemoveActionRequest} from '@/utils/protocol/requests/remove-action-request'
 
+import loggers from '@/utils/logger'
+const logger = loggers('protocol')
+
 export class NiaProtocol {
   private port: number
   private ws: WebSocket
@@ -307,9 +310,12 @@ export class NiaProtocol {
     return new Promise((resolve, reject) => {
       this.ws.once('message', message => {
         if (message instanceof Uint8Array) {
+          logger.debug('Got response. Deserializing...')
           const response: NiaResponse = NiaResponse.fromUint8Array(message)
 
+          logger.debug('Checking type.')
           if (response.getResponseType() == NiaResponseType.DefineAction) {
+            logger.debug('Response is define action response. Resolving...')
             resolve(response.getResponse() as NiaDefineActionResponse)
           } else {
             reject(new InvalidResponseError('Expected Define Action response.'))
@@ -319,9 +325,13 @@ export class NiaProtocol {
         }
       })
 
+      logger.debug('Constructing define action request...')
       const request: NiaRequest = new NiaDefineActionRequest(action).toRequest()
+
+      logger.debug('Serializing define action request...')
       const data: Uint8Array = request.toUint8Array()
 
+      logger.debug('Sending request...')
       this.ws.send(data)
     })
   }

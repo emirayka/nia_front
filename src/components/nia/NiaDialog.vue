@@ -44,15 +44,15 @@
 
     get niaDialogContainerStyle(): object {
       return {
-        backgroundColor: store.getters.ThemeModule.getBackgroundColor,
-        color: store.getters.ThemeModule.getForegroundColor,
+        backgroundColor: store.getters.Theme.getBackgroundColor,
+        color: store.getters.Theme.getForegroundColor,
         width: `${this.width}px`
       }
     }
 
     get niaDialogHeaderStyle(): object {
       return {
-        color: store.getters.ThemeModule.getForegroundColorAccent1,
+        color: store.getters.Theme.getForegroundColorAccent1,
       }
     }
   }

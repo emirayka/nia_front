@@ -1,3 +1,6 @@
+import loggers from '@/utils/logger'
+const logger = loggers('General Module')
+
 import {NiaAction, NiaKey, NiaModifierDescription} from '@/utils'
 import {defineModule} from 'direct-vuex'
 import {moduleActionContext, moduleGetterContext} from '@/store'
@@ -33,8 +36,13 @@ const GeneralModule = defineModule({
     },
 
     toggleModifierSelection: (state: UIModuleState, modifier: NiaModifierDescription) => {
+      logger.debug('Got toggle modifier selection mutation:')
+      logger.debug(modifier)
+
       for (const selectedModifier of state.selectedModifiers) {
         if (selectedModifier.equals(modifier)) {
+          logger.debug('Unselected modifier.')
+
           state.selectedModifiers = state.selectedModifiers
             .filter((selectedModifier) => !selectedModifier.equals(modifier))
           return
@@ -42,6 +50,7 @@ const GeneralModule = defineModule({
       }
 
       state.selectedModifiers.push(modifier)
+      logger.debug('Selected modifier.')
     },
     unselectModifiers: (state: UIModuleState) => {
       state.selectedModifiers = []

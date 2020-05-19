@@ -52,14 +52,14 @@
 
     updateColor(): void {
       if (this.danger) {
-        this.bgColor = store.getters.ThemeModule.getBackgroundColorError2
-        this.fgColor = store.getters.ThemeModule.getForegroundColorError2
+        this.bgColor = store.getters.Theme.getBackgroundColorError2
+        this.fgColor = store.getters.Theme.getForegroundColorError2
       } else if (this.success) {
-        this.bgColor = store.getters.ThemeModule.getBackgroundColorSuccess2
-        this.fgColor = store.getters.ThemeModule.getForegroundColorSuccess2
+        this.bgColor = store.getters.Theme.getBackgroundColorSuccess2
+        this.fgColor = store.getters.Theme.getForegroundColorSuccess2
       } else {
-        this.bgColor = store.getters.ThemeModule.getBackgroundColor
-        this.fgColor = store.getters.ThemeModule.getForegroundColor
+        this.bgColor = store.getters.Theme.getBackgroundColor
+        this.fgColor = store.getters.Theme.getForegroundColor
       }
 
       const bgColor: Color = Color(this.bgColor)

@@ -32,13 +32,13 @@ const AddModifierDialogModule = defineModule({
       state.isShown = false
     },
 
-    selectedDeviceName: (state: AddModifierDialogState, name: string) => {
+    setSelectedDeviceName: (state: AddModifierDialogState, name: string) => {
       state.selectedDevice = name
     },
-    selectedKeyCode: (state: AddModifierDialogState, code: number) => {
+    setSelectedKeyCode: (state: AddModifierDialogState, code: number) => {
       state.selectedKeyCode = code
     },
-    selectedModifierAlias: (state: AddModifierDialogState, modifierAlias: string) => {
+    setSelectedModifierAlias: (state: AddModifierDialogState, modifierAlias: string) => {
       state.selectedModifierAlias = modifierAlias
     },
   },

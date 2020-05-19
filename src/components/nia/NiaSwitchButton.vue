@@ -37,10 +37,10 @@
 
     get style(): object {
       const color: string = this.danger
-        ? store.getters.ThemeModule.getForegroundColorError1
+        ? store.getters.Theme.getForegroundColorError1
         : this.success
-          ? store.getters.ThemeModule.getForegroundColorSuccess1
-          : store.getters.ThemeModule.getForegroundColorAccent1
+          ? store.getters.Theme.getForegroundColorSuccess1
+          : store.getters.Theme.getForegroundColorAccent1
 
       return {
         '--color': color,

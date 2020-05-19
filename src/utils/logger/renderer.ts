@@ -1,65 +1,63 @@
-import winston from 'winston'
 import stringify from 'string.ify'
-import BrowserConsole from 'winston-transport-browserconsole'
 
-const container = new winston.Container()
-
-const levels = {
-  levels: {
-    failure: 0,
-    error: 1,
-    debug: 2,
-    warn: 3,
-    data: 4,
-    info: 5,
-    verbose: 6,
-    silly: 7,
-  },
-  colors: {
-    failure: 'red',
-    error: 'red',
-    debug: 'blue',
-    warn: 'yellow',
-    data: 'grey',
-    info: 'cyan',
-    verbose: 'green',
-    silly: 'magenta',
-  },
+interface Logger {
+  failure: (arg: any) => void,
+  error: (arg: any) => void,
+  debug: (arg: any) => void,
+  warn: (arg: any) => void,
+  data: (arg: any) => void,
+  info: (arg: any) => void,
+  verbose: (arg: any) => void,
+  silly: (arg: any) => void,
 }
 
-const customLabelFormat = winston.format((info, opts) => {
-  if (opts.label !== undefined) {
-    if (typeof info.message === 'object' && info.message !== null) {
-      let objectString: string = stringify
-        .maxDepth(3)
-        .maxArrayLength(10)
-        (info.message)
+interface LoggerContainer {
+  [s: string]: Logger
+}
 
-      info.message = `[${opts.label}]:\n ${objectString}\n`
-    } else {
-      info.message = `[${opts.label}]:\n ${info.message}\n`
-    }
+const makeLogger = (category: string): Logger => {
+  return {
+    failure: arg => {
+      console.error(category)
+      console.error(arg)
+    },
+    error: arg =>  {
+      console.error(category)
+      console.error(arg)
+    },
+    debug: arg =>  {
+      console.log(category)
+      console.log(arg)
+    },
+    warn: arg =>  {
+      console.log(category)
+      console.log(arg)
+    },
+    data: arg =>  {
+      console.log(category)
+      console.log(arg)
+    },
+    info: arg =>  {
+      console.log(category)
+      console.log(arg)
+    },
+    verbose: arg =>  {
+      console.log(category)
+      console.log(arg)
+    },
+    silly: arg =>  {
+      console.log(category)
+      console.log(arg)
+    },
+  }
+}
+
+const container: LoggerContainer = {}
+
+export default (category: string): Logger => {
+  if (!container.hasOwnProperty(category)) {
+    container[category] = makeLogger(category)
   }
 
-  return info
-})
-
-winston.addColors(levels.colors)
-
-export default (category: string) => {
-  if (!winston.loggers.has(category)) {
-    winston.loggers.add(category, {
-      levels: levels.levels,
-      transports: [
-        new BrowserConsole(
-          {
-            format: winston.format.simple(),
-            level: 'silly'
-          }
-        )
-      ],
-    })
-  }
-
-  return winston.loggers.get(category)
+  return container[category]
 }

@@ -3,7 +3,7 @@ import {
 } from '@/store/models'
 import {defineModule} from 'direct-vuex'
 
-export interface ThemeModuleState {
+export interface ThemeState {
   theme: Theme
 }
 
@@ -41,42 +41,42 @@ const defaultTheme: ThemeMaker = () => ({
   fgSuccess2: 'black',
 })
 
-const ThemeModule = defineModule({
+const Theme = defineModule({
   namespaced: true as true,
   state: {
     theme: defaultTheme()
-  } as ThemeModuleState,
+  } as ThemeState,
   getters: {
-    getBackgroundColor: (state: ThemeModuleState) => state.theme.bg,
-    getForegroundColor: (state: ThemeModuleState) => state.theme.fg,
+    getBackgroundColor: (state: ThemeState) => state.theme.bg,
+    getForegroundColor: (state: ThemeState) => state.theme.fg,
 
-    getBackgroundColorAccent1: (state: ThemeModuleState) => state.theme.bgAccent1,
-    getForegroundColorAccent1: (state: ThemeModuleState) => state.theme.fgAccent1,
+    getBackgroundColorAccent1: (state: ThemeState) => state.theme.bgAccent1,
+    getForegroundColorAccent1: (state: ThemeState) => state.theme.fgAccent1,
 
-    getBackgroundColorAccent2: (state: ThemeModuleState) => state.theme.bgAccent2,
-    getForegroundColorAccent2: (state: ThemeModuleState) => state.theme.fgAccent2,
+    getBackgroundColorAccent2: (state: ThemeState) => state.theme.bgAccent2,
+    getForegroundColorAccent2: (state: ThemeState) => state.theme.fgAccent2,
 
-    getBackgroundColorAccentLight: (state: ThemeModuleState) => state.theme.bgAccentLight,
-    getForegroundColorAccentLight: (state: ThemeModuleState) => state.theme.fgAccentLight,
+    getBackgroundColorAccentLight: (state: ThemeState) => state.theme.bgAccentLight,
+    getForegroundColorAccentLight: (state: ThemeState) => state.theme.fgAccentLight,
 
-    getBackgroundColorWarning1: (state: ThemeModuleState) => state.theme.bgWarning1,
-    getForegroundColorWarning1: (state: ThemeModuleState) => state.theme.fgWarning1,
+    getBackgroundColorWarning1: (state: ThemeState) => state.theme.bgWarning1,
+    getForegroundColorWarning1: (state: ThemeState) => state.theme.fgWarning1,
 
-    getBackgroundColorWarning2: (state: ThemeModuleState) => state.theme.bgWarning1,
-    getForegroundColorWarning2: (state: ThemeModuleState) => state.theme.fgWarning1,
+    getBackgroundColorWarning2: (state: ThemeState) => state.theme.bgWarning1,
+    getForegroundColorWarning2: (state: ThemeState) => state.theme.fgWarning1,
 
-    getBackgroundColorError1: (state: ThemeModuleState) => state.theme.bgError1,
-    getForegroundColorError1: (state: ThemeModuleState) => state.theme.fgError1,
+    getBackgroundColorError1: (state: ThemeState) => state.theme.bgError1,
+    getForegroundColorError1: (state: ThemeState) => state.theme.fgError1,
 
-    getBackgroundColorError2: (state: ThemeModuleState) => state.theme.bgError2,
-    getForegroundColorError2: (state: ThemeModuleState) => state.theme.fgError2,
+    getBackgroundColorError2: (state: ThemeState) => state.theme.bgError2,
+    getForegroundColorError2: (state: ThemeState) => state.theme.fgError2,
 
-    getBackgroundColorSuccess1: (state: ThemeModuleState) => state.theme.bgSuccess1,
-    getForegroundColorSuccess1: (state: ThemeModuleState) => state.theme.fgSuccess1,
+    getBackgroundColorSuccess1: (state: ThemeState) => state.theme.bgSuccess1,
+    getForegroundColorSuccess1: (state: ThemeState) => state.theme.fgSuccess1,
 
-    getBackgroundColorSuccess2: (state: ThemeModuleState) => state.theme.bgSuccess2,
-    getForegroundColorSuccess2: (state: ThemeModuleState) => state.theme.fgSuccess2,
+    getBackgroundColorSuccess2: (state: ThemeState) => state.theme.bgSuccess2,
+    getForegroundColorSuccess2: (state: ThemeState) => state.theme.fgSuccess2,
   },
 })
 
-export default ThemeModule
+export default Theme

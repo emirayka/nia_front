@@ -13,11 +13,11 @@
     </template>
 
     <template v-slot:footer>
-      <NiaDialogFooterButton @click="$emit('add-modifier')">
+      <NiaDialogFooterButton @click="addModifierHandler()">
         Add
       </NiaDialogFooterButton>
 
-      <NiaDialogFooterButton @click="$emit('cancel')">
+      <NiaDialogFooterButton @click="cancelHandler()">
         Cancel
       </NiaDialogFooterButton>
     </template>
@@ -38,9 +38,9 @@
     NiaFormPropertyEvent,
     NiaFormPropertyType, NiaFormSelectEvent, NiaFormSelectProperty,
   } from '@/components/nia/lib'
-  import {mapKeyCodeToString, NiaDeviceInfo} from '@/utils'
+  import {mapKeyCodeToString, mapStringToKeyCode, NiaDefineModifierEvent, NiaDeviceInfo} from '@/utils'
 
-  const PROPERTY_KEYBOARD = 'Keyboard'
+  const PROPERTY_DEVICE = 'Device'
   const PROPERTY_KEY = 'Key'
   const PROPERTY_MODIFIER_ALIAS = 'Modifier alias'
 
@@ -49,12 +49,12 @@
   })
   export default class NiaAddModifierDialog extends Vue {
     constructFormProperties() {
-      const selectedKeyboardName = store.getters.UIModule.addModifierDialogSelectedKeyboard
-      const deviceNames: Array<string> = store.getters.KeymappingModule.deviceNames
+      const selectedDeviceName = store.getters.UI.AddModifierDialog.selectedDevice
+      const deviceNames: Array<string> = store.getters.Keymapping.DevicesInfo.deviceNames
       let keys: Array<string> = [];
 
-      if (selectedKeyboardName !== null) {
-        const selectedDevice: NiaDeviceInfo | null = store.getters.KeymappingModule.getDeviceByName(selectedKeyboardName)
+      if (selectedDeviceName !== null) {
+        const selectedDevice: NiaDeviceInfo | null = store.getters.Keymapping.DevicesInfo.getDeviceByName(selectedDeviceName)
 
         if (selectedDevice !== null) {
           keys = selectedDevice
@@ -67,7 +67,7 @@
       return [
         {
           type: NiaFormPropertyType.Select,
-          name: PROPERTY_KEYBOARD,
+          name: PROPERTY_DEVICE,
           validator: () => true,
           selectValues: deviceNames,
         } as NiaFormSelectProperty,
@@ -87,16 +87,63 @@
 
     changeHandler(event: NiaFormPropertyEvent): void {
       switch (event.propertyName) {
-        case PROPERTY_KEYBOARD:
-          this.$emit('select-keyboard', (event.selectEvent as NiaFormSelectEvent).value)
+        case PROPERTY_DEVICE:
+          this.selectDeviceHandler((event.selectEvent as NiaFormSelectEvent).value)
           break;
         case PROPERTY_KEY:
-          this.$emit('select-key-code', (event.selectEvent as NiaFormSelectEvent).value)
+          this.selectKeyCodeHandler((event.selectEvent as NiaFormSelectEvent).value)
           break;
         case PROPERTY_MODIFIER_ALIAS:
-          this.$emit('select-modifier-alias', (event.editEvent as NiaFormEditEvent).value)
+          this.selectModifierAliasHandler((event.editEvent as NiaFormEditEvent).value)
           break;
       }
+    }
+
+
+    addModifierHandler(): void {
+      const deviceName: string = store.getters.UI.AddModifierDialog.selectedDevice
+      const device: NiaDeviceInfo | null = store.getters.Keymapping.DevicesInfo.getDeviceByName(deviceName)
+
+      if (device === null) {
+        // todo: show error here
+        return
+      }
+
+      const keyCode: number = store.getters.UI.AddModifierDialog.selectedKeyCode
+      const modifierAlias: string = store.getters.UI.AddModifierDialog.selectedModifierAlias
+
+      if (store.getters.Keymapping.Modifiers.isModifierAlreadyDefined(device.getDeviceId(), keyCode)) {
+        // todo: show error here
+        return
+      }
+
+      store.dispatch.Connection.defineModifier({
+        keyboardId: device.getDeviceId(),
+        keyCode,
+        modifierAlias,
+      })
+
+      store.commit.UI.AddModifierDialog.hide()
+    }
+
+    cancelHandler(): void {
+      store.commit.UI.AddModifierDialog.hide()
+    }
+
+    selectDeviceHandler(keyboardName: string): void {
+      store.commit.UI.AddModifierDialog.setSelectedDeviceName(keyboardName)
+    }
+
+    selectKeyCodeHandler(keyCodeName: string): void {
+      const keyCode: number = mapStringToKeyCode(keyCodeName)
+
+      if (Number.isInteger(keyCode)) {
+        store.commit.UI.AddModifierDialog.setSelectedKeyCode(keyCode)
+      }
+    }
+
+    selectModifierAliasHandler(modifierAlias: string): void {
+      store.commit.UI.AddModifierDialog.setSelectedModifierAlias(modifierAlias)
     }
   }
 </script>

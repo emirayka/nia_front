@@ -154,6 +154,7 @@ export class NiaAction implements SerializablePB<NiaAction, Action>, Serializabl
 
         actionPB = new Action()
         actionPB.setActionKeyPress(keyPressActionPB)
+        break
 
       case NiaActionType.KeyClick:
         const keyClickAction: NiaActionKeyClick = this.action as NiaActionKeyClick
@@ -161,6 +162,7 @@ export class NiaAction implements SerializablePB<NiaAction, Action>, Serializabl
 
         actionPB = new Action()
         actionPB.setActionKeyClick(keyClickActionPB)
+        break
 
       case NiaActionType.KeyRelease:
         const keyReleaseAction: NiaActionKeyRelease = this.action as NiaActionKeyRelease
@@ -168,6 +170,7 @@ export class NiaAction implements SerializablePB<NiaAction, Action>, Serializabl
 
         actionPB = new Action()
         actionPB.setActionKeyRelease(keyReleaseActionPB)
+        break
 
       case NiaActionType.MouseButtonPress:
         const mouseButtonPressAction: NiaActionMouseButtonPress = this.action as NiaActionMouseButtonPress
@@ -175,6 +178,7 @@ export class NiaAction implements SerializablePB<NiaAction, Action>, Serializabl
 
         actionPB = new Action()
         actionPB.setActionMouseButtonPress(mouseButtonPressActionPB)
+        break
 
       case NiaActionType.MouseButtonClick:
         const mouseButtonClickAction: NiaActionMouseButtonClick = this.action as NiaActionMouseButtonClick
@@ -182,6 +186,7 @@ export class NiaAction implements SerializablePB<NiaAction, Action>, Serializabl
 
         actionPB = new Action()
         actionPB.setActionMouseButtonClick(mouseButtonClickActionPB)
+        break
 
       case NiaActionType.MouseButtonRelease:
         const mouseButtonReleaseAction: NiaActionMouseButtonRelease = this.action as NiaActionMouseButtonRelease
@@ -189,6 +194,7 @@ export class NiaAction implements SerializablePB<NiaAction, Action>, Serializabl
 
         actionPB = new Action()
         actionPB.setActionMouseButtonRelease(mouseButtonReleaseActionPB)
+        break
 
       case NiaActionType.MouseRelativeMove:
         const mouseRelativeMoveAction: NiaActionMouseRelativeMove = this.action as NiaActionMouseRelativeMove
@@ -196,6 +202,7 @@ export class NiaAction implements SerializablePB<NiaAction, Action>, Serializabl
 
         actionPB = new Action()
         actionPB.setActionMouseRelativeMove(mouseRelativeMoveActionPB)
+        break
 
       case NiaActionType.MouseAbsoluteMove:
         const mouseAbsoluteAction: NiaActionMouseAbsoluteMove = this.action as NiaActionMouseAbsoluteMove
@@ -203,6 +210,7 @@ export class NiaAction implements SerializablePB<NiaAction, Action>, Serializabl
 
         actionPB = new Action()
         actionPB.setActionMouseAbsoluteMove(mouseAbsoluteActionPB)
+        break
 
       case NiaActionType.TextType:
         const textTypeAction: NiaActionTextType = this.action as NiaActionTextType
@@ -210,6 +218,7 @@ export class NiaAction implements SerializablePB<NiaAction, Action>, Serializabl
 
         actionPB = new Action()
         actionPB.setActionTextType(textTypeActionPB)
+        break
 
       case NiaActionType.Wait:
         const waitAction: NiaActionWait = this.action as NiaActionWait
@@ -217,6 +226,7 @@ export class NiaAction implements SerializablePB<NiaAction, Action>, Serializabl
 
         actionPB = new Action()
         actionPB.setActionWait(waitActionPB)
+        break
 
       case NiaActionType.ExecuteCode:
         const executeCodeAction: NiaActionExecuteCode = this.action as NiaActionExecuteCode
@@ -224,6 +234,7 @@ export class NiaAction implements SerializablePB<NiaAction, Action>, Serializabl
 
         actionPB = new Action()
         actionPB.setActionExecuteCode(executeCodeActionPB)
+        break
 
       case NiaActionType.ExecuteFunction:
         const executeFunctionAction: NiaActionExecuteFunction = this.action as NiaActionExecuteFunction
@@ -231,6 +242,7 @@ export class NiaAction implements SerializablePB<NiaAction, Action>, Serializabl
 
         actionPB = new Action()
         actionPB.setActionExecuteFunction(executeFunctionActionPB)
+        break
 
       case NiaActionType.ExecuteOSCommand:
         const executeOSCommandAction: NiaActionExecuteOSCommand = this.action as NiaActionExecuteOSCommand
@@ -238,6 +250,7 @@ export class NiaAction implements SerializablePB<NiaAction, Action>, Serializabl
 
         actionPB = new Action()
         actionPB.setActionExecuteOsCommand(executeOSCommandActionPB)
+        break
     }
 
     if (actionPB === null) {

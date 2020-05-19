@@ -18,20 +18,14 @@
             :title="'Modifiers'"
             :multiple="false"
           >
-<!--            <NiaModifierTable-->
-<!--              :modifiers="getDefinedModifiers"-->
-<!--              :selected-modifiers="getSelectedModifiers"-->
-<!--              @toggle-modifier-selection="toggleModifierSelection($event)"-->
-<!--              @add-modifier="showAddModifierDialogHandler()"-->
-<!--              @remove-selected-modifiers="removeSelectedModifiersHandler()"-->
-<!--            />-->
+            <NiaModifierTable/>
           </NiaAccordionItem>
           <NiaAccordionItem
             :id="'112'"
             :title="'Actions'"
             :multiple="false"
           >
-<!--            <NiaActionTable />-->
+            <NiaActionTable />
           </NiaAccordionItem>
           <NiaAccordionItem
             :id="'113'"
@@ -67,20 +61,8 @@
       </NiaGridItem>
     </NiaGridLayout>
 
-    <NiaAddModifierDialog
-      v-if="addModifierDialogIsShown"
-      @add-modifier="addModifierDialogAddModifierHandler"
-      @cancel="addModifierDialogCancelHandler"
-      @select-keyboard="addModifierDialogSelectKeyboardHandler($event)"
-      @select-key-code="addModifierDialogSelectKeyCodeHandler($event)"
-      @select-modifier-alias="addModifierDialogSelectModifierAliasHandler($event)"
-    />
-
-    <NiaAddActionDialog
-      v-if="addActionDialogIsShown"
-      @add-action="addActionDialogAddActionHandler"
-      @cancel="addActionDialogCancelHandler"
-    />
+    <NiaAddModifierDialog v-if="addModifierDialogIsShown"/>
+    <NiaAddActionDialog v-if="addActionDialogIsShown" />
   </div>
 </template>
 
@@ -115,55 +97,12 @@
     },
   })
   export default class Keyboards extends Vue {
-    // // add modifier dialog
-    // showAddModifierDialogHandler(): void {
-    //   store.commit.UIModule.showAddModifierDialog()
-    // }
-    //
-    // addModifierDialogAddModifierHandler(): void {
-    //   const deviceName: string = store.getters.UIModule.addModifierDialogSelectedKeyboard
-    //   const device: NiaDeviceInfo | null = store.getters.KeymappingModule.getDeviceByName(deviceName)
-    //
-    //   if (device === null) {
-    //     // todo: show error here
-    //     return
-    //   }
-    //
-    //   const keyCode: number = store.getters.UIModule.addModifierDialogSelectedKeyCode
-    //   const modifierAlias: string = store.getters.UIModule.addModifierDialogSelectedModifierAlias
-    //
-    //   if (store.getters.KeymappingModule.isModifierAlreadyDefined(device.getDeviceId(), keyCode)) {
-    //     // todo: show error here
-    //     return
-    //   }
-    //
-    //   this.$emit('define-modifier', new NiaDefineModifierEvent({
-    //     keyboardId: device.getDeviceId(),
-    //     keyCode,
-    //     modifierAlias,
-    //   }))
-    //   store.commit.UIModule.hideAddModifierDialog()
-    // }
-    //
-    // addModifierDialogCancelHandler(): void {
-    //   store.commit.UIModule.hideAddModifierDialog()
-    // }
-    //
-    // addModifierDialogSelectKeyboardHandler(keyboardName: string): void {
-    //   store.commit.UIModule.setAddModifierDialogSelectedKeyboardName(keyboardName)
-    // }
-    //
-    // addModifierDialogSelectKeyCodeHandler(keyCodeName: string): void {
-    //   const keyCode: number = mapStringToKeyCode(keyCodeName)
-    //
-    //   if (Number.isInteger(keyCode)) {
-    //     store.commit.UIModule.setAddModifierDialogSelectedKeyCode(keyCode)
-    //   }
-    // }
-    //
-    // addModifierDialogSelectModifierAliasHandler(modifierAlias: string): void {
-    //   store.commit.UIModule.setAddModifierDialogSelectedModifierAlias(modifierAlias)
-    // }
+    get addModifierDialogIsShown(): boolean {
+      return store.getters.UI.AddModifierDialog.isShown
+    }
+    get addActionDialogIsShown(): boolean {
+      return store.getters.UI.AddActionDialog.isShown
+    }
     //
     // //
     // showAddActionDialogHandler(): void {

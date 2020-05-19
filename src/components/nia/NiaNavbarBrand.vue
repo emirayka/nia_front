@@ -19,7 +19,7 @@
   export default class NiaNavbarBrand extends Vue {
     get style(): object {
       return {
-        color: store.getters.ThemeModule.getForegroundColorAccent1,
+        color: store.getters.Theme.getForegroundColorAccent1,
       }
     }
   }
