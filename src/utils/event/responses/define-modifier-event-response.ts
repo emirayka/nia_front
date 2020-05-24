@@ -1,27 +1,38 @@
 import {
   NiaDefineDeviceEvent,
-  NiaDefineModifierEvent, NiaDefineModifierEventObject, NiaDefineModifierResponse,
-  NiaEventResponse, NiaKey, NiaKeyObject, NiaModifierDescription, NiaModifierDescriptionObject,
+  NiaDefineModifierEvent,
+  NiaDefineModifierEventObject,
+  NiaDefineModifierResponse,
+  NiaEventResponse,
+  NiaKey,
+  NiaKeyObject,
+  NiaModifierDescription,
+  NiaModifierDescriptionObject,
+  NiaModifierDescriptionSerialized,
 } from '@/utils'
 
 import SerializableObject from '@/utils/serializable-object'
 
 export interface NiaDefineModifierEventResponseObject {
-  deviceId: number
-  keyCode: number
-  modifierAlias: string
+  modifier: NiaModifierDescription,
+
   message: string
   success: boolean
   error: boolean
   failure: boolean
 }
 
-export type NiaDefineModifierEventResponseSerialized = NiaDefineModifierEventResponseObject
+export interface NiaDefineModifierEventResponseSerialized {
+  modifierSerialized: NiaModifierDescriptionSerialized
+
+  message: string
+  success: boolean
+  error: boolean
+  failure: boolean
+}
 
 export class NiaDefineModifierEventResponse implements SerializableObject<NiaDefineModifierEventResponse, NiaDefineModifierEventResponseSerialized> {
-  private readonly deviceId: number
-  private readonly keyCode: number
-  private readonly modifierAlias: string
+  private readonly modifier: NiaModifierDescription
 
   private readonly message: string
   private readonly success: boolean
@@ -29,9 +40,7 @@ export class NiaDefineModifierEventResponse implements SerializableObject<NiaDef
   private readonly failure: boolean
 
   constructor(args: NiaDefineModifierEventResponseObject) {
-    this.deviceId = args.deviceId
-    this.keyCode = args.keyCode
-    this.modifierAlias = args.modifierAlias
+    this.modifier = args.modifier
 
     this.message = args.message
     this.success = args.success
@@ -41,9 +50,7 @@ export class NiaDefineModifierEventResponse implements SerializableObject<NiaDef
 
   static from(event: NiaDefineModifierEvent, response: NiaDefineModifierResponse): NiaDefineModifierEventResponse {
     const args: NiaDefineModifierEventResponseObject = {
-      deviceId: event.getDeviceId(),
-      keyCode: event.getKeyCode(),
-      modifierAlias: event.getModifierAlias(),
+      modifier: event.getModifier(),
 
       message: response.getMessage(),
       success: response.isSuccess(),
@@ -54,16 +61,8 @@ export class NiaDefineModifierEventResponse implements SerializableObject<NiaDef
     return new NiaDefineModifierEventResponse(args)
   }
 
-  getDeviceId(): number {
-    return this.deviceId
-  }
-
-  getKeyCode(): number {
-    return this.keyCode
-  }
-
-  getModifierAlias(): string {
-    return this.modifierAlias
+  getModifier(): NiaModifierDescription {
+    return this.modifier
   }
 
   getMessage(): string {
@@ -88,29 +87,22 @@ export class NiaDefineModifierEventResponse implements SerializableObject<NiaDef
     return niaEventResponse
   }
 
-  toModifier(): NiaModifierDescription {
-    const key: NiaKey = new NiaKey({
-      keyCode: this.keyCode,
-      deviceId: this.deviceId
-    })
-
-    return new NiaModifierDescription({
-      key,
-      alias: this.modifierAlias
-    })
-  }
-
   static deserialize(serialized: NiaDefineModifierEventResponseSerialized): NiaDefineModifierEventResponse {
-    const args: NiaDefineModifierEventResponseObject = serialized
+    const args: NiaDefineModifierEventResponseObject = {
+      modifier: NiaModifierDescription.deserialize(serialized.modifierSerialized),
+
+      message: serialized.message,
+      success: serialized.success,
+      error: serialized.error,
+      failure: serialized.failure
+    }
 
     return new NiaDefineModifierEventResponse(args)
   }
 
-  serialize(): NiaDefineModifierEventResponseObject {
+  serialize(): NiaDefineModifierEventResponseSerialized {
     return {
-      deviceId: this.deviceId,
-      keyCode: this.keyCode,
-      modifierAlias: this.modifierAlias,
+      modifierSerialized: this.modifier.serialize(),
 
       message: this.message,
       success: this.success,

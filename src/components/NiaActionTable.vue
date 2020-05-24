@@ -1,10 +1,10 @@
 <template>
   <div class="nia-action-table">
-    <div class="nia-action-table__controls">
+    <NiaContainer class="nia-action-table__controls">
       <NiaButton @click.stop="addActionHandler()">+</NiaButton>
       <NiaButton @click.stop="removeSelectedActionsHandler()">-</NiaButton>
       <NiaButton>3</NiaButton>
-    </div>
+    </NiaContainer>
 
     <NiaTable
       class="nia-action-action"
@@ -37,17 +37,17 @@
   import {Prop} from 'vue-property-decorator'
 
   import store from '@/store'
-  import {mapKeyCodeToString, NiaDeviceInfo, NiaAction} from '@/utils'
+  import {mapKeyCodeToString, NiaDeviceInfo, NiaNamedAction} from '@/utils'
   import {NiaTableColumnDefinition} from '@/components/nia/lib'
 
   @Component({
     name: 'NiaActionTable',
   })
   export default class NiaActionTable extends Vue {
-    private hoverAction: NiaAction | null = null
+    private hoverAction: NiaNamedAction | null = null
 
     // methods
-    actionRowClasses(action: NiaAction): object {
+    actionRowClasses(action: NiaNamedAction): object {
       for (const selectedAction of this.selectedActions) {
         if (action.getActionName() == selectedAction.getActionName()) {
           return {
@@ -71,16 +71,16 @@
       ]
     }
 
-    get definedActions(): Array<NiaAction> {
+    get definedActions(): Array<NiaNamedAction> {
       return store.getters.Keymapping.Actions.definedActions
     }
 
-    get selectedActions(): Array<NiaAction> {
+    get selectedActions(): Array<NiaNamedAction> {
       return store.getters.UI.General.selectedActions
     }
 
     // handlers
-    hoverHandler(action: NiaAction, hover: boolean): void {
+    hoverHandler(action: NiaNamedAction, hover: boolean): void {
       if (hover) {
         this.hoverAction = action
       } else {
@@ -93,7 +93,7 @@
     }
 
     removeSelectedActionsHandler() {
-      const selectedActions: Array<NiaAction> = store.getters.UI.General.selectedActions
+      const selectedActions: Array<NiaNamedAction> = store.getters.UI.General.selectedActions
 
       for (const selectedAction of selectedActions) {
         store.dispatch.Connection.removeAction({
@@ -104,7 +104,7 @@
       store.commit.UI.General.unselectActions()
     }
 
-    toggleActionSelectionHandler(action: NiaAction) {
+    toggleActionSelectionHandler(action: NiaNamedAction) {
       store.commit.UI.General.toggleActionSelection(action)
     }
   }
@@ -112,12 +112,12 @@
 
 <style scoped>
   .nia-action-table__actions__action.selected {
-    background-color: lightgoldenrodyellow;
-    color: black;
+    background-color: lightgoldenrodyellow !important;
+    color: black !important;
   }
 
   .nia-action-table__actions__action.hover {
-    background-color: #444444;
+    background-color: #777777 !important;
   }
 
   .nia-action-table__actions__action__action-name {

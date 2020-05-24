@@ -28,9 +28,8 @@ export class NiaActionExecuteOSCommand implements SerializablePB<NiaActionExecut
     return this.osCommand
   }
 
-  toAction(name: string): NiaAction {
+  toAction(): NiaAction {
     return new NiaAction({
-      actionName: name,
       action: this,
     })
   }

@@ -3,36 +3,25 @@ import {
 } from '@/utils/event'
 
 import SerializableObject from '@/utils/serializable-object'
+import {NiaModifierDescription, NiaModifierDescriptionSerialized} from '@/utils'
 
 export interface NiaDefineModifierEventObject {
-  keyboardId: number
-  keyCode: number
-  modifierAlias: string
+  modifier: NiaModifierDescription
 }
 
-export type NiaDefineModifierEventSerialized = NiaDefineModifierEventObject
+export type NiaDefineModifierEventSerialized = {
+  modifierSerialized: NiaModifierDescriptionSerialized
+}
 
 export class NiaDefineModifierEvent implements SerializableObject<NiaDefineModifierEvent, NiaDefineModifierEventSerialized> {
-  private readonly keyboardId: number
-  private readonly keyCode: number
-  private readonly modifierAlias: string
+  private readonly modifier: NiaModifierDescription
 
   constructor(args: NiaDefineModifierEventObject) {
-    this.keyboardId = args.keyboardId
-    this.keyCode = args.keyCode
-    this.modifierAlias = args.modifierAlias
+    this.modifier = args.modifier
   }
 
-  getDeviceId(): number {
-    return this.keyboardId
-  }
-
-  getKeyCode(): number {
-    return this.keyCode
-  }
-
-  getModifierAlias(): string {
-    return this.modifierAlias
+  getModifier(): NiaModifierDescription {
+    return this.modifier
   }
 
   getEventType(): NiaEventType {
@@ -47,14 +36,14 @@ export class NiaDefineModifierEvent implements SerializableObject<NiaDefineModif
 
   serialize(): NiaDefineModifierEventSerialized {
     return {
-      keyboardId: this.keyboardId,
-      keyCode: this.keyCode,
-      modifierAlias: this.modifierAlias
+      modifierSerialized: this.modifier.serialize()
     }
   }
 
   static deserialize(obj: NiaDefineModifierEventSerialized): NiaDefineModifierEvent {
-    const args: NiaDefineModifierEventObject = obj
+    const args: NiaDefineModifierEventObject = {
+      modifier: NiaModifierDescription.deserialize(obj.modifierSerialized)
+    }
 
     return new NiaDefineModifierEvent(args)
   }

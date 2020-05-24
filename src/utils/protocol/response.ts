@@ -1,25 +1,38 @@
 import {
-  NiaDefineModifierResponse, NiaExecuteCodeResponse, NiaGetDefinedModifiersResponse, NiaGetDevicesResponse,
-  NiaHandshakeResponse, NiaRemoveModifierResponse,
-} from './responses'
-import {NiaDefineDeviceResponse} from '@/utils/protocol/responses/define-device-response'
-import {NiaRemoveDeviceByNameResponse} from '@/utils/protocol/responses/remove-device-by-name-response'
-import {
+  ChangeMappingResponse,
   DefineActionResponse,
-  DefineDeviceResponse,
+  DefineDeviceResponse, DefineMappingResponse,
   DefineModifierResponse,
-  ExecuteCodeResponse, GetDefinedActionsResponse,
+  ExecuteCodeResponse, GetDefinedActionsResponse, GetDefinedMappingsResponse,
   GetDefinedModifiersResponse,
   GetDevicesResponse,
-  HandshakeResponse, RemoveActionResponse,
+  HandshakeResponse, IsListeningResponse, RemoveActionResponse,
   RemoveDeviceByNameResponse,
-  RemoveDeviceByPathResponse, RemoveModifierResponse,
-  Response,
+  RemoveDeviceByPathResponse, RemoveMappingResponse, RemoveModifierResponse,
+  Response, StartListeningResponse, StopListeningResponse,
 } from 'nia-protocol-js'
-import {NiaRemoveDeviceByPathResponse} from '@/utils/protocol/responses/remove-device-by-path-response'
-import {NiaGetDefinedActionsResponse} from '@/utils/protocol/responses/get-defined-actions-request'
-import {NiaDefineActionResponse} from '@/utils/protocol/responses/define-action-response'
-import {NiaRemoveActionResponse} from '@/utils/protocol/responses/remove-action-response'
+
+import {
+  NiaDefineMappingResponse,
+  NiaDefineModifierResponse,
+  NiaExecuteCodeResponse,
+  NiaGetDefinedMappingsResponse,
+  NiaGetDefinedModifiersResponse,
+  NiaGetDevicesResponse,
+  NiaHandshakeResponse, NiaRemoveMappingResponse,
+  NiaRemoveModifierResponse,
+  NiaDefineDeviceResponse,
+  NiaRemoveDeviceByNameResponse,
+  NiaRemoveDeviceByPathResponse,
+  NiaGetDefinedActionsResponse,
+  NiaDefineActionResponse,
+  NiaRemoveActionResponse,
+} from '@/utils'
+import {NiaChangeMappingResponse} from '@/utils/protocol/responses/change-mapping-response'
+import {NiaStartListeningResponse} from '@/utils/protocol/responses/start-listening-response'
+import {NiaStopListeningRequest} from '@/utils/protocol/requests/stop-listening-request'
+import {NiaStopListeningResponse} from '@/utils/protocol/responses/stop-listening-response'
+import {NiaIsListeningResponse} from '@/utils/protocol/responses/is-listening-response'
 
 export type NiaResponseUnderlyingType = NiaDefineDeviceResponse |
   NiaDefineModifierResponse |
@@ -32,7 +45,14 @@ export type NiaResponseUnderlyingType = NiaDefineDeviceResponse |
   NiaRemoveModifierResponse |
   NiaGetDefinedActionsResponse |
   NiaDefineActionResponse |
-  NiaRemoveActionResponse
+  NiaRemoveActionResponse |
+  NiaGetDefinedMappingsResponse |
+  NiaDefineMappingResponse |
+  NiaChangeMappingResponse |
+  NiaRemoveMappingResponse |
+  NiaIsListeningResponse |
+  NiaStartListeningResponse |
+  NiaStopListeningResponse
 
 export enum NiaResponseType {
   DefineDevice,
@@ -47,6 +67,13 @@ export enum NiaResponseType {
   GetDefinedActions,
   DefineAction,
   RemoveAction,
+  GetDefinedMappings,
+  DefineMapping,
+  ChangeMapping,
+  RemoveMapping,
+  IsListening,
+  StartListening,
+  StopListening,
 }
 
 export class NiaResponse {
@@ -187,6 +214,77 @@ export class NiaResponse {
 
         const removeActionResponse: NiaRemoveActionResponse = NiaRemoveActionResponse.fromPB(removeActionResponsePB)
         return new NiaResponse(removeActionResponse)
+
+
+      case Response.ResponseCase.GET_DEFINED_MAPPINGS_RESPONSE:
+        const getDefinedMappingsResponsePB: GetDefinedMappingsResponse | undefined = responsePB.getGetDefinedMappingsResponse()
+
+        if (getDefinedMappingsResponsePB === undefined) {
+          throw new Error('GetDefinedMappingsResponse was not set')
+        }
+
+        const getDefinedMappingsResponse: NiaGetDefinedMappingsResponse = NiaGetDefinedMappingsResponse.fromPB(getDefinedMappingsResponsePB)
+        return new NiaResponse(getDefinedMappingsResponse)
+
+      case Response.ResponseCase.DEFINE_MAPPING_RESPONSE:
+        const defineMappingResponsePB: DefineMappingResponse | undefined = responsePB.getDefineMappingResponse()
+
+        if (defineMappingResponsePB === undefined) {
+          throw new Error('DefineMappingResponse was not set')
+        }
+
+        const defineMappingResponse: NiaDefineMappingResponse = NiaDefineMappingResponse.fromPB(defineMappingResponsePB)
+        return new NiaResponse(defineMappingResponse)
+
+      case Response.ResponseCase.CHANGE_MAPPING_RESPONSE:
+        const changeMappingResponsePB: ChangeMappingResponse | undefined = responsePB.getChangeMappingResponse()
+
+        if (changeMappingResponsePB === undefined) {
+          throw new Error('ChangeMappingResponse was not set')
+        }
+
+        const changeMappingResponse: NiaChangeMappingResponse = NiaChangeMappingResponse.fromPB(changeMappingResponsePB)
+        return new NiaResponse(changeMappingResponse)
+
+      case Response.ResponseCase.REMOVE_MAPPING_RESPONSE:
+        const removeMappingResponsePB: RemoveMappingResponse | undefined = responsePB.getRemoveMappingResponse()
+
+        if (removeMappingResponsePB === undefined) {
+          throw new Error('RemoveMappingResponse was not set')
+        }
+
+        const removeMappingResponse: NiaRemoveMappingResponse = NiaRemoveMappingResponse.fromPB(removeMappingResponsePB)
+        return new NiaResponse(removeMappingResponse)
+
+      case Response.ResponseCase.IS_LISTENING_RESPONSE:
+        const isListeningResponsePB: IsListeningResponse | undefined = responsePB.getIsListeningResponse()
+
+        if (isListeningResponsePB === undefined) {
+          throw new Error('IsListeningResponse was not set')
+        }
+
+        const isListeningResponse: NiaIsListeningResponse = NiaIsListeningResponse.fromPB(isListeningResponsePB)
+        return new NiaResponse(isListeningResponse)
+
+      case Response.ResponseCase.START_LISTENING_RESPONSE:
+        const startListeningResponsePB: StartListeningResponse | undefined = responsePB.getStartListeningResponse()
+
+        if (startListeningResponsePB === undefined) {
+          throw new Error('StartListeningResponse was not set')
+        }
+
+        const startListeningResponse: NiaStartListeningResponse = NiaStartListeningResponse.fromPB(startListeningResponsePB)
+        return new NiaResponse(startListeningResponse)
+
+      case Response.ResponseCase.STOP_LISTENING_RESPONSE:
+        const stopListeningResponsePB: StopListeningResponse | undefined = responsePB.getStopListeningResponse()
+
+        if (stopListeningResponsePB === undefined) {
+          throw new Error('StopListeningResponse was not set')
+        }
+
+        const stopListeningResponse: NiaStopListeningResponse = NiaStopListeningResponse.fromPB(stopListeningResponsePB)
+        return new NiaResponse(stopListeningResponse)
 
       default:
         throw new Error('Unknown response')

@@ -4,24 +4,25 @@ import {
 
 import SerializableObject from '@/utils/serializable-object'
 import {NiaAction, NiaActionSerialized} from '@/utils'
+import {NiaNamedAction, NiaNamedActionSerialized} from '@/utils/domain/action/named-action'
 
 export interface NiaDefineActionEventObject {
-  action: NiaAction
+  namedAction: NiaNamedAction
 }
 
 export type NiaDefineActionEventSerialized = {
-  actionSerialized: NiaActionSerialized
+  namedActionSerialized: NiaNamedActionSerialized
 }
 
 export class NiaDefineActionEvent implements SerializableObject<NiaDefineActionEvent, NiaDefineActionEventSerialized> {
-  private readonly action: NiaAction
+  private readonly namedAction: NiaNamedAction
 
   constructor(args: NiaDefineActionEventObject) {
-    this.action = args.action
+    this.namedAction = args.namedAction
   }
 
-  getAction(): NiaAction {
-    return this.action
+  getNamedAction(): NiaNamedAction {
+    return this.namedAction
   }
 
   getEventType(): NiaEventType {
@@ -36,13 +37,13 @@ export class NiaDefineActionEvent implements SerializableObject<NiaDefineActionE
 
   serialize(): NiaDefineActionEventSerialized {
     return {
-      actionSerialized: this.action.serialize()
+      namedActionSerialized: this.namedAction.serialize()
     }
   }
 
   static deserialize(serialized: NiaDefineActionEventSerialized): NiaDefineActionEvent {
     const args: NiaDefineActionEventObject = {
-      action: NiaAction.deserialize(serialized.actionSerialized)
+      namedAction: NiaNamedAction.deserialize(serialized.namedActionSerialized)
     }
 
     return new NiaDefineActionEvent(args)

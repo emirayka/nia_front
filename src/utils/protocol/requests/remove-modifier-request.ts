@@ -1,24 +1,18 @@
 import {
   Request,
-  RemoveModifierRequest
+  RemoveModifierRequest, Key,
 } from 'nia-protocol-js'
-import {NiaRequest, NiaRequestType, SerializablePB} from '@/utils'
+import {NiaKey, NiaRequest, NiaRequestType, SerializablePB} from '@/utils'
 
 export class NiaRemoveModifierRequest implements SerializablePB<NiaRemoveModifierRequest, RemoveModifierRequest> {
-  private readonly deviceId: number
-  private readonly keyCode: number
+  private readonly key: NiaKey
 
-  constructor(deviceId: number, keyCode: number) {
-    this.deviceId = deviceId
-    this.keyCode = keyCode
+  constructor(key: NiaKey) {
+    this.key = key
   }
 
-  getDeviceId(): number {
-    return this.deviceId
-  }
-
-  getKeyCode(): number {
-    return this.keyCode
+  getKey(): NiaKey {
+    return this.key
   }
 
   getType(): NiaRequestType {
@@ -30,9 +24,10 @@ export class NiaRemoveModifierRequest implements SerializablePB<NiaRemoveModifie
   }
 
   toPB(): RemoveModifierRequest {
+    const modifierKeyPB: Key = this.key.toPB()
+
     const removeModifierRequest = new RemoveModifierRequest()
-    removeModifierRequest.setDeviceId(this.deviceId)
-    removeModifierRequest.setKeyCode(this.keyCode)
+    removeModifierRequest.setModifierKey(modifierKeyPB)
 
     return removeModifierRequest
   }

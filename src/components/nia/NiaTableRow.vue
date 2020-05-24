@@ -1,6 +1,7 @@
 <template>
   <tr
     class="nia-table-row"
+    :style="style"
     @click="$emit('click', $event)"
     @mouseover="$emit('hover', true)"
     @mouseleave="$emit('hover', false)"
@@ -9,14 +10,27 @@
   </tr>
 </template>
 
-<script>
-  export default {
-    name: "NiaTableRow",
+<script lang="ts">
+  import Vue from 'vue'
+  import Component from 'vue-class-component'
+
+  import store from '@/store'
+
+  @Component({
+    name: 'NiaTableRow',
+  })
+  export default class NiaTableRow extends Vue {
+    get style(): object {
+      return {
+        color: store.getters.Theme.getForegroundColor2,
+        backgroundColor: store.getters.Theme.getBackgroundColor2,
+      }
+    }
   }
 </script>
 
 <style scoped>
-  tr {
+  .nia-table-row {
     width: 100%;
 
     line-height: 1.15;

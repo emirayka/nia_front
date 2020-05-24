@@ -15,7 +15,7 @@
           class="nia-editor__nia-code-editor"
           :code="code"
           @change="changeHandler($event)"
-          @execute="$emit('execute', $event)"
+          @execute="executeHandler"
         />
       </div>
 
@@ -43,15 +43,21 @@
   })
   export default class Editor extends Vue{
     get log(): Array<ExecutionResult> {
-      return store.state.KeymappingModule.log
+      return store.getters.Editor.executionLog
     }
 
     get code(): string {
-      return store.state.KeymappingModule.code
+      return store.getters.Editor.code
     }
 
     changeHandler(code: string): void {
-      store.commit.KeymappingModule.setCode(code)
+      store.commit.Editor.setCode(code)
+    }
+
+    executeHandler(code: string): void {
+      store.dispatch.Connection.executeCode({
+        code
+      })
     }
   }
 </script>

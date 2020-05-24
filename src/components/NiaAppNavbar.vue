@@ -5,23 +5,28 @@
         Nia
       </NiaNavbarBrand>
 
-      <NiaNavbarNav>
-        <NiaNavItem
+      <NiaNavbarItem>
+        <NiaNavbarNav
           title="Keyboards"
           path="/Keyboards"
           @nav="$emit('nav', $event)"
         />
-        <NiaNavItem
+        <NiaNavbarNav
           title="Editor"
           path="/Editor"
           @nav="$emit('nav', $event)"
         />
-        <NiaNavItem
+        <NiaNavbarNav
           title="Settings"
           path="/Settings"
           @nav="$emit('nav', $event)"
         />
-      </NiaNavbarNav>
+      </NiaNavbarItem>
+
+      <NiaNavbarItem>
+        <NiaListeningButton>
+        </NiaListeningButton>
+      </NiaNavbarItem>
     </NiaNavbar>
   </div>
 </template>
@@ -30,8 +35,13 @@
   import Vue from 'vue'
   import Component from 'vue-class-component'
 
+  import NiaListeningButton from './NiaListeningButton.vue'
+
   @Component({
     name: 'NiaAppNavbar',
+    components: {
+      NiaListeningButton
+    },
   })
   export default class NiaAppNavbar extends Vue {
   }

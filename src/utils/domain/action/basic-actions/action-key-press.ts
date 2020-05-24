@@ -29,9 +29,8 @@ export class NiaActionKeyPress implements SerializablePB<NiaActionKeyPress, Acti
     return this.keyCode
   }
 
-  toAction(name: string): NiaAction {
+  toAction(): NiaAction {
     return new NiaAction({
-      actionName: name,
       action: this,
     })
   }

@@ -10,25 +10,48 @@ import {moduleActionContext, moduleGetterContext, rootActionContext} from '@/sto
 import {
   NiaAction,
   NiaDefineDeviceEvent,
-  NiaDefineDeviceEventObject, NiaDefineDeviceEventResponse,
+  NiaDefineDeviceEventObject,
+  NiaDefineDeviceEventResponse,
+  NiaDefineMappingEvent,
+  NiaDefineMappingEventObject,
+  NiaDefineMappingEventResponse,
   NiaDefineModifierEvent,
-  NiaDefineModifierEventObject, NiaDefineModifierEventResponse, NiaDeviceInfo,
+  NiaDefineModifierEventObject,
+  NiaDefineModifierEventResponse,
+  NiaDeviceInfo,
   NiaEvent,
   NiaEventResponse,
   NiaEventResponseSerialized,
   NiaExecuteCodeEvent,
-  NiaExecuteCodeEventObject, NiaExecuteCodeEventResponse, NiaKey, NiaModifierDescription,
+  NiaExecuteCodeEventObject,
+  NiaExecuteCodeEventResponse,
+  NiaKey,
+  NiaMapping,
+  NiaModifierDescription, NiaNamedAction,
   NiaRemoveDeviceEvent,
-  NiaRemoveDeviceEventObject, NiaRemoveDeviceEventResponse,
+  NiaRemoveDeviceEventObject,
+  NiaRemoveDeviceEventResponse, NiaRemoveMappingEvent, NiaRemoveMappingEventObject, NiaRemoveMappingEventResponse,
   NiaRemoveModifierEvent,
-  NiaRemoveModifierEventObject, NiaRemoveModifierEventResponse,
-  NiaSynchronizeEvent, NiaSynchronizeEventResponse,
+  NiaRemoveModifierEventObject,
+  NiaRemoveModifierEventResponse,
+  NiaSynchronizeEvent,
+  NiaSynchronizeEventResponse,
 } from '@/utils'
+import {NiaRemoveActionEvent, NiaRemoveActionEventObject} from '@/utils'
+import {NiaDefineActionEvent, NiaDefineActionEventObject} from '@/utils'
+import {NiaRemoveActionEventResponse} from '@/utils'
+import {NiaDefineActionEventResponse} from '@/utils'
+
 import {ExecutionResult} from '@/store/models'
-import {NiaRemoveActionEvent, NiaRemoveActionEventObject} from '@/utils/event/events/remove-action'
-import {NiaDefineActionEvent, NiaDefineActionEventObject} from '@/utils/event/events/define-action'
-import {NiaRemoveActionEventResponse} from '@/utils/event/responses/remove-action-event-response'
-import {NiaDefineActionEventResponse} from '@/utils/event/responses/define-action-event-response'
+import {NiaChangeMappingEventResponse} from '@/utils/event/responses/change-mapping-event-response'
+import {NiaChangeMappingEvent, NiaChangeMappingEventObject} from '@/utils/event/events/change-mapping-event'
+import {NiaStopListeningEventResponse} from '@/utils/event/responses/stop-listening-event-response'
+import {NiaStartListeningEventResponse} from '@/utils/event/responses/start-listening-event-response'
+import {NiaStopListeningEvent} from '@/utils/event/events/stop-listening-event'
+import {NiaStartListeningEvent} from '@/utils/event/events/start-listening-event'
+
+import loggers from '@/utils/logger'
+const logger = loggers('store/Connection')
 
 type IPCListener = (_: any, eventResponse: NiaEventResponseSerialized) => void;
 
@@ -158,28 +181,76 @@ const ConnectionModule = defineModule({
       dispatch.sendEvent(event)
     },
 
+    defineMapping(context, args: NiaDefineMappingEventObject): void {
+      const { dispatch } = ConnectionModuleActionContext(context)
+
+      const defineMappingEvent: NiaDefineMappingEvent = new NiaDefineMappingEvent(args)
+      const event: NiaEvent = defineMappingEvent.toEvent()
+
+      dispatch.sendEvent(event)
+    },
+
+    changeMapping(context, args: NiaChangeMappingEventObject): void {
+      const { dispatch } = ConnectionModuleActionContext(context)
+
+      const changeMappingEvent: NiaChangeMappingEvent = new NiaChangeMappingEvent(args)
+      const event: NiaEvent = changeMappingEvent.toEvent()
+
+      dispatch.sendEvent(event)
+    },
+
+    removeMapping(context, args: NiaRemoveMappingEventObject): void {
+      const { dispatch } = ConnectionModuleActionContext(context)
+
+      const removeMappingEvent: NiaRemoveMappingEvent = new NiaRemoveMappingEvent(args)
+      const event: NiaEvent = removeMappingEvent.toEvent()
+
+      dispatch.sendEvent(event)
+    },
+
+    startListening(context): void {
+      const { dispatch } = ConnectionModuleActionContext(context)
+
+      const startListeningEvent: NiaStartListeningEvent = new NiaStartListeningEvent()
+      const event: NiaEvent = startListeningEvent.toEvent()
+
+      dispatch.sendEvent(event)
+    },
+
+    stopListening(context): void {
+      const { dispatch } = ConnectionModuleActionContext(context)
+
+      const removeMappingEvent: NiaStopListeningEvent = new NiaStopListeningEvent()
+      const event: NiaEvent = removeMappingEvent.toEvent()
+
+      dispatch.sendEvent(event)
+    },
+
     // event response handlers
     handleSynchronizeEventResponse(context, response: NiaSynchronizeEventResponse): void {
       const { rootCommit } = rootActionContext(context)
 
       const version: string = response.getVersion()
       const info: string = response.getInfo()
+      const listening: boolean = response.isListening()
       const devicesInfo: Array<NiaDeviceInfo> = response.getDevicesInfo()
       const definedModifiers: Array<NiaModifierDescription> = response.getDefinedModifiers()
-      const definedActions: Array<NiaAction> = response.getDefinedActions()
+      const definedActions: Array<NiaNamedAction> = response.getDefinedActions()
+      const definedMappings: Array<NiaMapping> = response.getDefinedMappings()
 
       rootCommit.Keymapping.ServerInfo.setInfo(info)
       rootCommit.Keymapping.ServerInfo.setVersion(version)
+      rootCommit.Keymapping.Listening.setListening(listening)
       rootCommit.Keymapping.DevicesInfo.setDevicesInfo(devicesInfo)
       rootCommit.Keymapping.Modifiers.setModifiers(definedModifiers)
       rootCommit.Keymapping.Actions.setActions(definedActions)
+      rootCommit.Keymapping.Mappings.setMappings(definedMappings)
     },
     handleExecuteCodeEventResponse(context, response: NiaExecuteCodeEventResponse): void {
       const { rootCommit } = ConnectionModuleActionContext(context)
-
       const executionResult: ExecutionResult = response.toExecutionResult()
 
-      rootCommit.Keymapping.ExecutionLog.addExecutionResult(executionResult)
+      rootCommit.Editor.addExecutionResult(executionResult)
     },
     handleDefineDeviceResponse(context, response: NiaDefineDeviceEventResponse): void {
       const { rootCommit } = ConnectionModuleActionContext(context)
@@ -194,7 +265,7 @@ const ConnectionModule = defineModule({
     handleDefineModifierResponse(context, response: NiaDefineModifierEventResponse): void {
       const { rootCommit } = ConnectionModuleActionContext(context)
 
-      const modifier: NiaModifierDescription = response.toModifier()
+      const modifier: NiaModifierDescription = response.getModifier()
 
       rootCommit.Keymapping.Modifiers.defineModifier(modifier)
     },
@@ -227,6 +298,55 @@ const ConnectionModule = defineModule({
 
       rootCommit.Keymapping.Actions.removeAction(response.getActionName())
     },
+    handleDefineMappingResponse(context, response: NiaDefineMappingEventResponse): void {
+      const { rootCommit } = ConnectionModuleActionContext(context)
+
+      if (response.isSuccess()) {
+        rootCommit.Keymapping.Mappings.defineMapping(response.getMapping())
+        rootCommit.UI.AddMappingDialog.hide()
+      }
+    },
+    handleChangeMappingResponse(context, response: NiaChangeMappingEventResponse): void {
+      const { rootCommit } = ConnectionModuleActionContext(context)
+
+      if (response.isSuccess()) {
+        rootCommit.Keymapping.Mappings.changeMapping({
+            keyChords: response.getKeyChords(),
+            action: response.getAction(),
+          },
+        )
+      }
+    },
+    handleRemoveMappingResponse(context, response: NiaRemoveMappingEventResponse): void {
+      const { rootCommit } = ConnectionModuleActionContext(context)
+
+      if (response.isSuccess()) {
+        rootCommit.Keymapping.Mappings.removeMapping(response.getKeyChords())
+        rootCommit.UI.General.unselectMapping()
+      } else {
+        // errors ...
+      }
+    },
+    handleStartListeningResponse(context, response: NiaStartListeningEventResponse): void {
+      const { rootCommit } = ConnectionModuleActionContext(context)
+
+      if (response.getSuccess()) {
+        rootCommit.Keymapping.Listening.setListening(true)
+      } else {
+        // errors ...
+      }
+    },
+    handleStopListeningResponse(context, response: NiaStopListeningEventResponse): void {
+      const { rootCommit } = ConnectionModuleActionContext(context)
+      logger.debug('Got stop listening event response:')
+      logger.debug(response)
+
+      if (response.getSuccess()) {
+        rootCommit.Keymapping.Listening.setListening(false)
+      } else {
+        // errors ...
+      }
+    },
     handleEventResponse(context, response: NiaEventResponse): void {
       const { dispatch } = ConnectionModuleActionContext(context)
 
@@ -246,6 +366,16 @@ const ConnectionModule = defineModule({
         dispatch.handleDefineActionResponse(response.takeDefineActionEventResponse())
       } else if (response.isRemoveActionEventResponse()) {
         dispatch.handleRemoveActionResponse(response.takeRemoveActionEventResponse())
+      } else if (response.isDefineMappingEventResponse()) {
+        dispatch.handleDefineMappingResponse(response.takeDefineMappingEventResponse())
+      } else if (response.isChangeMappingEventResponse()) {
+        dispatch.handleChangeMappingResponse(response.takeChangeMappingEventResponse())
+      } else if (response.isRemoveMappingEventResponse()) {
+        dispatch.handleRemoveMappingResponse(response.takeRemoveMappingEventResponse())
+      } else if (response.isStartListeningEventResponse()) {
+        dispatch.handleStartListeningResponse(response.takeStartListeningEventResponse())
+      } else if (response.isStopListeningEventResponse()) {
+        dispatch.handleStopListeningResponse(response.takeStopListeningEventResponse())
       } else {
         console.log('unknown')
       }

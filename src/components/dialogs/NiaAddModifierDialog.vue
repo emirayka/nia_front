@@ -38,7 +38,13 @@
     NiaFormPropertyEvent,
     NiaFormPropertyType, NiaFormSelectEvent, NiaFormSelectProperty,
   } from '@/components/nia/lib'
-  import {mapKeyCodeToString, mapStringToKeyCode, NiaDefineModifierEvent, NiaDeviceInfo} from '@/utils'
+  import {
+    mapKeyCodeToString,
+    mapStringToKeyCode,
+    NiaDefineModifierEvent,
+    NiaDeviceInfo, NiaKey,
+    NiaModifierDescription,
+  } from '@/utils'
 
   const PROPERTY_DEVICE = 'Device'
   const PROPERTY_KEY = 'Key'
@@ -109,18 +115,25 @@
         return
       }
 
+      const deviceId: number = device.getDeviceId()
       const keyCode: number = store.getters.UI.AddModifierDialog.selectedKeyCode
       const modifierAlias: string = store.getters.UI.AddModifierDialog.selectedModifierAlias
 
-      if (store.getters.Keymapping.Modifiers.isModifierAlreadyDefined(device.getDeviceId(), keyCode)) {
+      if (store.getters.Keymapping.Modifiers.isModifierAlreadyDefined(deviceId, keyCode)) {
         // todo: show error here
         return
       }
 
+      const key: NiaKey = new NiaKey({
+        deviceId: deviceId,
+        keyCode: keyCode
+      })
+
       store.dispatch.Connection.defineModifier({
-        keyboardId: device.getDeviceId(),
-        keyCode,
-        modifierAlias,
+        modifier: new NiaModifierDescription({
+          key,
+          alias: modifierAlias
+        })
       })
 
       store.commit.UI.AddModifierDialog.hide()

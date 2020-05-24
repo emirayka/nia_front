@@ -1,17 +1,18 @@
 import {
   Request,
-  DefineActionRequest, Action,
+  DefineActionRequest, Action, NamedAction,
 } from 'nia-protocol-js'
 import {NiaAction, NiaRequest, NiaRequestType, SerializablePB} from '@/utils'
+import {NiaNamedAction} from '@/utils/domain/action/named-action'
 
 export class NiaDefineActionRequest implements SerializablePB<NiaDefineActionRequest, DefineActionRequest> {
-  private readonly action: NiaAction
+  private readonly action: NiaNamedAction
 
-  constructor(action: NiaAction) {
+  constructor(action: NiaNamedAction) {
     this.action = action
   }
 
-  getAction(): NiaAction {
+  getAction(): NiaNamedAction {
     return this.action
   }
 
@@ -25,7 +26,7 @@ export class NiaDefineActionRequest implements SerializablePB<NiaDefineActionReq
 
   toPB(): DefineActionRequest {
     const defineActionRequestPB: DefineActionRequest = new DefineActionRequest()
-    const actionPB: Action = this.action.toPB()
+    const actionPB: NamedAction = this.action.toPB()
 
     defineActionRequestPB.setAction(actionPB)
 

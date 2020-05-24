@@ -29,9 +29,8 @@ export class NiaActionTextType implements SerializablePB<NiaActionTextType, Acti
     return this.text
   }
 
-  toAction(name: string): NiaAction {
+  toAction(): NiaAction {
     return new NiaAction({
-      actionName: name,
       action: this,
     })
   }

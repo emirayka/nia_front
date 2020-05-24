@@ -10,7 +10,7 @@ import {
   NiaActionMouseButtonRelease,
   NiaActionMouseRelativeMove, NiaActionTextType,
   NiaActionType,
-  NiaActionUnderlyingType, NiaActionWait,
+  NiaActionUnderlyingType, NiaActionWait, NiaNamedAction,
 } from '@/utils'
 
 export interface AddActionDialogState {
@@ -72,96 +72,100 @@ const AddActionDialogModule = defineModule({
     selectedOSCommand: (state: AddActionDialogState): string => state.osCommand,
     selectedWaitAmount: (state: AddActionDialogState): number => state.waitMSAmount,
 
-    constructAction: (state: AddActionDialogState) => (): NiaAction => {
-      let action: NiaActionUnderlyingType | null = null
+    constructAction: (state: AddActionDialogState) => (): NiaNamedAction => {
+      let underlyingAction: NiaActionUnderlyingType | null = null
 
       switch (state.actionType) {
         case NiaActionType.KeyPress:
-          action = new NiaActionKeyPress({
+          underlyingAction = new NiaActionKeyPress({
             keyCode: state.keyCode
           })
           break;
 
         case NiaActionType.KeyClick:
-          action = new NiaActionKeyClick({
+          underlyingAction = new NiaActionKeyClick({
             keyCode: state.keyCode
           })
           break;
 
         case NiaActionType.KeyRelease:
-          action = new NiaActionKeyRelease({
+          underlyingAction = new NiaActionKeyRelease({
             keyCode: state.keyCode
           })
           break;
 
         case NiaActionType.MouseButtonPress:
-          action = new NiaActionMouseButtonPress({
+          underlyingAction = new NiaActionMouseButtonPress({
             buttonCode: state.buttonCode
           })
           break;
 
         case NiaActionType.MouseButtonClick:
-          action = new NiaActionMouseButtonClick({
+          underlyingAction = new NiaActionMouseButtonClick({
             buttonCode: state.buttonCode
           })
           break;
 
         case NiaActionType.MouseButtonRelease:
-          action = new NiaActionMouseButtonRelease({
+          underlyingAction = new NiaActionMouseButtonRelease({
             buttonCode: state.buttonCode
           })
           break;
 
         case NiaActionType.MouseRelativeMove:
-          action = new NiaActionMouseRelativeMove({
+          underlyingAction = new NiaActionMouseRelativeMove({
             dx: state.dx,
             dy: state.dy,
           })
           break;
 
         case NiaActionType.MouseAbsoluteMove:
-          action = new NiaActionMouseAbsoluteMove({
+          underlyingAction = new NiaActionMouseAbsoluteMove({
             x: state.x,
             y: state.y,
           })
           break;
 
         case NiaActionType.TextType:
-          action = new NiaActionTextType({
+          underlyingAction = new NiaActionTextType({
             text: state.text
           })
           break;
 
         case NiaActionType.ExecuteCode:
-          action = new NiaActionExecuteCode({
+          underlyingAction = new NiaActionExecuteCode({
             code: state.code
           })
           break;
 
         case NiaActionType.ExecuteFunction:
-          action = new NiaActionExecuteFunction({
+          underlyingAction = new NiaActionExecuteFunction({
             functionName: state.functionName
           })
           break;
 
         case NiaActionType.ExecuteOSCommand:
-          action = new NiaActionExecuteOSCommand({
+          underlyingAction = new NiaActionExecuteOSCommand({
             osCommand: state.osCommand
           })
           break;
 
         case NiaActionType.Wait:
-          action = new NiaActionWait({
+          underlyingAction = new NiaActionWait({
             ms: state.waitMSAmount
           })
           break;
       }
 
-      if (action === null) {
+      if (underlyingAction === null) {
         throw new Error('Unknown action to be constructed.')
       }
 
-      return new NiaAction({
+      const action: NiaAction = new NiaAction({
+        action: underlyingAction
+      })
+
+      return new NiaNamedAction({
         actionName: state.actionName,
         action: action
       })

@@ -1,48 +1,41 @@
 <template>
-  <div
-    class="nia-keyboards"
-    ref="tabs"
-  >
-    <NiaTabs
-      class="nia-keyboards__nia-tabs"
+  <NiaContainer class="nia-keyboards-container">
+    <div
+      class="nia-keyboards"
+      ref="tabs"
     >
-      <NiaTab
-        class="nia-keyboards__nia-tabs__nia-tab"
-        v-for="(device, index) of devicesInfo"
-        :key="index"
-        :title="device.getDeviceName()"
+      <NiaTabs
+        class="nia-keyboards__nia-tabs"
       >
-        <NiaKeyboard
-          :model="device.getDeviceModel()"
-          :defined="device.isDefined()"
-          :keyboard-height="keyboardHeight"
-          :keyboard-width="keyboardWidth"
-          :selected-keys="getDeviceSelectedKeys(device.getDeviceId())"
-          :modifiers="getDeviceModifiers(device.getDeviceId())"
-          @switch="switchHandler(device, $event)"
-          @click-key="clickKeyHandler(device, $event)"
-          @click-keyboard="clickKeyboardHandler(device)"
-        />
-      </NiaTab>
+        <NiaTab
+          class="nia-keyboards__nia-tabs__nia-tab"
+          v-for="(device, index) of devicesInfo"
+          :key="index"
+          :title="`${device.getDeviceId()}:${device.getDeviceName()}`"
+        >
+          <NiaKeyboard
+            :model="device.getDeviceModel()"
+            :defined="device.isDefined()"
+            :keyboard-height="keyboardHeight"
+            :keyboard-width="keyboardWidth"
+            :selected-keys="getDeviceSelectedKeys(device.getDeviceId())"
+            :modifiers="getDeviceModifiers(device.getDeviceId())"
+            @click-key="clickKeyHandler(device, $event)"
+            @click-keyboard="clickKeyboardHandler(device)"
+          />
+        </NiaTab>
 
-      <NiaTab
-        :title="'No devices'"
-        v-if="noDevices"
-      >
-        <div>
-          No devices were found
-        </div>
-      </NiaTab>
-      <NiaTab
-        :title="'No devices 2'"
-        v-if="noDevices"
-      >
-        <div>
-          No devices were found too
-        </div>
-      </NiaTab>
-    </NiaTabs>
-  </div>
+        <NiaTab
+          :title="'No devices'"
+          v-if="noDevices"
+        >
+          <div>
+            No devices were found
+          </div>
+        </NiaTab>
+      </NiaTabs>
+    </div>
+  </NiaContainer>
 </template>
 
 <script lang="ts">
@@ -71,22 +64,6 @@
   export default class NiaKeyboards extends Vue {
     $refs!: {
       tabs: HTMLDivElement;
-    }
-
-    switchHandler(deviceInfo: NiaDeviceInfo, needToDefine: boolean): void {
-      if (needToDefine) {
-        const args: NiaDefineDeviceEventObject = {
-          deviceId: deviceInfo.getDeviceId(),
-        }
-
-        store.dispatch.Connection.defineDevice(args)
-      } else {
-        const args: NiaRemoveDeviceEventObject = {
-          devicePath: deviceInfo.getDevicePath(),
-        }
-
-        store.dispatch.Connection.removeDevice(args)
-      }
     }
 
     clickKeyboardHandler(device: NiaDeviceInfo): void {
@@ -159,6 +136,12 @@
 </script>
 
 <style scoped>
+  .nia-keyboards-container {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+  }
+
   .nia-keyboards {
     box-sizing: border-box;
     width: 100%;

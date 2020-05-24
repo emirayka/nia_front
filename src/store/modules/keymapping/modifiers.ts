@@ -2,7 +2,6 @@ import Vue from 'vue'
 import {NiaKey, NiaModifierDescription} from '@/utils'
 import {defineModule} from 'direct-vuex'
 import {moduleActionContext, moduleGetterContext} from '@/store'
-import ExecutionLogModule from '@/store/modules/keymapping/execution-log'
 
 export interface ModifiersModuleState {
   definedModifiers: Array<NiaModifierDescription>,

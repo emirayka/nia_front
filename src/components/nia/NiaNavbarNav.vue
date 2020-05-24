@@ -1,15 +1,24 @@
 <template>
-  <ul
-    class="nia-navbar-nav"
-    :style="style"
+  <li
+    class="nia-nav-item"
+    :style="listItemStyle"
+    @click.prevent.capture="$emit('nav', path)"
+    @mouseover="hover = true"
+    @mouseleave="hover = false"
   >
-    <slot></slot>
-  </ul>
+    <a
+      class="nia-nav-item__link"
+      :style="linkStyle"
+    >
+      {{ title }}
+    </a>
+  </li>
 </template>
 
 <script lang="ts">
   import Vue from 'vue'
   import Component from 'vue-class-component'
+  import {Prop} from 'vue-property-decorator'
 
   import store from '@/store'
 
@@ -17,31 +26,61 @@
     name: "NiaNavbarNav",
   })
   export default class NiaNavbarNav extends Vue {
-    get style(): object {
+    @Prop({ default: '' })
+    title!: string
+
+    @Prop({ default: '' })
+    path!: string
+
+    hover = false
+
+    get listItemStyle(): object {
+      const backgroundColor: string = this.hover
+        ? store.getters.Theme.getBackgroundColorAccent2
+        : store.getters.Theme.getBackgroundColor
+
       return {
-        color: store.getters.Theme.getForegroundColor,
+        backgroundColor,
+      }
+    }
+
+    get linkStyle(): object {
+      const backgroundColor: string = this.hover
+        ? store.getters.Theme.getBackgroundColorAccent2
+        : store.getters.Theme.getBackgroundColor
+
+      const color: string = this.hover
+        ? store.getters.Theme.getForegroundColorAccent2
+        : store.getters.Theme.getForegroundColor
+
+      return {
+        backgroundColor,
+        color
       }
     }
   }
 </script>
 
 <style scoped>
-  .nia-navbar-nav {
+  .nia-nav-item {
     box-sizing: border-box;
-    display: flex;
-    flex-direction: row;
-
+    display: inline-block;
     list-style: none;
 
-    font-size: 1rem;
-    font-weight: 400;
+    margin-left: 5px;
+    margin-right: 5px;
+
+    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+    font-size: 1.25em;
+    font-weight: 500;
     line-height: 1.5;
-    text-align: left;
 
-    margin-top: 0;
-    margin-bottom: 0;
-    padding-left: 0;
-
-    background-color: transparent;
+    border-radius: 5px;
+    padding: 5px;
   }
+
+  .nia-nav-item:hover {
+    cursor: pointer;
+  }
+
 </style>

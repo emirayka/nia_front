@@ -15,9 +15,9 @@ export interface NiaDefineKeyboardEventResponseObject {
   failure: boolean
 }
 
-export type NiaDefineKeyboardEventResponseSerialized = NiaDefineKeyboardEventResponseObject
+export type NiaDefineDeviceEventResponseSerialized = NiaDefineKeyboardEventResponseObject
 
-export class NiaDefineDeviceEventResponse implements SerializableObject<NiaDefineDeviceEventResponse, NiaDefineKeyboardEventResponseSerialized> {
+export class NiaDefineDeviceEventResponse implements SerializableObject<NiaDefineDeviceEventResponse, NiaDefineDeviceEventResponseSerialized> {
   private readonly deviceId: number
 
   private readonly message: string
@@ -71,7 +71,7 @@ export class NiaDefineDeviceEventResponse implements SerializableObject<NiaDefin
     return niaEventResponse
   }
 
-  static deserialize(obj: NiaDefineKeyboardEventResponseSerialized): NiaDefineDeviceEventResponse {
+  static deserialize(obj: NiaDefineDeviceEventResponseSerialized): NiaDefineDeviceEventResponse {
     const args: NiaDefineKeyboardEventResponseObject = obj
 
     return new NiaDefineDeviceEventResponse(args)

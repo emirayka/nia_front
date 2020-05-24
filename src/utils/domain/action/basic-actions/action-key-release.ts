@@ -29,9 +29,8 @@ export class NiaActionKeyRelease implements SerializablePB<NiaActionKeyRelease, 
     return this.keyCode
   }
 
-  toAction(name: string): NiaAction {
+  toAction(): NiaAction {
     return new NiaAction({
-      actionName: name,
       action: this,
     })
   }

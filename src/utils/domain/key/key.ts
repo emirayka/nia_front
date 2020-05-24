@@ -1,7 +1,11 @@
 import {Key, Key1, Key2} from 'nia-protocol-js'
 
-import {SerializablePB} from '@/utils'
+import {mapStringToKeyCode, SerializablePB} from '@/utils'
 import SerializableObject from '@/utils/serializable-object'
+
+import {
+  mapKeyCodeToString
+} from '@/utils'
 
 export interface NiaKeyObject {
   keyCode: number
@@ -27,11 +31,25 @@ export class NiaKey implements SerializablePB<NiaKey, Key>, SerializableObject<N
     return this.keyCode
   }
 
+  stringify(): string {
+    const keyCode: string = mapKeyCodeToString(this.keyCode)
+
+    if (this.deviceId !== null) {
+      return `${this.deviceId}:${keyCode}`
+    } else {
+      return `${keyCode}`
+    }
+  }
+
   equals(other: NiaKey): boolean {
     if (this.deviceId === null || other.deviceId === null) {
       return this.keyCode === other.keyCode
     }
 
+    return this.deviceId === other.deviceId && this.keyCode === other.keyCode
+  }
+
+  same(other: NiaKey): boolean {
     return this.deviceId === other.deviceId && this.keyCode === other.keyCode
   }
 
@@ -88,6 +106,7 @@ export class NiaKey implements SerializablePB<NiaKey, Key>, SerializableObject<N
           keyCode,
           deviceId: null
         }
+        break
 
       case Key.KeyCase.KEY_2:
         const key2PB: Key2 | undefined = keyPB.getKey2()
@@ -103,6 +122,7 @@ export class NiaKey implements SerializablePB<NiaKey, Key>, SerializableObject<N
           keyCode,
           deviceId
         }
+        break
     }
 
     if (args === null) {
@@ -110,5 +130,43 @@ export class NiaKey implements SerializablePB<NiaKey, Key>, SerializableObject<N
     }
 
     return new NiaKey(args)
+  }
+
+  static fromString(s: string): NiaKey | null {
+    const splitted: Array<string> = s.split(':')
+
+    let deviceId: number | null | undefined = null
+    let keyCode: number | null | undefined = null
+
+    switch (splitted.length) {
+      case 1:
+        keyCode = mapStringToKeyCode(splitted[0])
+        break
+
+      case 2:
+        deviceId = +splitted[0]
+        keyCode = mapStringToKeyCode(splitted[1])
+        break
+    }
+    console.log(deviceId)
+    console.log(keyCode)
+
+    // if nan
+    if (deviceId === undefined) {
+      return null
+    }
+
+    if (deviceId !== deviceId) {
+      return null
+    }
+
+    if (keyCode === null || keyCode === undefined) {
+      return null
+    }
+
+    return new NiaKey({
+      deviceId,
+      keyCode
+    })
   }
 }

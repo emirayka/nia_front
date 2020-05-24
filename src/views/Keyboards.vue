@@ -14,6 +14,14 @@
       >
         <NiaAccordion>
           <NiaAccordionItem
+            :id="'110'"
+            :title="'Devices'"
+            :multiple="false"
+          >
+            <NiaDeviceTable />
+          </NiaAccordionItem>
+
+          <NiaAccordionItem
             :id="'111'"
             :title="'Modifiers'"
             :multiple="false"
@@ -26,16 +34,6 @@
             :multiple="false"
           >
             <NiaActionTable />
-          </NiaAccordionItem>
-          <NiaAccordionItem
-            :id="'113'"
-            :title="'title-3'"
-            :multiple="false"
-          >
-            <div>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid dolor dolore, ducimus exercitationem
-              facilis fugiat, harum, in ipsam iure laudantium officia officiis optio quod rem suscipit veniam veritatis
-              voluptas voluptates.
-            </div>
           </NiaAccordionItem>
         </NiaAccordion>
       </NiaGridItem>
@@ -55,14 +53,13 @@
         :w="70"
         :h="40"
       >
-        <NiaColoredDiv>
-          3
-        </NiaColoredDiv>
+        <NiaMappingView />
       </NiaGridItem>
     </NiaGridLayout>
 
     <NiaAddModifierDialog v-if="addModifierDialogIsShown"/>
     <NiaAddActionDialog v-if="addActionDialogIsShown" />
+    <NiaAddMappingDialog v-if="addMappingDialogIsShown" />
   </div>
 </template>
 
@@ -73,8 +70,12 @@
   import NiaKeyboards from '@/components/NiaKeyboards.vue'
   import NiaModifierTable from '@/components/NiaModifierTable.vue'
   import NiaActionTable from '@/components/NiaActionTable.vue'
+  import NiaDeviceTable from '@/components/NiaDeviceTable.vue'
+  import NiaMappingView from '@/components/NiaMappingView.vue'
+
   import NiaAddModifierDialog from '@/components/dialogs/NiaAddModifierDialog.vue'
   import NiaAddActionDialog from '@/components/dialogs/NiaAddActionDialog.vue'
+  import NiaAddMappingDialog from '@/components/dialogs/NiaAddMappingDialog.vue'
 
   import store from '@/store'
   import {mapStringToKeyCode} from '@/utils/utils'
@@ -92,8 +93,11 @@
       NiaActionTable,
       NiaKeyboards,
       NiaModifierTable,
+      NiaDeviceTable,
       NiaAddModifierDialog,
       NiaAddActionDialog,
+      NiaAddMappingDialog,
+      NiaMappingView,
     },
   })
   export default class Keyboards extends Vue {
@@ -103,67 +107,9 @@
     get addActionDialogIsShown(): boolean {
       return store.getters.UI.AddActionDialog.isShown
     }
-    //
-    // //
-    // showAddActionDialogHandler(): void {
-    //   store.commit.UIModule.showAddActionDialog()
-    // }
-    //
-    // addActionDialogAddActionHandler(): void {
-    //   return
-    // }
-    //
-    // addActionDialogCancelHandler(): void {
-    //   store.commit.UIModule.hideAddActionDialog()
-    // }
-    //
-    // toggleModifierSelection(modifier: NiaModifierDescription): void {
-    //   store.commit.UIModule.toggleModifierSelection(modifier)
-    // }
-    //
-    // removeSelectedModifiersHandler(): void {
-    //   this.$emit('remove-selected-modifiers')
-    // }
-    //
-    // clickKeyboardHandler(): void {
-    //   store.commit.UIModule.unselectKeys()
-    // }
-    //
-    // clickKeyHandler(key: NiaKey): void {
-    //   store.commit.UIModule.toggleKeySelection(key)
-    // }
-    //
-    // get addModifierDialogIsShown(): boolean {
-    //   return store.getters.UIModule.addModifierDialogIsShown
-    // }
-    //
-    // get addActionDialogIsShown(): boolean {
-    //   return store.getters.UIModule.addActionDialogIsShown
-    // }
-    //
-    // get getDevicesInfo(): Array<NiaDeviceInfo> {
-    //   return store.getters.KeymappingModule.devices
-    // }
-    //
-    // get getSelectedKeys(): Array<NiaKey> {
-    //   return store.getters.UIModule.getSelectedKeys
-    // }
-    //
-    // get getDefinedModifiers(): Array<NiaModifierDescription> {
-    //   return store.getters.KeymappingModule.definedModifiers
-    // }
-    //
-    // get getSelectedModifiers(): Array<NiaModifierDescription> {
-    //   return store.getters.UIModule.getSelectedModifiers
-    // }
-    //
-    // get getDefinedActions(): Array<NiaAction> {
-    //   return store.getters.KeymappingModule.definedActions
-    // }
-    //
-    // get getSelectedActions(): Array<NiaAction> {
-    //   return store.getters.UIModule.getSelectedActions
-    // }
+    get addMappingDialogIsShown(): boolean {
+      return store.getters.UI.AddMappingDialog.isShown
+    }
   }
 </script>
 

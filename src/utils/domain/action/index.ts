@@ -1,4 +1,5 @@
 export * from './basic-actions'
 export * from './action-type'
 export * from './action'
+export * from './named-action'
 export * from './action-list'

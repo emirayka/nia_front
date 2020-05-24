@@ -39,7 +39,7 @@ import {NiaActionType} from '@/utils'
     NiaFormSelectEvent,
     NiaFormSelectProperty,
   } from '@/components/nia/lib'
-  import {NiaAction, NiaActionType} from '@/utils'
+  import {NiaAction, NiaActionType, NiaNamedAction} from '@/utils'
 
   import loggers from '@/utils/logger'
   const logger = loggers('AddActionDialog')
@@ -315,10 +315,10 @@ import {NiaActionType} from '@/utils'
     }
 
     addActionHandler(): void {
-      const action: NiaAction = store.getters.UI.AddActionDialog.constructAction()
+      const namedAction: NiaNamedAction = store.getters.UI.AddActionDialog.constructAction()
 
       store.dispatch.Connection.defineAction({
-        action
+        namedAction
       })
     }
 

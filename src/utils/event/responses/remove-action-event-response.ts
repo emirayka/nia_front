@@ -2,11 +2,11 @@ import {
   NiaAction,
   NiaRemoveDeviceEvent,
   NiaEventResponse, NiaKey, NiaKeyObject, NiaActionSerialized,
+  NiaRemoveActionEvent,
+  NiaRemoveActionResponse,
 } from '@/utils'
 
 import SerializableObject from '@/utils/serializable-object'
-import {NiaRemoveActionEvent} from '@/utils/event/events/remove-action'
-import {NiaRemoveActionResponse} from '@/utils/protocol/responses/remove-action-response'
 
 export interface NiaRemoveActionEventResponseObject {
   actionName: string
@@ -41,7 +41,7 @@ export class NiaRemoveActionEventResponse implements SerializableObject<NiaRemov
 
   static from(
     event: NiaRemoveActionEvent,
-    response: NiaRemoveActionResponse
+    response: NiaRemoveActionResponse,
   ): NiaRemoveActionEventResponse {
     const args: NiaRemoveActionEventResponseObject = {
       actionName: event.getActionName(),

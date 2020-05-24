@@ -21,7 +21,7 @@
 
   import 'codemirror/theme/darcula.css'
   import Component from 'vue-class-component'
-  import {Prop} from 'vue-property-decorator'
+  import {Prop, Watch} from 'vue-property-decorator'
 
   @Component({
     name: 'NiaCodeEditor',
@@ -30,8 +30,11 @@
     editor: codemirror.Editor | null = null
     changeHandler: ((instance: codemirror.Editor, changeObj: codemirror.EditorChangeLinkedList) => void) | null = null
 
-    @Prop({ required: true})
+    @Prop({ required: true })
     code!: string;
+
+    @Prop({ default: true })
+    enabled!: boolean;
 
     $refs!: {
       editorElement: HTMLElement;
@@ -59,13 +62,15 @@
 
           this.$emit('execute', selectedCode)
         },
-        "Tab": function(instance: CodeMirror.Editor) {
+        "Tab": function (instance: CodeMirror.Editor) {
           const indentUnit: number = instance.getOption("indentUnit") || 2
           const spaces: string = Array(indentUnit + 1).join(" ");
 
           instance.replaceSelection(spaces);
-        }
+        },
       });
+
+      this.editor?.setOption('readOnly', !this.enabled)
 
       this.changeHandler = (instance) => {
         const newCode = instance.getValue()
@@ -80,8 +85,13 @@
       if (this.editor === null || this.changeHandler === null) {
         return
       }
-      
+
       this.editor.off('change', this.changeHandler)
+    }
+
+    @Watch('enabled')
+    enabledChanged(value: boolean): void {
+      this.editor?.setOption('readOnly', !value)
     }
   }
 </script>

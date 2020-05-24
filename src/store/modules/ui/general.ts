@@ -1,7 +1,7 @@
 import loggers from '@/utils/logger'
 const logger = loggers('General Module')
 
-import {NiaAction, NiaKey, NiaModifierDescription} from '@/utils'
+import {NiaAction, NiaDeviceInfo, NiaKey, NiaMapping, NiaModifierDescription, NiaNamedAction} from '@/utils'
 import {defineModule} from 'direct-vuex'
 import {moduleActionContext, moduleGetterContext} from '@/store'
 import AddModifierDialogModule from '@/store/modules/ui/add-modifier-dialog'
@@ -9,7 +9,9 @@ import AddModifierDialogModule from '@/store/modules/ui/add-modifier-dialog'
 export interface UIModuleState {
   selectedKeys: Array<NiaKey>,
   selectedModifiers: Array<NiaModifierDescription>,
-  selectedActions: Array<NiaAction>,
+  selectedActions: Array<NiaNamedAction>,
+  selectedDevice: NiaDeviceInfo | null,
+  selectedMapping: NiaMapping | null,
 }
 
 const GeneralModule = defineModule({
@@ -18,8 +20,11 @@ const GeneralModule = defineModule({
     selectedKeys: [],
     selectedModifiers: [],
     selectedActions: [],
+    selectedDevice: null,
+    selectedMapping: null,
   } as UIModuleState,
   mutations: {
+    // keys
     toggleKeySelection: (state: UIModuleState, key: NiaKey) => {
       for (const selectedKey of state.selectedKeys) {
         if (selectedKey.equals(key)) {
@@ -35,6 +40,7 @@ const GeneralModule = defineModule({
       state.selectedKeys = []
     },
 
+    // modifiers
     toggleModifierSelection: (state: UIModuleState, modifier: NiaModifierDescription) => {
       logger.debug('Got toggle modifier selection mutation:')
       logger.debug(modifier)
@@ -56,7 +62,8 @@ const GeneralModule = defineModule({
       state.selectedModifiers = []
     },
 
-    toggleActionSelection: (state: UIModuleState, action: NiaAction) => {
+    // actions
+    toggleActionSelection: (state: UIModuleState, action: NiaNamedAction) => {
       for (const selectedAction of state.selectedActions) {
         if (selectedAction.getActionName() === action.getActionName()) {
           state.selectedActions = state.selectedActions
@@ -70,11 +77,26 @@ const GeneralModule = defineModule({
     unselectActions: (state: UIModuleState) => {
       state.selectedModifiers = []
     },
+
+    // device
+    selectDevice: (state: UIModuleState, device: NiaDeviceInfo) => {
+      state.selectedDevice = device
+    },
+
+    // mapping
+    selectMapping: (state: UIModuleState, mapping: NiaMapping) => {
+      state.selectedMapping = mapping
+    },
+    unselectMapping: (state: UIModuleState) => {
+      state.selectedMapping = null
+    },
   },
   getters: {
     selectedKeys: (state: UIModuleState) => state.selectedKeys,
     selectedModifiers: (state: UIModuleState) => state.selectedModifiers,
     selectedActions: (state: UIModuleState) => state.selectedActions,
+    selectedDevice: (state: UIModuleState) => state.selectedDevice,
+    selectedMapping: (state: UIModuleState) => state.selectedMapping,
   },
 })
 

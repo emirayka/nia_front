@@ -36,9 +36,8 @@ export class NiaActionMouseRelativeMove implements SerializablePB<NiaActionMouse
     return this.dy
   }
 
-  toAction(name: string): NiaAction {
+  toAction(): NiaAction {
     return new NiaAction({
-      actionName: name,
       action: this,
     })
   }

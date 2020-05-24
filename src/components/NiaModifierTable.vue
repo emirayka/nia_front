@@ -144,26 +144,26 @@
     removeSelectedModifiersHandler(): void {
       const selectedModifiers: Array<NiaModifierDescription> = this.selectedModifiers
 
-      store.commit.UI.General.unselectModifiers()
-
       for (const selectedModifier of selectedModifiers) {
         store.dispatch.Connection.removeModifier({
           deviceId: selectedModifier.getKey().getDeviceId(),
           keyCode: selectedModifier.getKey().getKeyCode(),
         })
       }
+
+      store.commit.UI.General.unselectModifiers()
     }
   }
 </script>
 
 <style scoped>
-  .nia-modifier-table__modifiers__modifier.selected {
-    background-color: lightgoldenrodyellow;
-    color: black;
+  .nia-table-row.nia-modifier-table__modifiers__modifier.selected {
+    background-color: lightgoldenrodyellow !important;
+    color: black !important;
   }
 
-  .nia-modifier-table__modifiers__modifier.hover {
-    background-color: #444444;
+  .nia-table-row.nia-modifier-table__modifiers__modifier.hover {
+    background-color: #777777 !important;
   }
 
   .nia-modifier-table__modifiers__modifier__device-id {

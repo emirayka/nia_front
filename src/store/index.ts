@@ -4,6 +4,7 @@ import {createDirectStore} from 'direct-vuex'
 
 import {
   Connection,
+  Editor,
   Keymapping,
   Theme,
   UI,
@@ -23,6 +24,7 @@ const {
     Keymapping,
     Theme,
     UI,
+    Editor,
   },
 })
 

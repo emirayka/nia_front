@@ -17,3 +17,6 @@ const vue: Vue = new Vue({
 })
 
 vue.$mount('#app')
+// todo: listening
+// todo: add error/failure checkings in connection store module
+// todo: add error dialog view

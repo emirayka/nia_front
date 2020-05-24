@@ -17,21 +17,43 @@ import {
   NiaRemoveDeviceByNameRequest,
   NiaRemoveDeviceByPathRequest,
   NiaRemoveModifierRequest,
-  NiaRemoveModifierResponse, NiaRequest,
-} from '@/utils/protocol'
-import {NiaResponse, NiaResponseType} from '@/utils/protocol/response'
-import {NiaDefineDeviceResponse} from '@/utils/protocol/responses/define-device-response'
-import {NiaRemoveDeviceByPathResponse} from '@/utils/protocol/responses/remove-device-by-path-response'
-import {NiaRemoveDeviceByNameResponse} from '@/utils/protocol/responses/remove-device-by-name-response'
-import {NiaAction, NiaKey} from '@/utils'
-import {NiaGetDefinedActionsResponse} from '@/utils/protocol/responses/get-defined-actions-request'
-import {NiaDefineActionResponse} from '@/utils/protocol/responses/define-action-response'
-import {NiaGetDefinedActionsRequest} from '@/utils/protocol/requests/get-defined-actions-request'
-import {NiaDefineActionRequest} from '@/utils/protocol/requests/define-action-request'
-import {NiaRemoveActionResponse} from '@/utils/protocol/responses/remove-action-response'
-import {NiaRemoveActionRequest} from '@/utils/protocol/requests/remove-action-request'
+  NiaRemoveModifierResponse,
+  NiaRequest,
+  NiaResponse,
+  NiaResponseType,
+  NiaDefineDeviceResponse,
+  NiaRemoveDeviceByPathResponse,
+  NiaRemoveDeviceByNameResponse,
+  NiaAction,
+  NiaKey,
+  NiaGetDefinedActionsResponse,
+  NiaDefineActionResponse,
+  NiaGetDefinedActionsRequest,
+  NiaDefineActionRequest,
+  NiaRemoveActionResponse,
+  NiaRemoveActionRequest,
+  NiaGetDefinedMappingsResponse,
+  NiaGetDefinedMappingsRequest,
+  NiaMapping,
+  NiaDefineMappingResponse,
+  NiaDefineMappingRequest,
+  NiaRemoveMappingResponse,
+  NiaRemoveMappingRequest,
+  NiaKeyChord,
+  NiaModifierDescription,
+} from '@/utils'
+
+import {NiaChangeMappingRequest} from '@/utils/protocol/requests/change-mapping-request'
+import {NiaChangeMappingResponse} from '@/utils/protocol/responses/change-mapping-response'
+import {NiaStartListeningResponse} from '@/utils/protocol/responses/start-listening-response'
+import {NiaStartListeningRequest} from '@/utils/protocol/requests/start-listening-request'
+import {NiaStopListeningRequest} from '@/utils/protocol/requests/stop-listening-request'
+import {NiaStopListeningResponse} from '@/utils/protocol/responses/stop-listening-response'
+import {NiaNamedAction} from '@/utils/domain/action/named-action'
 
 import loggers from '@/utils/logger'
+import {NiaIsListeningResponse} from '@/utils/protocol/responses/is-listening-response'
+import {NiaIsListeningRequest} from '@/utils/protocol/requests/is-listening-request'
 const logger = loggers('protocol')
 
 export class NiaProtocol {
@@ -222,7 +244,7 @@ export class NiaProtocol {
     })
   }
 
-  defineModifier(keyboardId: number, keyCode: number, modifierAlias: string): Promise<NiaDefineModifierResponse> {
+  defineModifier(modifierDescription: NiaModifierDescription): Promise<NiaDefineModifierResponse> {
     return new Promise((resolve, reject) => {
       this.ws.once('message', message => {
         if (message instanceof Uint8Array) {
@@ -238,14 +260,19 @@ export class NiaProtocol {
         }
       })
 
-      const request: NiaRequest = new NiaDefineModifierRequest(
-        keyboardId,
-        keyCode,
-        modifierAlias,
-      ).toRequest()
+      logger.debug('Need to send define modifier')
+      logger.debug(modifierDescription)
+      logger.debug('Constructing request..')
+      const request: NiaRequest = new NiaDefineModifierRequest(modifierDescription).toRequest()
+      logger.debug('Constructed:')
+      logger.debug(request)
+
+      logger.debug('Serializing...')
       const data: Uint8Array = request.toUint8Array()
 
+      logger.debug('Sending define modifier request...')
       this.ws.send(data)
+      logger.debug('Sent.')
     })
   }
 
@@ -265,18 +292,7 @@ export class NiaProtocol {
         }
       })
 
-      const deviceId: number | null = key.getDeviceId()
-      const keyCode: number = key.getKeyCode()
-
-      if (deviceId === null) {
-        reject('Device is is not set')
-        return
-      }
-
-      const request: NiaRequest = new NiaRemoveModifierRequest(
-        deviceId,
-        keyCode
-      ).toRequest()
+      const request: NiaRequest = new NiaRemoveModifierRequest(key).toRequest()
       const data: Uint8Array = request.toUint8Array()
 
       this.ws.send(data)
@@ -306,7 +322,7 @@ export class NiaProtocol {
     })
   }
 
-  async defineAction(action: NiaAction): Promise<NiaDefineActionResponse> {
+  async defineAction(namedAction: NiaNamedAction): Promise<NiaDefineActionResponse> {
     return new Promise((resolve, reject) => {
       this.ws.once('message', message => {
         if (message instanceof Uint8Array) {
@@ -326,7 +342,7 @@ export class NiaProtocol {
       })
 
       logger.debug('Constructing define action request...')
-      const request: NiaRequest = new NiaDefineActionRequest(action).toRequest()
+      const request: NiaRequest = new NiaDefineActionRequest(namedAction).toRequest()
 
       logger.debug('Serializing define action request...')
       const data: Uint8Array = request.toUint8Array()
@@ -353,6 +369,181 @@ export class NiaProtocol {
       })
 
       const request: NiaRequest = new NiaRemoveActionRequest(actionName).toRequest()
+      const data: Uint8Array = request.toUint8Array()
+
+      this.ws.send(data)
+    })
+  }
+
+  async getDefinedMappings(): Promise<NiaGetDefinedMappingsResponse> {
+    return new Promise((resolve, reject) => {
+      this.ws.once('message', message => {
+        if (message instanceof Uint8Array) {
+          const response: NiaResponse = NiaResponse.fromUint8Array(message)
+
+          if (response.getResponseType() == NiaResponseType.GetDefinedMappings) {
+            resolve(response.getResponse() as NiaGetDefinedMappingsResponse)
+          } else {
+            reject(new InvalidResponseError('Expected Get Defined Mappings response.'))
+          }
+        } else {
+          reject()
+        }
+      })
+
+      const request: NiaRequest = new NiaGetDefinedMappingsRequest().toRequest()
+      const data: Uint8Array = request.toUint8Array()
+
+      this.ws.send(data)
+    })
+  }
+
+  async defineMapping(mapping: NiaMapping): Promise<NiaDefineMappingResponse> {
+    return new Promise((resolve, reject) => {
+      this.ws.once('message', message => {
+        if (message instanceof Uint8Array) {
+          logger.debug('Got response. Deserializing...')
+          const response: NiaResponse = NiaResponse.fromUint8Array(message)
+
+          logger.debug('Checking type.')
+          if (response.getResponseType() == NiaResponseType.DefineMapping) {
+            logger.debug('Response is define mapping response. Resolving...')
+            resolve(response.getResponse() as NiaDefineMappingResponse)
+          } else {
+            reject(new InvalidResponseError('Expected Define Mapping response.'))
+          }
+        } else {
+          reject()
+        }
+      })
+
+      logger.debug('Constructing define mapping request...')
+      const request: NiaRequest = new NiaDefineMappingRequest(mapping).toRequest()
+
+      logger.debug('Serializing define mapping request...')
+      const data: Uint8Array = request.toUint8Array()
+
+      logger.debug('Sending request...')
+      this.ws.send(data)
+    })
+  }
+
+  async changeMapping(keyChords: Array<NiaKeyChord>, action: NiaAction): Promise<NiaChangeMappingResponse> {
+    return new Promise((resolve, reject) => {
+      this.ws.once('message', message => {
+        if (message instanceof Uint8Array) {
+          logger.debug('Got response. Deserializing...')
+          const response: NiaResponse = NiaResponse.fromUint8Array(message)
+
+          logger.debug('Checking type...')
+          if (response.getResponseType() == NiaResponseType.ChangeMapping) {
+            logger.debug('Response is change mapping response. Resolving...')
+            resolve(response.getResponse() as NiaChangeMappingResponse)
+          } else {
+            reject(new InvalidResponseError('Expected Change Mapping response.'))
+          }
+        } else {
+          reject()
+        }
+      })
+
+      logger.debug('Constructing change mapping request...')
+      const request: NiaRequest = new NiaChangeMappingRequest(keyChords, action).toRequest()
+
+      logger.debug('Serializing change mapping request...')
+      const data: Uint8Array = request.toUint8Array()
+
+      logger.debug('Sending request...')
+      this.ws.send(data)
+    })
+  }
+
+  async removeMapping(keyChords: Array<NiaKeyChord>): Promise<NiaRemoveMappingResponse> {
+    return new Promise((resolve, reject) => {
+      this.ws.once('message', message => {
+        if (message instanceof Uint8Array) {
+          const response: NiaResponse = NiaResponse.fromUint8Array(message)
+
+          if (response.getResponseType() == NiaResponseType.RemoveMapping) {
+            resolve(response.getResponse() as NiaRemoveMappingResponse)
+          } else {
+            reject(new InvalidResponseError('Expected Remove Mapping response.'))
+          }
+        } else {
+          reject()
+        }
+      })
+
+      const request: NiaRequest = new NiaRemoveMappingRequest(keyChords).toRequest()
+      const data: Uint8Array = request.toUint8Array()
+
+      this.ws.send(data)
+    })
+  }
+
+  async isListening(): Promise<NiaIsListeningResponse> {
+    return new Promise((resolve, reject) => {
+      this.ws.once('message', message => {
+        if (message instanceof Uint8Array) {
+          const response: NiaResponse = NiaResponse.fromUint8Array(message)
+
+          if (response.getResponseType() == NiaResponseType.IsListening) {
+            resolve(response.getResponse() as NiaIsListeningResponse)
+          } else {
+            reject(new InvalidResponseError('Expected Is Listening response.'))
+          }
+        } else {
+          reject()
+        }
+      })
+
+      const request: NiaRequest = new NiaIsListeningRequest().toRequest()
+      const data: Uint8Array = request.toUint8Array()
+
+      this.ws.send(data)
+    })
+  }
+
+  async startListening(): Promise<NiaStartListeningResponse> {
+    return new Promise((resolve, reject) => {
+      this.ws.once('message', message => {
+        if (message instanceof Uint8Array) {
+          const response: NiaResponse = NiaResponse.fromUint8Array(message)
+
+          if (response.getResponseType() == NiaResponseType.StartListening) {
+            resolve(response.getResponse() as NiaStartListeningResponse)
+          } else {
+            reject(new InvalidResponseError('Expected Start Listening response.'))
+          }
+        } else {
+          reject()
+        }
+      })
+
+      const request: NiaRequest = new NiaStartListeningRequest().toRequest()
+      const data: Uint8Array = request.toUint8Array()
+
+      this.ws.send(data)
+    })
+  }
+
+  async stopListening(): Promise<NiaStopListeningResponse> {
+    return new Promise((resolve, reject) => {
+      this.ws.once('message', message => {
+        if (message instanceof Uint8Array) {
+          const response: NiaResponse = NiaResponse.fromUint8Array(message)
+
+          if (response.getResponseType() == NiaResponseType.StopListening) {
+            resolve(response.getResponse() as NiaStopListeningResponse)
+          } else {
+            reject(new InvalidResponseError('Expected Stop Listening response.'))
+          }
+        } else {
+          reject()
+        }
+      })
+
+      const request: NiaRequest = new NiaStopListeningRequest().toRequest()
       const data: Uint8Array = request.toUint8Array()
 
       this.ws.send(data)

@@ -1,30 +1,18 @@
 import {
   Request,
-  DefineModifierRequest,
+  DefineModifierRequest, ModifierDescription,
 } from 'nia-protocol-js'
-import {NiaRequest, NiaRequestType, SerializablePB} from '@/utils'
+import {NiaModifierDescription, NiaRequest, NiaRequestType, SerializablePB} from '@/utils'
 
 export class NiaDefineModifierRequest implements SerializablePB<NiaDefineModifierRequest, DefineModifierRequest> {
-  private readonly deviceId: number
-  private readonly keyCode: number
-  private readonly modifierAlias: string
+  private readonly modifier: NiaModifierDescription
 
-  constructor(deviceId: number, keyCode: number, modifierAlias: string) {
-    this.deviceId = deviceId
-    this.keyCode = keyCode
-    this.modifierAlias = modifierAlias
+  constructor(modifier: NiaModifierDescription) {
+    this.modifier = modifier
   }
 
-  getDeviceId(): number {
-    return this.deviceId
-  }
-
-  getKeyCode(): number {
-    return this.keyCode
-  }
-
-  getModifierAlias(): string {
-    return this.modifierAlias
+  getModifier(): NiaModifierDescription {
+    return this.modifier
   }
 
   getType(): NiaRequestType {
@@ -36,10 +24,9 @@ export class NiaDefineModifierRequest implements SerializablePB<NiaDefineModifie
   }
 
   toPB(): DefineModifierRequest {
+    const modifierDescriptionPB: ModifierDescription = this.modifier.toPB()
     const defineModifierRequest = new DefineModifierRequest()
-    defineModifierRequest.setDeviceId(this.deviceId)
-    defineModifierRequest.setKeyCode(this.keyCode)
-    defineModifierRequest.setModifierAlias(this.modifierAlias)
+    defineModifierRequest.setModifier(modifierDescriptionPB)
 
     return defineModifierRequest
   }

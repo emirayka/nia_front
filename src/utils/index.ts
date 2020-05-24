@@ -1,12 +1,7 @@
 export * from './domain'
 export * from './sockets'
 
-export {
-  keyChordPartToString,
-  keyChordToString,
-  mapKeyCodeToString,
-  mapStringToKeyCode,
-} from './utils'
+export * from './utils'
 
 export {
   BasicError,

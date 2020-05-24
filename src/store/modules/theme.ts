@@ -13,6 +13,12 @@ const defaultTheme: ThemeMaker = () => ({
   bg: '#151515',
   fg: '#FBFCD4',
 
+  bg2: '#252525',
+  fg2: '#FBFCD4',
+
+  bg3: '#353535',
+  fg3: '#FBFCD4',
+
   bgAccent1: '#0A0A0A',
   fgAccent1: '#FFDD03',
 
@@ -49,6 +55,12 @@ const Theme = defineModule({
   getters: {
     getBackgroundColor: (state: ThemeState) => state.theme.bg,
     getForegroundColor: (state: ThemeState) => state.theme.fg,
+
+    getBackgroundColor2: (state: ThemeState) => state.theme.bg2,
+    getForegroundColor2: (state: ThemeState) => state.theme.fg2,
+
+    getBackgroundColor3: (state: ThemeState) => state.theme.bg3,
+    getForegroundColor3: (state: ThemeState) => state.theme.fg3,
 
     getBackgroundColorAccent1: (state: ThemeState) => state.theme.bgAccent1,
     getForegroundColorAccent1: (state: ThemeState) => state.theme.fgAccent1,

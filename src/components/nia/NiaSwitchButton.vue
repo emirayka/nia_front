@@ -1,15 +1,17 @@
 <template>
-  <div class="nia-switch-button-control">
-    <div
-      class="nia-switch-button"
-      :class="{ enabled: isEnabled }"
-      @click="toggle"
-      :style="style"
-    >
-      <div class="button"></div>
-    </div>
-    <div class="nia-switch-button-label">
-      <slot></slot>
+  <div class="nia-switch-button-control-wrapper">
+    <div class="nia-switch-button-control">
+      <div
+        class="nia-switch-button"
+        :class="{ enabled: isEnabled }"
+        @click="toggle"
+        :style="style"
+      >
+        <div class="button"></div>
+      </div>
+      <div class="nia-switch-button-label">
+        <slot></slot>
+      </div>
     </div>
   </div>
 </template>
@@ -25,7 +27,7 @@
     name: 'NiaSwitchButton',
   })
   export default class NiaSwitchButton extends Vue {
-    @Prop({ default: false })
+    @Prop({ default: true })
     isEnabled!: boolean
 
     danger = false
@@ -53,6 +55,10 @@
   scoped
   lang="scss"
 >
+  .nia-switch-button-control-wrapper {
+    display: inline-block;
+  }
+
   .nia-switch-button-control {
     display: flex;
     flex-direction: row;

@@ -2,6 +2,12 @@ export interface Theme {
   bg: string,
   fg: string,
 
+  bg2: string,
+  fg2: string,
+
+  bg3: string,
+  fg3: string,
+
   bgAccent1: string,
   fgAccent1: string,
 

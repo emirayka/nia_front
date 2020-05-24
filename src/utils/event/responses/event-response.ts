@@ -5,51 +5,92 @@ import {
   NiaRemoveDeviceEventResponse,
   NiaRemoveModifierEventResponse,
   NiaSynchronizeEventResponse,
-  NiaDefineKeyboardEventResponseSerialized,
+  NiaDefineDeviceEventResponseSerialized,
   NiaDefineModifierEventResponseSerialized,
   NiaSynchronizeEventResponseSerialized,
-  NiaExecuteCodeEventResponseSerialized, NiaRemoveDeviceResponseSerialized, NiaRemoveModifierEventResponseSerialized,
+  NiaExecuteCodeEventResponseSerialized,
+  NiaRemoveDeviceResponseSerialized,
+  NiaRemoveModifierEventResponseSerialized,
+  NiaDefineMappingEventResponse,
+  NiaRemoveMappingEventResponse,
+  NiaDefineMappingEventResponseSerialized,
+  NiaRemoveMappingEventResponseSerialized,
 } from '@/utils'
-import SerializableObject from '@/utils/serializable-object'
+
 import {
   NiaDefineActionEventResponse,
   NiaDefineActionEventResponseSerialized,
-} from '@/utils/event/responses/define-action-event-response'
+} from '@/utils'
+
 import {
   NiaRemoveActionEventResponse,
   NiaRemoveActionEventResponseSerialized,
-} from '@/utils/event/responses/remove-action-event-response'
+} from '@/utils'
+
+import SerializableObject from '@/utils/serializable-object'
+import {
+  NiaChangeMappingEventResponse,
+  NiaChangeMappingEventResponseSerialized,
+} from '@/utils/event/responses/change-mapping-event-response'
+import {
+  NiaStartListeningEventResponse,
+  NiaStartListeningEventResponseSerialized,
+} from '@/utils/event/responses/start-listening-event-response'
+import {
+  NiaStopListeningEventResponse,
+  NiaStopListeningEventResponseSerialized,
+} from '@/utils/event/responses/stop-listening-event-response'
 
 export enum NiaEventResponseType {
-  DefineDevice,
-  DefineModifier,
+  Synchronize,
   ExecuteCode,
+
+  DefineDevice,
   RemoveDevice,
+
+  DefineModifier,
   RemoveModifier,
+
   DefineAction,
   RemoveAction,
-  Synchronize
+
+  DefineMapping,
+  ChangeMapping,
+  RemoveMapping,
+
+  StartListening,
+  StopListening,
 }
 
 export type NiaEventResponseUnderlyingType =
-  NiaDefineDeviceEventResponse |
-  NiaDefineModifierEventResponse |
+  NiaSynchronizeEventResponse |
   NiaExecuteCodeEventResponse |
+  NiaDefineDeviceEventResponse |
   NiaRemoveDeviceEventResponse |
+  NiaDefineModifierEventResponse |
   NiaRemoveModifierEventResponse |
   NiaDefineActionEventResponse |
   NiaRemoveActionEventResponse |
-  NiaSynchronizeEventResponse
+  NiaDefineMappingEventResponse |
+  NiaChangeMappingEventResponse |
+  NiaRemoveMappingEventResponse |
+  NiaStartListeningEventResponse |
+  NiaStopListeningEventResponse
 
 export type NiaEventResponseUnderlyingTypeSerialized =
-  NiaDefineKeyboardEventResponseSerialized |
-  NiaDefineModifierEventResponseSerialized |
+  NiaSynchronizeEventResponseSerialized |
   NiaExecuteCodeEventResponseSerialized |
+  NiaDefineDeviceEventResponseSerialized |
   NiaRemoveDeviceResponseSerialized |
+  NiaDefineModifierEventResponseSerialized |
   NiaRemoveModifierEventResponseSerialized |
   NiaDefineActionEventResponseSerialized |
   NiaRemoveActionEventResponseSerialized |
-  NiaSynchronizeEventResponseSerialized
+  NiaDefineMappingEventResponseSerialized |
+  NiaChangeMappingEventResponseSerialized |
+  NiaRemoveMappingEventResponseSerialized |
+  NiaStartListeningEventResponseSerialized |
+  NiaStopListeningEventResponseSerialized
 
 export interface NiaEventResponseSerialized {
   eventResponse: NiaEventResponseUnderlyingTypeSerialized,
@@ -63,20 +104,24 @@ export class NiaEventResponse implements SerializableObject<NiaEventResponse, Ni
     this.event = event
   }
 
-  isDefineDeviceEventResponse(): boolean {
-    return this.event instanceof NiaDefineDeviceEventResponse
-  }
-
-  isDefineModifierEventResponse(): boolean {
-    return this.event instanceof NiaDefineModifierEventResponse
+  isSynchronizeEventResponse(): boolean {
+    return this.event instanceof NiaSynchronizeEventResponse
   }
 
   isExecuteCodeEventResponse(): boolean {
     return this.event instanceof NiaExecuteCodeEventResponse
   }
 
+  isDefineDeviceEventResponse(): boolean {
+    return this.event instanceof NiaDefineDeviceEventResponse
+  }
+
   isRemoveDeviceEventResponse(): boolean {
     return this.event instanceof NiaRemoveDeviceEventResponse
+  }
+
+  isDefineModifierEventResponse(): boolean {
+    return this.event instanceof NiaDefineModifierEventResponse
   }
 
   isRemoveModifierEventResponse(): boolean {
@@ -91,24 +136,46 @@ export class NiaEventResponse implements SerializableObject<NiaEventResponse, Ni
     return this.event instanceof NiaRemoveActionEventResponse
   }
 
-  isSynchronizeEventResponse(): boolean {
-    return this.event instanceof NiaSynchronizeEventResponse
+  isDefineMappingEventResponse(): boolean {
+    return this.event instanceof NiaDefineMappingEventResponse
   }
 
-  takeDefineDeviceEventResponse(): NiaDefineDeviceEventResponse {
-    return this.event as NiaDefineDeviceEventResponse
+  isChangeMappingEventResponse(): boolean {
+    return this.event instanceof NiaChangeMappingEventResponse
   }
 
-  takeDefineModifierEventResponse(): NiaDefineModifierEventResponse {
-    return this.event as NiaDefineModifierEventResponse
+  isRemoveMappingEventResponse(): boolean {
+    return this.event instanceof NiaRemoveMappingEventResponse
+  }
+
+  isStartListeningEventResponse(): boolean {
+    return this.event instanceof NiaStartListeningEventResponse
+  }
+
+  isStopListeningEventResponse(): boolean {
+    return this.event instanceof NiaStopListeningEventResponse
+  }
+
+  // take
+
+  takeSynchronizeEventResponse(): NiaSynchronizeEventResponse {
+    return this.event as NiaSynchronizeEventResponse
   }
 
   takeExecuteCodeEventResponse(): NiaExecuteCodeEventResponse {
     return this.event as NiaExecuteCodeEventResponse
   }
 
+  takeDefineDeviceEventResponse(): NiaDefineDeviceEventResponse {
+    return this.event as NiaDefineDeviceEventResponse
+  }
+
   takeRemoveDeviceEventResponse(): NiaRemoveDeviceEventResponse {
     return this.event as NiaRemoveDeviceEventResponse
+  }
+
+  takeDefineModifierEventResponse(): NiaDefineModifierEventResponse {
+    return this.event as NiaDefineModifierEventResponse
   }
 
   takeRemoveModifierEventResponse(): NiaRemoveModifierEventResponse {
@@ -123,31 +190,52 @@ export class NiaEventResponse implements SerializableObject<NiaEventResponse, Ni
     return this.event as NiaRemoveActionEventResponse
   }
 
-  takeSynchronizeEventResponse(): NiaSynchronizeEventResponse {
-    return this.event as NiaSynchronizeEventResponse
+  takeDefineMappingEventResponse(): NiaDefineMappingEventResponse {
+    return this.event as NiaDefineMappingEventResponse
+  }
+
+  takeChangeMappingEventResponse(): NiaChangeMappingEventResponse {
+    return this.event as NiaChangeMappingEventResponse
+  }
+
+  takeRemoveMappingEventResponse(): NiaRemoveMappingEventResponse {
+    return this.event as NiaRemoveMappingEventResponse
+  }
+
+  takeStartListeningEventResponse(): NiaStartListeningEventResponse {
+    return this.event as NiaStartListeningEventResponse
+  }
+
+  takeStopListeningEventResponse(): NiaStopListeningEventResponse {
+    return this.event as NiaStopListeningEventResponse
   }
 
   static deserialize(serialized: NiaEventResponseSerialized): NiaEventResponse {
     switch (serialized.eventType) {
-      case NiaEventResponseType.DefineDevice:
-        const defineKeyboardEventResponseSerialized = serialized.eventResponse as NiaDefineKeyboardEventResponseSerialized
-        const defineKeyboardEventResponse = NiaDefineDeviceEventResponse.deserialize(defineKeyboardEventResponseSerialized)
-        return new NiaEventResponse(defineKeyboardEventResponse)
-
-      case NiaEventResponseType.DefineModifier:
-        const defineModifierEventResponseSerialized = serialized.eventResponse as NiaDefineModifierEventResponseSerialized
-        const defineModifierEventResponse = NiaDefineModifierEventResponse.deserialize(defineModifierEventResponseSerialized)
-        return new NiaEventResponse(defineModifierEventResponse)
+      case NiaEventResponseType.Synchronize:
+        const synchronizeEventResponseSerialized = serialized.eventResponse as NiaSynchronizeEventResponseSerialized
+        const synchronizeEventResponse = NiaSynchronizeEventResponse.deserialize(synchronizeEventResponseSerialized)
+        return new NiaEventResponse(synchronizeEventResponse)
 
       case NiaEventResponseType.ExecuteCode:
         const executeCodeEventResponseSerialized = serialized.eventResponse as NiaExecuteCodeEventResponseSerialized
         const executeCodeEventResponse = NiaExecuteCodeEventResponse.deserialize(executeCodeEventResponseSerialized)
         return new NiaEventResponse(executeCodeEventResponse)
 
+      case NiaEventResponseType.DefineDevice:
+        const defineKeyboardEventResponseSerialized = serialized.eventResponse as NiaDefineDeviceEventResponseSerialized
+        const defineKeyboardEventResponse = NiaDefineDeviceEventResponse.deserialize(defineKeyboardEventResponseSerialized)
+        return new NiaEventResponse(defineKeyboardEventResponse)
+
       case NiaEventResponseType.RemoveDevice:
         const removeKeyboardEventResponseSerialized = serialized.eventResponse as NiaRemoveDeviceResponseSerialized
         const removeKeyboardEventResponse = NiaRemoveDeviceEventResponse.deserialize(removeKeyboardEventResponseSerialized)
         return new NiaEventResponse(removeKeyboardEventResponse)
+
+      case NiaEventResponseType.DefineModifier:
+        const defineModifierEventResponseSerialized = serialized.eventResponse as NiaDefineModifierEventResponseSerialized
+        const defineModifierEventResponse = NiaDefineModifierEventResponse.deserialize(defineModifierEventResponseSerialized)
+        return new NiaEventResponse(defineModifierEventResponse)
 
       case NiaEventResponseType.RemoveModifier:
         const removeModifierEventResponseSerialized = serialized.eventResponse as NiaRemoveModifierEventResponseSerialized
@@ -164,10 +252,30 @@ export class NiaEventResponse implements SerializableObject<NiaEventResponse, Ni
         const removeActionEventResponse = NiaRemoveActionEventResponse.deserialize(removeActionEventResponseSerialized)
         return new NiaEventResponse(removeActionEventResponse)
 
-      case NiaEventResponseType.Synchronize:
-        const synchronizeEventResponseSerialized = serialized.eventResponse as NiaSynchronizeEventResponseSerialized
-        const synchronizeEventResponse = NiaSynchronizeEventResponse.deserialize(synchronizeEventResponseSerialized)
-        return new NiaEventResponse(synchronizeEventResponse)
+      case NiaEventResponseType.DefineMapping:
+        const defineMappingEventResponseSerialized = serialized.eventResponse as NiaDefineMappingEventResponseSerialized
+        const defineMappingEventResponse = NiaDefineMappingEventResponse.deserialize(defineMappingEventResponseSerialized)
+        return new NiaEventResponse(defineMappingEventResponse)
+
+      case NiaEventResponseType.ChangeMapping:
+        const changeMappingEventResponseSerialized = serialized.eventResponse as NiaChangeMappingEventResponseSerialized
+        const changeMappingEventResponse = NiaChangeMappingEventResponse.deserialize(changeMappingEventResponseSerialized)
+        return new NiaEventResponse(changeMappingEventResponse)
+
+      case NiaEventResponseType.RemoveMapping:
+        const removeMappingEventResponseSerialized = serialized.eventResponse as NiaRemoveMappingEventResponseSerialized
+        const removeMappingEventResponse = NiaRemoveMappingEventResponse.deserialize(removeMappingEventResponseSerialized)
+        return new NiaEventResponse(removeMappingEventResponse)
+
+      case NiaEventResponseType.StartListening:
+        const startListeningEventResponseSerialized = serialized.eventResponse as NiaStartListeningEventResponseSerialized
+        const startListeningEventResponse = NiaStartListeningEventResponse.deserialize(startListeningEventResponseSerialized)
+        return new NiaEventResponse(startListeningEventResponse)
+
+      case NiaEventResponseType.StopListening:
+        const stopListeningEventResponseSerialized = serialized.eventResponse as NiaStopListeningEventResponseSerialized
+        const stopListeningEventResponse = NiaStopListeningEventResponse.deserialize(stopListeningEventResponseSerialized)
+        return new NiaEventResponse(stopListeningEventResponse)
 
       default:
         throw new Error('Unknown event type.')
@@ -176,25 +284,30 @@ export class NiaEventResponse implements SerializableObject<NiaEventResponse, Ni
 
   serialize(): NiaEventResponseSerialized {
     // todo: probably remove type as type casting, because they may be unnecessary
-    if (this.event instanceof NiaDefineDeviceEventResponse) {
+    if (this.event instanceof NiaSynchronizeEventResponse) {
       return {
-        eventType: NiaEventResponseType.DefineDevice,
-        eventResponse: (this.event as NiaDefineDeviceEventResponse).serialize(),
-      }
-    } else if (this.event instanceof NiaDefineModifierEventResponse) {
-      return {
-        eventType: NiaEventResponseType.DefineModifier,
-        eventResponse: (this.event as NiaDefineModifierEventResponse).serialize(),
+        eventType: NiaEventResponseType.Synchronize,
+        eventResponse: (this.event as NiaSynchronizeEventResponse).serialize(),
       }
     } else if (this.event instanceof NiaExecuteCodeEventResponse) {
       return {
         eventType: NiaEventResponseType.ExecuteCode,
         eventResponse: (this.event as NiaExecuteCodeEventResponse).serialize(),
       }
+    } else if (this.event instanceof NiaDefineDeviceEventResponse) {
+      return {
+        eventType: NiaEventResponseType.DefineDevice,
+        eventResponse: (this.event as NiaDefineDeviceEventResponse).serialize(),
+      }
     } else if (this.event instanceof NiaRemoveDeviceEventResponse) {
       return {
         eventType: NiaEventResponseType.RemoveDevice,
         eventResponse: (this.event as NiaRemoveDeviceEventResponse).serialize(),
+      }
+    } else if (this.event instanceof NiaDefineModifierEventResponse) {
+      return {
+        eventType: NiaEventResponseType.DefineModifier,
+        eventResponse: (this.event as NiaDefineModifierEventResponse).serialize(),
       }
     } else if (this.event instanceof NiaRemoveModifierEventResponse) {
       return {
@@ -211,10 +324,30 @@ export class NiaEventResponse implements SerializableObject<NiaEventResponse, Ni
         eventType: NiaEventResponseType.RemoveAction,
         eventResponse: (this.event as NiaRemoveActionEventResponse).serialize(),
       }
-    } else if (this.event instanceof NiaSynchronizeEventResponse) {
+    } else if (this.event instanceof NiaDefineMappingEventResponse) {
       return {
-        eventType: NiaEventResponseType.Synchronize,
-        eventResponse: (this.event as NiaSynchronizeEventResponse).serialize(),
+        eventType: NiaEventResponseType.DefineMapping,
+        eventResponse: (this.event as NiaDefineMappingEventResponse).serialize(),
+      }
+    } else if (this.event instanceof NiaChangeMappingEventResponse) {
+      return {
+        eventType: NiaEventResponseType.ChangeMapping,
+        eventResponse: (this.event as NiaChangeMappingEventResponse).serialize(),
+      }
+    } else if (this.event instanceof NiaRemoveMappingEventResponse) {
+      return {
+        eventType: NiaEventResponseType.RemoveMapping,
+        eventResponse: (this.event as NiaRemoveMappingEventResponse).serialize(),
+      }
+    } else if (this.event instanceof NiaStartListeningEventResponse) {
+      return {
+        eventType: NiaEventResponseType.StartListening,
+        eventResponse: (this.event as NiaStartListeningEventResponse).serialize(),
+      }
+    } else if (this.event instanceof NiaStopListeningEventResponse) {
+      return {
+        eventType: NiaEventResponseType.StopListening,
+        eventResponse: (this.event as NiaStopListeningEventResponse).serialize(),
       }
     } else {
       throw new Error('Unknown event to serialize.')

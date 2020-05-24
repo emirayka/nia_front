@@ -11,8 +11,11 @@
 </script>
 
 <style scoped>
-  td.nia-table-row-item {
+  .nia-table-row-item {
     text-align: left;
+
+    border-radius: 15px;
+    padding: 10px;
 
     &:first-child {
       padding-top: .5em;

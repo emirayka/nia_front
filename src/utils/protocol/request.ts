@@ -1,11 +1,21 @@
 import {
+  ChangeMappingRequest,
   DefineActionRequest,
-  DefineDeviceRequest, DefineModifierRequest,
-  ExecuteCodeRequest, GetDefinedActionsRequest,
+  DefineDeviceRequest,
+  DefineMappingRequest,
+  DefineModifierRequest,
+  ExecuteCodeRequest,
+  GetDefinedActionsRequest,
+  GetDefinedMappingsRequest,
   GetDefinedModifiersRequest,
   GetDevicesRequest,
-  HandshakeRequest, RemoveActionRequest, RemoveDeviceByNameRequest, RemoveDeviceByPathRequest, RemoveModifierRequest,
-  Request,
+  HandshakeRequest, IsListeningRequest,
+  RemoveActionRequest,
+  RemoveDeviceByNameRequest,
+  RemoveDeviceByPathRequest,
+  RemoveMappingRequest,
+  RemoveModifierRequest,
+  Request, StartListeningRequest, StopListeningRequest,
 } from 'nia-protocol-js'
 
 import {
@@ -17,12 +27,16 @@ import {
   NiaRemoveDeviceByNameRequest,
   NiaRemoveDeviceByPathRequest,
   NiaDefineModifierRequest,
-  NiaRemoveModifierRequest,
+  NiaRemoveModifierRequest, NiaGetDefinedMappingsRequest, NiaDefineMappingRequest, NiaRemoveMappingRequest,
 } from './requests'
 import {SerializablePB} from '@/utils'
 import {NiaGetDefinedActionsRequest} from '@/utils/protocol/requests/get-defined-actions-request'
 import {NiaDefineActionRequest} from '@/utils/protocol/requests/define-action-request'
 import {NiaRemoveActionRequest} from '@/utils/protocol/requests/remove-action-request'
+import {NiaChangeMappingRequest} from '@/utils/protocol/requests/change-mapping-request'
+import {NiaStartListeningRequest} from '@/utils/protocol/requests/start-listening-request'
+import {NiaStopListeningRequest} from '@/utils/protocol/requests/stop-listening-request'
+import {NiaIsListeningRequest} from '@/utils/protocol/requests/is-listening-request'
 
 export type NiaRequestUnderlyingType = NiaHandshakeRequest |
   NiaGetDevicesRequest |
@@ -35,7 +49,14 @@ export type NiaRequestUnderlyingType = NiaHandshakeRequest |
   NiaRemoveModifierRequest |
   NiaGetDefinedActionsRequest |
   NiaDefineActionRequest |
-  NiaRemoveActionRequest
+  NiaRemoveActionRequest |
+  NiaGetDefinedMappingsRequest |
+  NiaDefineMappingRequest |
+  NiaChangeMappingRequest |
+  NiaRemoveMappingRequest |
+  NiaIsListeningRequest |
+  NiaStartListeningRequest |
+  NiaStopListeningRequest
 
 export enum NiaRequestType {
   Handshake,
@@ -50,6 +71,13 @@ export enum NiaRequestType {
   GetDefinedActions,
   DefineAction,
   RemoveAction,
+  GetDefinedMappings,
+  DefineMapping,
+  ChangeMapping,
+  RemoveMapping,
+  IsListening,
+  StartListening,
+  StopListening,
 }
 
 export class NiaRequest implements SerializablePB<NiaRequest, Request> {
@@ -155,6 +183,55 @@ export class NiaRequest implements SerializablePB<NiaRequest, Request> {
         const removeActionRequestPB: RemoveActionRequest = removeActionRequest.toPB()
 
         request.setRemoveActionRequest(removeActionRequestPB)
+        break
+
+      case NiaRequestType.GetDefinedMappings:
+        const getDefinedMappingsRequest: NiaGetDefinedMappingsRequest = this.request as NiaGetDefinedMappingsRequest
+        const getDefinedMappingsRequestPB: GetDefinedMappingsRequest = getDefinedMappingsRequest.toPB()
+
+        request.setGetDefinedMappingsRequest(getDefinedMappingsRequestPB)
+        break
+
+      case NiaRequestType.DefineMapping:
+        const defineMappingRequest: NiaDefineMappingRequest = this.request as NiaDefineMappingRequest
+        const defineMappingRequestPB: DefineMappingRequest = defineMappingRequest.toPB()
+
+        request.setDefineMappingRequest(defineMappingRequestPB)
+        break
+
+      case NiaRequestType.ChangeMapping:
+        const changeMappingRequest: NiaChangeMappingRequest = this.request as NiaChangeMappingRequest
+        const changeMappingRequestPB: ChangeMappingRequest = changeMappingRequest.toPB()
+
+        request.setChangeMappingRequest(changeMappingRequestPB)
+        break
+
+      case NiaRequestType.RemoveMapping:
+        const removeMappingRequest: NiaRemoveMappingRequest = this.request as NiaRemoveMappingRequest
+        const removeMappingRequestPB: RemoveMappingRequest = removeMappingRequest.toPB()
+
+        request.setRemoveMappingRequest(removeMappingRequestPB)
+        break
+
+      case NiaRequestType.IsListening:
+        const isListeningRequest: NiaIsListeningRequest = this.request as NiaIsListeningRequest
+        const isListeningRequestPB: IsListeningRequest = isListeningRequest.toPB()
+
+        request.setIsListeningRequest(isListeningRequestPB)
+        break
+
+      case NiaRequestType.StartListening:
+        const startListeningRequest: NiaStartListeningRequest = this.request as NiaStartListeningRequest
+        const startListeningRequestPB: StartListeningRequest = startListeningRequest.toPB()
+
+        request.setStartListeningRequest(startListeningRequestPB)
+        break
+
+      case NiaRequestType.StopListening:
+        const stopListeningRequest: NiaStopListeningRequest = this.request as NiaStopListeningRequest
+        const stopListeningRequestPB: StopListeningRequest = stopListeningRequest.toPB()
+
+        request.setStopListeningRequest(stopListeningRequestPB)
         break
 
       default:

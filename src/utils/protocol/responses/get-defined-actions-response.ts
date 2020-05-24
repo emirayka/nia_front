@@ -1,15 +1,16 @@
 import {
   Action,
   ExecuteCodeResponse,
-  GetDefinedActionsResponse, Response,
+  GetDefinedActionsResponse, NamedAction, Response,
 } from 'nia-protocol-js'
 import {
   InvalidResponseError, NiaAction,
 } from '@/utils'
 import {NiaResponseType} from '@/utils/protocol/response'
+import {NiaNamedAction} from '@/utils/domain/action/named-action'
 
 export interface NiaGetDefinedActionsResponseObject {
-  actions: Array<NiaAction>
+  namedActions: Array<NiaNamedAction>
   message: string
   success: boolean
   error: boolean
@@ -17,22 +18,22 @@ export interface NiaGetDefinedActionsResponseObject {
 }
 
 export class NiaGetDefinedActionsResponse {
-  private readonly actions: Array<NiaAction>
+  private readonly namedActions: Array<NiaNamedAction>
   private readonly message: string
   private readonly success: boolean
   private readonly error: boolean
   private readonly failure: boolean
 
   constructor(args: NiaGetDefinedActionsResponseObject) {
-    this.actions = args.actions
+    this.namedActions = args.namedActions
     this.message = args.message
     this.success = args.success
     this.error = args.error
     this.failure = args.failure
   }
 
-  getActions(): Array<NiaAction> {
-    return this.actions
+  getNamedActions(): Array<NiaNamedAction> {
+    return this.namedActions
   }
 
   isSuccess(): boolean {
@@ -52,7 +53,7 @@ export class NiaGetDefinedActionsResponse {
   }
 
   static fromPB(getDefinedActionsResponsePB: GetDefinedActionsResponse): NiaGetDefinedActionsResponse {
-    let actions: Array<NiaAction> = []
+    let namedActions: Array<NiaNamedAction> = []
     let message: string = ''
     let success: boolean = false
     let error: boolean = false
@@ -60,12 +61,14 @@ export class NiaGetDefinedActionsResponse {
 
     switch (getDefinedActionsResponsePB.getResultCase()) {
       case GetDefinedActionsResponse.ResultCase.SUCCESS_RESULT:
-        const actionsPB: Array<Action> = getDefinedActionsResponsePB.getSuccessResult()?.getActionsList() ?? []
+        const namedActionsPB: Array<NamedAction> = getDefinedActionsResponsePB
+          .getSuccessResult()
+          ?.getNamedActionsList() ?? []
 
-        for (const actionPB of actionsPB) {
-          const action: NiaAction = NiaAction.fromPB(actionPB)
+        for (const namedActionPB of namedActionsPB) {
+          const namedAction: NiaNamedAction = NiaNamedAction.fromPB(namedActionPB)
 
-          actions.push(action)
+          namedActions.push(namedAction)
         }
 
         success = true
@@ -81,7 +84,7 @@ export class NiaGetDefinedActionsResponse {
     }
 
     const args: NiaGetDefinedActionsResponseObject = {
-      actions,
+      namedActions,
       message,
       success,
       error,

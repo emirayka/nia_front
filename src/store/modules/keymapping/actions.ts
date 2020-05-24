@@ -1,11 +1,11 @@
 import Vue from 'vue'
-import {NiaAction} from '@/utils'
+import {NiaAction, NiaNamedAction} from '@/utils'
 import {defineModule} from 'direct-vuex'
 
 import {moduleActionContext, moduleGetterContext} from '@/store'
 
 export interface ActionsModuleState {
-  definedActions: Array<NiaAction>,
+  definedActions: Array<NiaNamedAction>,
 }
 
 const ActionsModule = defineModule({
@@ -17,11 +17,11 @@ const ActionsModule = defineModule({
     definedActions: (state: ActionsModuleState) => state.definedActions,
   },
   mutations: {
-    setActions(state: ActionsModuleState, actions: Array<NiaAction>) {
+    setActions(state: ActionsModuleState, actions: Array<NiaNamedAction>) {
       state.definedActions.splice(0)
       state.definedActions.push(...actions)
     },
-    defineAction: (state: ActionsModuleState, action: NiaAction) => {
+    defineAction: (state: ActionsModuleState, action: NiaNamedAction) => {
       // todo: show error when action is already defined
       state.definedActions.push(
         action,

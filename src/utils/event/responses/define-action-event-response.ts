@@ -1,15 +1,14 @@
 import {
-  NiaAction, NiaActionSerialized,
+  NiaAction, NiaActionSerialized, NiaDefineActionEvent,
   NiaDefineDeviceEvent,
-  NiaEventResponse, NiaKey, NiaKeyObject,
+  NiaEventResponse, NiaKey, NiaKeyObject, NiaNamedAction, NiaNamedActionSerialized,
 } from '@/utils'
 
 import SerializableObject from '@/utils/serializable-object'
-import {NiaDefineActionEvent} from '@/utils/event/events/define-action'
 import {NiaDefineActionResponse} from '@/utils/protocol/responses/define-action-response'
 
 export interface NiaDefineActionEventResponseObject {
-  action: NiaAction
+  action: NiaNamedAction
 
   message: string
   success: boolean
@@ -18,7 +17,7 @@ export interface NiaDefineActionEventResponseObject {
 }
 
 export type NiaDefineActionEventResponseSerialized = {
-  actionSerialized: NiaActionSerialized
+  actionSerialized: NiaNamedActionSerialized
 
   message: string
   success: boolean
@@ -27,7 +26,7 @@ export type NiaDefineActionEventResponseSerialized = {
 }
 
 export class NiaDefineActionEventResponse implements SerializableObject<NiaDefineActionEventResponse, NiaDefineActionEventResponseSerialized> {
-  private readonly action: NiaAction
+  private readonly action: NiaNamedAction
   private readonly message: string
   private readonly success: boolean
   private readonly error: boolean
@@ -43,7 +42,7 @@ export class NiaDefineActionEventResponse implements SerializableObject<NiaDefin
 
   static from(event: NiaDefineActionEvent, response: NiaDefineActionResponse): NiaDefineActionEventResponse {
     const args: NiaDefineActionEventResponseObject = {
-      action: event.getAction(),
+      action: event.getNamedAction(),
 
       message: response.getMessage(),
       success: response.isSuccess(),
@@ -54,7 +53,7 @@ export class NiaDefineActionEventResponse implements SerializableObject<NiaDefin
     return new NiaDefineActionEventResponse(args)
   }
 
-  getAction(): NiaAction {
+  getAction(): NiaNamedAction {
     return this.action
   }
 
@@ -82,7 +81,7 @@ export class NiaDefineActionEventResponse implements SerializableObject<NiaDefin
 
   static deserialize(serialized: NiaDefineActionEventResponseSerialized): NiaDefineActionEventResponse {
     const args: NiaDefineActionEventResponseObject = {
-      action: NiaAction.deserialize(serialized.actionSerialized),
+      action: NiaNamedAction.deserialize(serialized.actionSerialized),
 
       message: serialized.message,
       success: serialized.success,

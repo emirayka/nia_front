@@ -3,12 +3,6 @@
     class="top-wrapper"
     :style="topWrapperStyle"
   >
-    <NiaSwitchButton
-      :isEnabled="defined"
-      @toggle="$emit('switch', $event)"
-    >
-    </NiaSwitchButton>
-
     <div
       class="nia-keyboard-wrapper-wrapper"
       :style="keyboardWrapperWrapperStyle"

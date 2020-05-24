@@ -29,9 +29,8 @@ export class NiaActionWait implements SerializablePB<NiaActionWait, ActionWait>,
     return this.ms
   }
 
-  toAction(name: string): NiaAction {
+  toAction(): NiaAction {
     return new NiaAction({
-      actionName: name,
       action: this,
     })
   }

@@ -127,6 +127,10 @@
   scoped
   lang="scss"
 >
+  .accordion-item {
+    border-top: 3px solid #333;
+  }
+
   .accordion-item-trigger,
   .accordion-item-details-inner {
     padding: 0.75rem 1.25rem;

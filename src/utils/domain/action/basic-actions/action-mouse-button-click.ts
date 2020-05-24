@@ -29,9 +29,8 @@ export class NiaActionMouseButtonClick implements SerializablePB<NiaActionMouseB
     return this.buttonCode
   }
 
-  toAction(name: string): NiaAction {
+  toAction(): NiaAction {
     return new NiaAction({
-      actionName: name,
       action: this,
     })
   }

@@ -21,21 +21,40 @@ import {
   NiaHandshakeResponse,
   NiaGetDevicesResponse,
   NiaGetDefinedModifiersResponse,
-  NiaExecuteCodeResponse, NiaDefineModifierResponse, NiaRemoveModifierResponse, NiaKey,
+  NiaExecuteCodeResponse,
+  NiaDefineModifierResponse,
+  NiaRemoveModifierResponse,
+  NiaKey,
+  NiaGetDefinedMappingsResponse,
+  NiaDefineMappingEventResponse,
+  NiaDefineMappingEvent,
+  NiaDefineMappingResponse,
+  NiaRemoveMappingEvent, NiaRemoveMappingResponse, NiaRemoveMappingEventResponse,
 } from '@/utils'
 
 import {NiaProtocol} from '@/utils'
-import {NiaDefineDeviceResponse} from '@/utils/protocol/responses/define-device-response'
-import {NiaRemoveDeviceByPathResponse} from '@/utils/protocol/responses/remove-device-by-path-response'
-import {NiaGetDefinedActionsResponse} from '@/utils/protocol/responses/get-defined-actions-request'
+import {NiaDefineDeviceResponse} from '@/utils'
+import {NiaRemoveDeviceByPathResponse} from '@/utils'
+import {NiaGetDefinedActionsResponse} from '@/utils'
 
 import loggers from '@/utils/logger'
-import {NiaDefineActionEvent} from '@/utils/event/events/define-action'
-import {NiaRemoveActionEvent} from '@/utils/event/events/remove-action'
-import {NiaRemoveActionEventResponse} from '@/utils/event/responses/remove-action-event-response'
-import {NiaRemoveActionResponse} from '@/utils/protocol/responses/remove-action-response'
-import {NiaDefineActionResponse} from '@/utils/protocol/responses/define-action-response'
-import {NiaDefineActionEventResponse} from '@/utils/event/responses/define-action-event-response'
+import {NiaDefineActionEvent} from '@/utils'
+import {NiaRemoveActionEvent} from '@/utils'
+import {NiaRemoveActionEventResponse} from '@/utils'
+import {NiaRemoveActionResponse} from '@/utils'
+import {NiaDefineActionResponse} from '@/utils'
+import {NiaDefineActionEventResponse} from '@/utils'
+import {NiaChangeMappingEvent} from '@/utils/event/events/change-mapping-event'
+import {NiaChangeMappingResponse} from '@/utils/protocol/responses/change-mapping-response'
+import {NiaChangeMappingEventResponse} from '@/utils/event/responses/change-mapping-event-response'
+import {NiaStartListeningEventResponse} from '@/utils/event/responses/start-listening-event-response'
+import {NiaStartListeningResponse} from '@/utils/protocol/responses/start-listening-response'
+import {NiaStartListeningEvent} from '@/utils/event/events/start-listening-event'
+import {NiaStopListeningEventResponse} from '@/utils/event/responses/stop-listening-event-response'
+import {NiaStopListeningResponse} from '@/utils/protocol/responses/stop-listening-response'
+import {NiaStopListeningEvent} from '@/utils/event/events/stop-listening-event'
+import {NiaIsListeningResponse} from '@/utils/protocol/responses/is-listening-response'
+
 const logger  = loggers('handle')
 
 const handleSynchronizeEvent = async (
@@ -49,6 +68,11 @@ const handleSynchronizeEvent = async (
   const handshakeResponse: NiaHandshakeResponse = await niaProtocol.handshake()
   logger.debug(`Got 'Handshake' response:`)
   logger.debug(handshakeResponse)
+
+  logger.debug(`Sending 'IsListening' request...`)
+  const isListeningResponse: NiaIsListeningResponse = await niaProtocol.isListening()
+  logger.debug(`Got 'IsListening' response:`)
+  logger.debug(isListeningResponse)
 
   logger.debug(`Sending 'Get Devices' request...`)
   const getDevicesResponse: NiaGetDevicesResponse = await niaProtocol.getDevices()
@@ -65,6 +89,11 @@ const handleSynchronizeEvent = async (
   logger.debug(`Got 'Get Defined Actions' response:`)
   logger.debug(getDefinedActionsResponse)
 
+  logger.debug(`Sending 'Get Defined Mappings' request...`)
+  const getDefinedMappingsResponse: NiaGetDefinedMappingsResponse = await niaProtocol.getDefinedMappings()
+  logger.debug(`Got 'Get Defined Mappings' response:`)
+  logger.debug(getDefinedMappingsResponse)
+
   logger.silly('"Все объекты класса Кетер,')
   logger.silly('Подросли на целый метр."')
   logger.silly('"И какой сейчас длины?"')
@@ -74,9 +103,11 @@ const handleSynchronizeEvent = async (
   const synchronizeEventResponse: NiaSynchronizeEventResponse = NiaSynchronizeEventResponse.from(
     event,
     handshakeResponse,
+    isListeningResponse,
     getDevicesResponse,
     getDefinedModifiersResponse,
-    getDefinedActionsResponse
+    getDefinedActionsResponse,
+    getDefinedMappingsResponse
   );
 
   logger.debug(`Sending 'Synchronize' event response.`)
@@ -140,14 +171,8 @@ const handleDefineModifierEvent = async (
 ): Promise<NiaEventResponse> => {
   await niaProtocol.isReady()
 
-  const deviceId: number = event.getDeviceId()
-  const keyCode: number = event.getKeyCode()
-  const modifierAlias: string = event.getModifierAlias()
-
   const response: NiaDefineModifierResponse = await niaProtocol.defineModifier(
-    deviceId,
-    keyCode,
-    modifierAlias,
+    event.getModifier()
   )
 
   const defineModifierEventResponse: NiaDefineModifierEventResponse = NiaDefineModifierEventResponse.from(
@@ -191,7 +216,7 @@ const handleDefineActionEvent = async (
   await niaProtocol.isReady()
 
   logger.debug('Sending define action request...')
-  const response: NiaDefineActionResponse = await niaProtocol.defineAction(event.getAction())
+  const response: NiaDefineActionResponse = await niaProtocol.defineAction(event.getNamedAction())
   logger.debug('Got response:')
   logger.debug(response)
 
@@ -225,6 +250,123 @@ const handleRemoveActionEvent = async (
   return removeActionEventResponse.toEventResponse()
 }
 
+const handleDefineMappingEvent = async (
+  niaProtocol: NiaProtocol,
+  event: NiaDefineMappingEvent,
+): Promise<NiaEventResponse> => {
+  await niaProtocol.isReady()
+
+  logger.debug('Sent "Define Mapping" request.')
+  const removeMappingResponse: NiaDefineMappingResponse = await niaProtocol.defineMapping(event.getMapping())
+  logger.debug('Got response:')
+  logger.debug(removeMappingResponse)
+
+  const removeMappingEventResponse: NiaDefineMappingEventResponse = NiaDefineMappingEventResponse.from(
+    event,
+    removeMappingResponse,
+  );
+
+  logger.debug('Constructed event response:')
+  logger.debug(removeMappingEventResponse)
+
+  return removeMappingEventResponse.toEventResponse()
+}
+
+const handleChangeMappingEvent = async (
+  niaProtocol: NiaProtocol,
+  event: NiaChangeMappingEvent,
+): Promise<NiaEventResponse> => {
+  await niaProtocol.isReady()
+
+  logger.debug('Sent "Change Mapping" request.')
+  const removeMappingResponse: NiaChangeMappingResponse = await niaProtocol.changeMapping(
+    event.getKeyChords(),
+    event.getAction()
+  )
+  logger.debug('Got response:')
+  logger.debug(removeMappingResponse)
+
+  const removeMappingEventResponse: NiaChangeMappingEventResponse = NiaChangeMappingEventResponse.from(
+    event,
+    removeMappingResponse,
+  );
+
+  logger.debug('Constructed event response:')
+  logger.debug(removeMappingEventResponse)
+
+  return removeMappingEventResponse.toEventResponse()
+}
+
+const handleRemoveMappingEvent = async (
+  niaProtocol: NiaProtocol,
+  event: NiaRemoveMappingEvent,
+): Promise<NiaEventResponse> => {
+  await niaProtocol.isReady()
+
+  logger.debug('Sent "Remove Mapping" request.')
+  const removeMappingResponse: NiaRemoveMappingResponse = await niaProtocol.removeMapping(
+    event.getKeyChords(),
+  )
+  logger.debug('Got response:')
+  logger.debug(removeMappingResponse)
+
+  const removeMappingEventResponse: NiaRemoveMappingEventResponse = NiaRemoveMappingEventResponse.from(
+    event,
+    removeMappingResponse,
+  );
+
+  logger.debug('Constructed event response:')
+  logger.debug(removeMappingEventResponse)
+
+  return removeMappingEventResponse.toEventResponse()
+}
+
+const handleStartListeningEvent = async (
+  niaProtocol: NiaProtocol,
+  event: NiaStartListeningEvent,
+): Promise<NiaEventResponse> => {
+  await niaProtocol.isReady()
+
+  logger.debug('Sent "StartListening" request.')
+  const startListeningResponse: NiaStartListeningResponse = await niaProtocol.startListening(
+  )
+  logger.debug('Got response:')
+  logger.debug(startListeningResponse)
+
+  const startListeningEventResponse: NiaStartListeningEventResponse = NiaStartListeningEventResponse.from(
+    event,
+    startListeningResponse,
+  );
+
+  logger.debug('Constructed event response:')
+  logger.debug(startListeningEventResponse)
+
+  return startListeningEventResponse.toEventResponse()
+}
+
+const handleStopListeningEvent = async (
+  niaProtocol: NiaProtocol,
+  event: NiaStopListeningEvent,
+): Promise<NiaEventResponse> => {
+  await niaProtocol.isReady()
+
+  logger.debug('Sent "StopListening" request.')
+  const stopListeningResponse: NiaStopListeningResponse = await niaProtocol.stopListening(
+  )
+  logger.debug('Got response:')
+  logger.debug(stopListeningResponse)
+
+  const stopListeningEventResponse: NiaStopListeningEventResponse = NiaStopListeningEventResponse.from(
+    event,
+    stopListeningResponse,
+  );
+
+  logger.debug('Constructed event response:')
+  logger.debug(stopListeningEventResponse)
+
+  return stopListeningEventResponse.toEventResponse()
+}
+
 const handleEvent = async (
   niaProtocol: NiaProtocol,
   event: NiaEvent,
@@ -247,6 +389,16 @@ const handleEvent = async (
     return handleDefineActionEvent(niaProtocol, event.takeDefineActionEvent())
   } else if (event.isRemoveActionEvent()) {
     return handleRemoveActionEvent(niaProtocol, event.takeRemoveActionEvent())
+  } else if (event.isDefineMappingEvent()) {
+    return handleDefineMappingEvent(niaProtocol, event.takeDefineMappingEvent())
+  } else if (event.isChangeMappingEvent()) {
+    return handleChangeMappingEvent(niaProtocol, event.takeChangeMappingEvent())
+  } else if (event.isRemoveMappingEvent()) {
+    return handleRemoveMappingEvent(niaProtocol, event.takeRemoveMappingEvent())
+  } else if (event.isStartListeningEvent()) {
+    return handleStartListeningEvent(niaProtocol, event.takeStartListeningEvent())
+  } else if (event.isStopListeningEvent()) {
+    return handleStopListeningEvent(niaProtocol, event.takeStopListeningEvent())
   } else {
     throw new Error('Unknown event was passed')
   }
