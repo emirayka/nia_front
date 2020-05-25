@@ -1,3 +1,4 @@
+// @ts-ignore
 import stringify from 'string.ify'
 
 interface Logger {

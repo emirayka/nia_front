@@ -43,7 +43,7 @@ export class NiaRemoveModifierEventResponse implements SerializableObject<NiaRem
 
   static from(event: NiaRemoveModifierEvent, response: NiaRemoveModifierResponse): NiaRemoveModifierEventResponse {
     const args: NiaRemoveModifierEventResponseObject = {
-      deviceId: event.getDeviceId(),
+      deviceId: event.getDeviceId() ?? 0, // todo: fix
       keyCode: event.getKeyCode(),
 
       message: response.getMessage(),

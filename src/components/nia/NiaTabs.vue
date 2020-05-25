@@ -54,6 +54,7 @@
     updateTabs(): void {
       Vue.nextTick(() => {
         if (this.tabs.length > 0) {
+          // @ts-ignore
           this.selectTab(this.tabs[0])
         }
       })
@@ -62,6 +63,7 @@
     selectTab(selectedTab: NiaTab) {
       this.selectedTab = selectedTab
 
+      // @ts-ignore
       this.tabs.forEach((tab: NiaTab) => tab.selected = tab === this.selectedTab)
     }
 

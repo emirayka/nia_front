@@ -49,6 +49,6 @@ export type NiaFormProperty = NiaFormEditProperty | NiaFormSelectProperty
 // table
 export interface NiaTableColumnDefinition {
   name: string;
-  width: number | string;
+  width: number;
   style?: object;
 }

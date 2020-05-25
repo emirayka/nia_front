@@ -38,7 +38,6 @@
 
     style(column: NiaTableColumnDefinition): object {
       const providedStyle: object = column.style ?? {}
-      const width: string = column.width
 
       return {
         ...providedStyle,

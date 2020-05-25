@@ -1,4 +1,5 @@
 import winston from 'winston'
+// @ts-ignore
 import stringify from 'string.ify'
 import BrowserConsole from 'winston-transport-browserconsole'
 
