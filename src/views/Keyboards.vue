@@ -60,6 +60,7 @@
     <NiaAddModifierDialog v-if="addModifierDialogIsShown"/>
     <NiaAddActionDialog v-if="addActionDialogIsShown" />
     <NiaAddMappingDialog v-if="addMappingDialogIsShown" />
+    <NiaErrorDialog v-if="errorDialogIsShown" />
   </div>
 </template>
 
@@ -76,6 +77,7 @@
   import NiaAddModifierDialog from '@/components/dialogs/NiaAddModifierDialog.vue'
   import NiaAddActionDialog from '@/components/dialogs/NiaAddActionDialog.vue'
   import NiaAddMappingDialog from '@/components/dialogs/NiaAddMappingDialog.vue'
+  import NiaErrorDialog from '@/components/dialogs/NiaErrorDialog.vue'
 
   import store from '@/store'
   import {mapStringToKeyCode} from '@/utils/utils'
@@ -97,6 +99,7 @@
       NiaAddModifierDialog,
       NiaAddActionDialog,
       NiaAddMappingDialog,
+      NiaErrorDialog,
       NiaMappingView,
     },
   })
@@ -109,6 +112,9 @@
     }
     get addMappingDialogIsShown(): boolean {
       return store.getters.UI.AddMappingDialog.isShown
+    }
+    get errorDialogIsShown(): boolean {
+      return store.getters.UI.ErrorDialog.isShown
     }
   }
 </script>

@@ -17,6 +17,9 @@ const DevicesInfoModule = defineModule({
   getters: {
     devices: (state: KeymappingModuleState) => state.devicesInfo,
 
+    atLeastOneDeviceIsDefined: (state: KeymappingModuleState) => state.devicesInfo
+        .reduce((acc, deviceInfo) => acc + (deviceInfo.isDefined() ? 1 : 0), 0) > 0,
+
     deviceNames: (state: KeymappingModuleState) => {
       return state.devicesInfo
         .map((deviceInfo: NiaDeviceInfo) => deviceInfo.getDeviceName())

@@ -3,7 +3,6 @@
     <div class="nia-modifier-table__controls">
       <NiaButton @click.stop="addModifierHandler()">+</NiaButton>
       <NiaButton @click.stop="removeSelectedModifiersHandler()">-</NiaButton>
-      <NiaButton>3</NiaButton>
     </div>
 
     <NiaTable

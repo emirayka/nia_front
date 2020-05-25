@@ -1,6 +1,7 @@
 import AddActionDialog from './add-action-dialog'
 import AddModifierDialog from './add-modifier-dialog'
 import AddMappingDialog from './add-mapping-dialog'
+import ErrorDialog from './error-dialog'
 import SelectedMappingInfoView from './selected-mapping-info-view'
 import General from './general'
 
@@ -13,6 +14,7 @@ const UIModule = defineModule({
     AddActionDialog,
     AddModifierDialog,
     AddMappingDialog,
+    ErrorDialog,
     SelectedMappingInfoView,
     General,
   }

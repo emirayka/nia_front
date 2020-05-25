@@ -209,12 +209,16 @@ const ConnectionModule = defineModule({
     },
 
     startListening(context): void {
-      const { dispatch } = ConnectionModuleActionContext(context)
+      const { dispatch, rootCommit, rootGetters } = ConnectionModuleActionContext(context)
 
-      const startListeningEvent: NiaStartListeningEvent = new NiaStartListeningEvent()
-      const event: NiaEvent = startListeningEvent.toEvent()
+      if (rootGetters.Keymapping.DevicesInfo.atLeastOneDeviceIsDefined) {
+        const startListeningEvent: NiaStartListeningEvent = new NiaStartListeningEvent()
+        const event: NiaEvent = startListeningEvent.toEvent()
 
-      dispatch.sendEvent(event)
+        dispatch.sendEvent(event)
+      } else {
+        rootCommit.UI.ErrorDialog.show('There is no devices to listen.')
+      }
     },
 
     stopListening(context): void {

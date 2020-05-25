@@ -3,7 +3,6 @@
     <NiaContainer class="nia-action-table__controls">
       <NiaButton @click.stop="addActionHandler()">+</NiaButton>
       <NiaButton @click.stop="removeSelectedActionsHandler()">-</NiaButton>
-      <NiaButton>3</NiaButton>
     </NiaContainer>
 
     <NiaTable
