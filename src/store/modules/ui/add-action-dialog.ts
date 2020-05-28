@@ -12,6 +12,7 @@ import {
   NiaActionType,
   NiaActionUnderlyingType, NiaActionWait, NiaNamedAction,
 } from '@/utils'
+import {NiaActionExecuteNamedAction} from '@/utils/domain/action/basic-actions/action-execute-named-action'
 
 export interface AddActionDialogState {
   isShown: boolean,
@@ -27,6 +28,7 @@ export interface AddActionDialogState {
   text: string,
   code: string,
   functionName: string,
+  executableActionName: string,
   osCommand: string,
   waitMSAmount: number,
 }
@@ -49,6 +51,7 @@ const AddActionDialogModule = defineModule({
       text: '',
       code: '',
       functionName: '',
+      executableActionName: '',
       osCommand: '',
       waitMSAmount: 0,
     }
@@ -69,6 +72,7 @@ const AddActionDialogModule = defineModule({
     selectedText: (state: AddActionDialogState): string => state.text,
     selectedCode: (state: AddActionDialogState): string => state.code,
     selectedFunctionName: (state: AddActionDialogState): string => state.functionName,
+    selectedExecutableActionName: (state: AddActionDialogState): string => state.executableActionName,
     selectedOSCommand: (state: AddActionDialogState): string => state.osCommand,
     selectedWaitAmount: (state: AddActionDialogState): number => state.waitMSAmount,
 
@@ -150,6 +154,12 @@ const AddActionDialogModule = defineModule({
           })
           break;
 
+        case NiaActionType.ExecuteNamedAction:
+          underlyingAction = new NiaActionExecuteNamedAction({
+            actionName: state.executableActionName
+          })
+          break;
+
         case NiaActionType.Wait:
           underlyingAction = new NiaActionWait({
             ms: state.waitMSAmount
@@ -211,6 +221,9 @@ const AddActionDialogModule = defineModule({
     },
     setFunctionName: (state: AddActionDialogState, functionName: string) => {
       state.functionName = functionName
+    },
+    setExecutableActionName: (state: AddActionDialogState, executableActionName: string) => {
+      state.executableActionName = executableActionName
     },
     setOSCommand: (state: AddActionDialogState, OSCommand: string) => {
       state.osCommand = OSCommand

@@ -4,7 +4,7 @@
   >
     <NiaContainer v-if="!noMappingIsSelected">
       <NiaTabs>
-        <NiaTab :title="'Keys'">
+        <NiaTab title="Keys">
           <NiaContainer
             class="nia-selected-mapping-info__action-keys"
             :flex="true"
@@ -89,9 +89,10 @@
 
           </NiaContainer>
         </NiaTab>
-        <NiaTab :title="'Low level events'">
+
+        <NiaTab title="Low level events">
           <NiaContainer
-            class="nia-selected-mapping-info__action-keys"
+            class="nia-selected-mapping-info__action-low-level"
             :flex="true"
           >
 
@@ -176,7 +177,7 @@
             />
 
             <NiaSelectedMappingInfoNumber2
-              :title="'Mouse absolute move'"
+              :title="'Mouse relative move'"
               :selected="getters.isActiveLowLevelMouseRelativeMove"
               :value1="getters.lowLevelMouseRelativeMoveX"
               :value2="getters.lowLevelMouseRelativeMoveY"
@@ -192,13 +193,14 @@
           </NiaContainer>
         </NiaTab>
 
-        <NiaTab :title="'Text type'">
+        <NiaTab title="Text type">
           <NiaContainer class="nia-selected-mapping-info__action-type-text">
             <NiaSelectedMappingInfoText
               class="nia-selected-mapping-info__action-type-text__input"
               :title="'Text to type'"
               :selected="getters.isActiveTextType"
               :value="getters.textToType"
+              :multiline="true"
               @selected="commit.selectTextType()"
               @change="commit.setTextToType($event)"
               @updated="updatedHandler()"
@@ -206,7 +208,7 @@
           </NiaContainer>
         </NiaTab>
 
-        <NiaTab :title="'Code execute'">
+        <NiaTab title="Code execute">
           <NiaContainer class="nia-selected-mapping-info__action-type-code">
             <NiaSelectedMappingInfoCode
               class="nia-selected-mapping-info__action-type-code__input"
@@ -215,6 +217,40 @@
               :value="getters.codeToExecute"
               @selected="commit.selectCodeExecute()"
               @change="commit.setCodeToExecute($event)"
+              @updated="updatedHandler()"
+            />
+          </NiaContainer>
+        </NiaTab>
+
+        <NiaTab title="Execute">
+          <NiaContainer class="nia-selected-mapping-info__action-type-misc">
+            <NiaSelectedMappingInfoText
+              class="nia-selected-mapping-info__action-type-execute-function"
+              title="Function name"
+              :selected="getters.isActiveExecuteFunction"
+              :value="getters.functionNameToExecute"
+              @selected="commit.selectFunctionExecute()"
+              @change="commit.setFunctionNameToExecute($event)"
+              @updated="updatedHandler()"
+            />
+
+            <NiaSelectedMappingInfoText
+              class="nia-selected-mapping-info__action-type-execute-os-command"
+              title="OS command"
+              :selected="getters.isActiveExecuteOSCommand"
+              :value="getters.osCommandToExecute"
+              @selected="commit.selectExecuteOSCommand()"
+              @change="commit.setOSCommandToExecute($event)"
+              @updated="updatedHandler()"
+            />
+
+            <NiaSelectedMappingInfoText
+              class="nia-selected-mapping-info__action-type-execute-os-command"
+              title="Action name"
+              :selected="getters.isActiveExecuteNamedAction"
+              :value="getters.actionNameToExecute"
+              @selected="commit.selectExecuteNamedAction()"
+              @change="commit.setActionNameToExecute($event)"
               @updated="updatedHandler()"
             />
           </NiaContainer>
@@ -269,7 +305,6 @@
       }
 
       const action: NiaAction = store.getters.UI.SelectedMappingInfoView.getCurrentAction
-      console.log(action)
 
       store.dispatch.Connection.changeMapping({
         keyChords: mapping.getKeyChords(),
@@ -281,6 +316,11 @@
 
 <style scoped>
   .nia-selected-mapping-info__action-keys {
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .nia-selected-mapping-info__action-low-level {
     justify-content: space-between;
     flex-wrap: wrap;
   }
@@ -303,6 +343,16 @@
     box-sizing: border-box;
     width: 95% !important;
     height: 90% !important;
+  }
+
+  .nia-selected-mapping-info__action-type-execute-function {
+    box-sizing: border-box;
+    width: 95% !important;
+  }
+
+  .nia-selected-mapping-info__action-type-execute-os-command {
+    box-sizing: border-box;
+    width: 95% !important;
   }
 
 </style>

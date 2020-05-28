@@ -91,6 +91,8 @@
     border-radius: .25em;
     box-shadow: none;
     outline: none;
+
+    width: 100%;
   }
 
   .nia-input-text__textarea {

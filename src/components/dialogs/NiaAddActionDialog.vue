@@ -35,7 +35,7 @@ import {NiaActionType} from '@/utils'
     NiaFormEditEvent,
     NiaFormEvent, NiaFormProperty,
     NiaFormPropertyEvent,
-    NiaFormPropertyType, NiaFormPropertyValue,
+    NiaFormPropertyType,
     NiaFormSelectEvent,
     NiaFormSelectProperty,
   } from '@/components/nia/lib'
@@ -90,6 +90,7 @@ import {NiaActionType} from '@/utils'
   const PROPERTY_CODE = 'Code'
   const PROPERTY_OS_COMMAND = 'OS command'
   const PROPERTY_FUNCTION_NAME = 'Function name'
+  const PROPERTY_EXECUTABLE_ACTION_NAME = 'Executable action name'
   const PROPERTY_WAIT_MS_AMOUNT = 'MS amount'
 
   // validators
@@ -239,6 +240,17 @@ import {NiaActionType} from '@/utils'
       ],
     ),
     makeActionType(
+      NiaActionType.ExecuteNamedAction,
+      'Executable action name',
+      [
+        {
+          type: NiaFormPropertyType.Edit,
+          name: PROPERTY_EXECUTABLE_ACTION_NAME,
+          validator: defaultValidator,
+        },
+      ],
+    ),
+    makeActionType(
       NiaActionType.TextType,
       'Text type',
       [
@@ -293,22 +305,6 @@ import {NiaActionType} from '@/utils'
       return actionDataItem.extraFields
     }
 
-    get currentExtraFieldValues(): Array<NiaFormPropertyValue> {
-      const selectedActionType: NiaActionType = this.selectedActionType
-      const actionDataItem: ActionDataItem = getActionDataItem(selectedActionType)
-
-      switch (selectedActionType) {
-        case NiaActionType.ExecuteCode:
-          return [{value: store.getters.UI.AddActionDialog.selectedCode}]
-
-        case NiaActionType.KeyRelease:
-          return [{value: store.getters.UI.AddActionDialog.selectedCode}]
-
-        default:
-          return []
-      }
-    }
-
     constructFormProperties(): Array<NiaFormProperty> {
       const properties = [
         {
@@ -323,24 +319,6 @@ import {NiaActionType} from '@/utils'
           selectValues: ACTION_TYPE_NAMES,
         },
         ...this.currentExtraFields,
-      ]
-
-      return properties
-    }
-
-    constructFormValues(): Array<NiaFormPropertyValue> {
-      const selectedActionTypeIndex: number = ACTION_TYPES.indexOf(
-        store.getters.UI.AddActionDialog.selectedActionType,
-      )
-
-      const properties = [
-        {
-          value: store.getters.UI.AddActionDialog.selectedActionName,
-        },
-        {
-          value: selectedActionTypeIndex
-        },
-        ...this.currentExtraFieldValues,
       ]
 
       return properties
@@ -364,43 +342,46 @@ import {NiaActionType} from '@/utils'
       switch (event.propertyName) {
         case PROPERTY_ACTION_NAME:
           this.handleChangeActionName((event.editEvent as NiaFormEditEvent).value)
-          break;
+          break
         case PROPERTY_ACTION_TYPE:
           this.handleChangeActionType((event.selectEvent as NiaFormSelectEvent).index)
-          break;
+          break
         case PROPERTY_KEY_CODE:
           this.handleChangeKeyCode(parseInt((event.editEvent as NiaFormEditEvent).value))
-          break;
+          break
         case PROPERTY_BUTTON_CODE:
           this.handleChangeButtonCode(parseInt((event.editEvent as NiaFormEditEvent).value))
-          break;
+          break
         case PROPERTY_X:
           this.handleChangeX(parseInt((event.editEvent as NiaFormEditEvent).value))
-          break;
+          break
         case PROPERTY_Y:
           this.handleChangeY(parseInt((event.editEvent as NiaFormEditEvent).value))
-          break;
+          break
         case PROPERTY_DX:
           this.handleChangeDX(parseInt((event.editEvent as NiaFormEditEvent).value))
-          break;
+          break
         case PROPERTY_DY:
           this.handleChangeDY(parseInt((event.editEvent as NiaFormEditEvent).value))
-          break;
+          break
         case PROPERTY_TEXT:
           this.handleChangeText((event.editEvent as NiaFormEditEvent).value)
-          break;
+          break
         case PROPERTY_CODE:
           this.handleChangeCode((event.editEvent as NiaFormEditEvent).value)
-          break;
+          break
         case PROPERTY_OS_COMMAND:
           this.handleChangeOSCommand((event.editEvent as NiaFormEditEvent).value)
-          break;
+          break
         case PROPERTY_FUNCTION_NAME:
           this.handleChangeFunctionName((event.editEvent as NiaFormEditEvent).value)
-          break;
+          break
+        case PROPERTY_EXECUTABLE_ACTION_NAME:
+          this.handleChangeExecutableActionName((event.editEvent as NiaFormEditEvent).value)
+          break
         case PROPERTY_WAIT_MS_AMOUNT:
           this.handleChangeWaitMSAmount(parseInt((event.editEvent as NiaFormEditEvent).value))
-          break;
+          break
       }
     }
 
@@ -450,6 +431,10 @@ import {NiaActionType} from '@/utils'
 
     handleChangeFunctionName(functionName: string): void {
       store.commit.UI.AddActionDialog.setFunctionName(functionName)
+    }
+
+    handleChangeExecutableActionName(executableActionName: string): void {
+      store.commit.UI.AddActionDialog.setExecutableActionName(executableActionName)
     }
 
     handleChangeWaitMSAmount(waitMSAmount: number): void {

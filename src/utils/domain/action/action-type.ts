@@ -23,5 +23,6 @@ export enum NiaActionType {
 
   ExecuteCode,
   ExecuteFunction,
-  ExecuteOSCommand
+  ExecuteOSCommand,
+  ExecuteNamedAction
 }

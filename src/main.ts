@@ -8,8 +8,6 @@ import '@/components/nia'
 
 Vue.config.productionTip = false
 
-// Vue.use(NiaComponents)
-
 const vue: Vue = new Vue({
   router,
   store: store.original,
@@ -17,6 +15,3 @@ const vue: Vue = new Vue({
 })
 
 vue.$mount('#app')
-// todo: listening
-// todo: add error/failure checkings in connection store module
-// todo: add error dialog view

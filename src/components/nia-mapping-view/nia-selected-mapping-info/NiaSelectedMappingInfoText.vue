@@ -12,7 +12,7 @@
     >
       <NiaInputText
         class="nia-selected-mapping-info-text__selectable__text"
-        :multiline="true"
+        :multiline="multiline"
         :enabled="selected"
         :value="value"
         @input="inputHandler($event)"
@@ -38,6 +38,9 @@
 
     @Prop({ required: true })
     value!: string
+
+    @Prop({ default: false })
+    multiline!: boolean
 
     selectedHandler(): void {
       this.$emit('selected')

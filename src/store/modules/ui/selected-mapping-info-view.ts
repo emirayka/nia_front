@@ -15,7 +15,7 @@ import {
   mapMouseButtonCodeToIndex,
   mapStringToKeyCode,
   NiaAction,
-  NiaActionExecuteCode,
+  NiaActionExecuteCode, NiaActionExecuteFunction, NiaActionExecuteOSCommand,
   NiaActionKeyClick,
   NiaActionKeyPress,
   NiaActionKeyRelease,
@@ -36,6 +36,7 @@ import {NiaActionMultimediaKeyClick} from '@/utils/domain/action/basic-actions/a
 import {NiaActionFunctionKeyClick} from '@/utils/domain/action/basic-actions/action-function-key-click'
 import {NiaActionNumberKeyClick} from '@/utils/domain/action/basic-actions/action-number-key-click'
 import {NiaActionTextKeyClick} from '@/utils/domain/action/basic-actions/action-text-key-click'
+import {NiaActionExecuteNamedAction} from '@/utils/domain/action/basic-actions/action-execute-named-action'
 
 export enum SelectedActionCategory {
   KeysText,
@@ -57,6 +58,10 @@ export enum SelectedActionCategory {
 
   TextType,
   CodeExecute,
+
+  ExecuteFunction,
+  ExecuteOSCommand,
+  ExecuteNamedAction,
 }
 
 export interface SelectedMappingInfoViewState {
@@ -89,6 +94,11 @@ export interface SelectedMappingInfoViewState {
 
   // code
   codeToExecute: string,
+
+  // misc
+  functionNameToExecute: string,
+  osCommandToExecute: string,
+  actionNameToExecute: string,
 }
 
 const defaultState = (): SelectedMappingInfoViewState => ({
@@ -121,6 +131,11 @@ const defaultState = (): SelectedMappingInfoViewState => ({
 
   // code
   codeToExecute: '',
+
+  // misc
+  functionNameToExecute: '',
+  osCommandToExecute: '',
+  actionNameToExecute: '',
 })
 
 const makeSelectedCategorySetter = (value: SelectedActionCategory) => (state: SelectedMappingInfoViewState, _: any) => {
@@ -200,6 +215,16 @@ const SelectedMappingInfoViewModule = defineModule({
     // text
     isActiveCodeExecute: (state: SelectedMappingInfoViewState) => state.selectedCategory === SelectedActionCategory.CodeExecute,
     codeToExecute: (state: SelectedMappingInfoViewState) => state.codeToExecute,
+
+    // misc
+    isActiveExecuteFunction: (state: SelectedMappingInfoViewState) => state.selectedCategory === SelectedActionCategory.ExecuteFunction,
+    functionNameToExecute: (state: SelectedMappingInfoViewState) => state.functionNameToExecute,
+
+    isActiveExecuteOSCommand: (state: SelectedMappingInfoViewState) => state.selectedCategory === SelectedActionCategory.ExecuteOSCommand,
+    osCommandToExecute: (state: SelectedMappingInfoViewState) => state.osCommandToExecute,
+
+    isActiveExecuteNamedAction: (state: SelectedMappingInfoViewState) => state.selectedCategory === SelectedActionCategory.ExecuteNamedAction,
+    actionNameToExecute: (state: SelectedMappingInfoViewState) => state.actionNameToExecute,
 
     // get current action
     getCurrentAction: (...args): NiaAction => {
@@ -293,6 +318,21 @@ const SelectedMappingInfoViewModule = defineModule({
             text: getters.textToType,
           }).toAction()
 
+        case SelectedActionCategory.ExecuteFunction:
+          return new NiaActionExecuteFunction({
+            functionName: getters.functionNameToExecute
+          }).toAction()
+
+        case SelectedActionCategory.ExecuteOSCommand:
+          return new NiaActionExecuteOSCommand({
+            osCommand: getters.osCommandToExecute
+          }).toAction()
+
+        case SelectedActionCategory.ExecuteNamedAction:
+          return new NiaActionExecuteNamedAction({
+            actionName: getters.actionNameToExecute
+          }).toAction()
+
         default:
           throw new Error('Some action were forgotten to implement')
       }
@@ -349,6 +389,16 @@ const SelectedMappingInfoViewModule = defineModule({
     // code
     selectCodeExecute: makeSelectedCategorySetter(SelectedActionCategory.CodeExecute),
     setCodeToExecute: (state: SelectedMappingInfoViewState, value: string) => state.codeToExecute = value,
+
+    // misc
+    selectFunctionExecute: makeSelectedCategorySetter(SelectedActionCategory.ExecuteFunction),
+    setFunctionNameToExecute: (state: SelectedMappingInfoViewState, value: string) => state.functionNameToExecute = value,
+
+    selectExecuteOSCommand: makeSelectedCategorySetter(SelectedActionCategory.ExecuteOSCommand),
+    setOSCommandToExecute: (state: SelectedMappingInfoViewState, value: string) => state.osCommandToExecute = value,
+
+    selectExecuteNamedAction: makeSelectedCategorySetter(SelectedActionCategory.ExecuteNamedAction),
+    setActionNameToExecute: (state: SelectedMappingInfoViewState, value: string) => state.actionNameToExecute = value,
 
     // set current action
     setCurrentAction: (state: SelectedMappingInfoViewState, action: NiaAction) => {
@@ -513,6 +563,33 @@ const SelectedMappingInfoViewModule = defineModule({
 
           state.selectedCategory = SelectedActionCategory.LowLevelMouseButtonRelease
           state.lowLevelMouseButtonReleaseIndex = indexMouseButtonRelease
+
+          break
+
+        case NiaActionType.ExecuteFunction:
+          const executeFunctionAction: NiaActionExecuteFunction = (action.getAction() as NiaActionExecuteFunction)
+          let functionName: string = executeFunctionAction.getFunctionName()
+
+          state.selectedCategory = SelectedActionCategory.ExecuteFunction
+          state.functionNameToExecute = functionName
+
+          break
+
+        case NiaActionType.ExecuteOSCommand:
+          const executeOSCommandAction: NiaActionExecuteOSCommand = (action.getAction() as NiaActionExecuteOSCommand)
+          const osCommand: string = executeOSCommandAction.getOSCommand()
+
+          state.selectedCategory = SelectedActionCategory.ExecuteOSCommand
+          state.osCommandToExecute = osCommand
+
+          break
+
+        case NiaActionType.ExecuteNamedAction:
+          const executeNamedAction: NiaActionExecuteNamedAction = (action.getAction() as NiaActionExecuteNamedAction)
+          const actionName: string = executeNamedAction.getActionName()
+
+          state.selectedCategory = SelectedActionCategory.ExecuteNamedAction
+          state.actionNameToExecute = actionName
 
           break
       }
