@@ -7,6 +7,7 @@ import {
 import {NiaAction} from '@/utils/domain/action/action'
 import {NiaActionType} from '@/utils/domain/action/action-type'
 import SerializableObject from '@/utils/serializable-object'
+import {NiaBasicAction} from '@/utils/domain/action/basic-actions/basic-action'
 
 export interface NiaActionKeyReleaseObject {
   keyCode: number
@@ -14,7 +15,10 @@ export interface NiaActionKeyReleaseObject {
 
 export type NiaActionKeyReleaseSerialized = NiaActionKeyReleaseObject
 
-export class NiaActionKeyRelease implements SerializablePB<NiaActionKeyRelease, ActionKeyRelease>, SerializableObject<NiaActionKeyRelease, NiaActionKeyReleaseSerialized> {
+export class NiaActionKeyRelease implements
+  NiaBasicAction,
+  SerializablePB<NiaActionKeyRelease, ActionKeyRelease>,
+  SerializableObject<NiaActionKeyRelease, NiaActionKeyReleaseSerialized> {
   private readonly keyCode: number
 
   constructor(args: NiaActionKeyReleaseObject) {
@@ -23,6 +27,22 @@ export class NiaActionKeyRelease implements SerializablePB<NiaActionKeyRelease, 
 
   getActionType(): NiaActionType {
     return NiaActionType.KeyRelease
+  }
+
+  getActionTypeName(): string {
+    return 'Key release'
+  }
+
+  getArgumentCount(): number {
+    return 1
+  }
+
+  firstArgument(): string {
+    return `${this.keyCode}`
+  }
+
+  secondArgument(): string {
+    return ''
   }
 
   getKeyCode(): number {

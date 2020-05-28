@@ -63,7 +63,8 @@ export class NiaSynchronizeEventResponse implements SerializableObject<NiaSynchr
     this.definedMappings = args.definedMappings
   }
 
-  static from(synchronizeEvent: NiaSynchronizeEvent,
+  static from(
+    // synchronizeEvent: NiaSynchronizeEvent,
               handshakeResponse: NiaHandshakeResponse,
               isListeningResponse: NiaIsListeningResponse,
               getDevicesResponse: NiaGetDevicesResponse,

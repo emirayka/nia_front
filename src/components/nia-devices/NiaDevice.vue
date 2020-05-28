@@ -27,6 +27,7 @@
             :code="key.code"
             :selected="isKeySelected(key.code)"
             :modifier="isKeyModifier(key.code)"
+            :in-selected-mapping="isKeyInSelectedMapping(key.code)"
             :key="index"
             @select-key="selectHandler($event)"
             @toggle-key-selection="toggleSelectionHandler($event)"
@@ -99,6 +100,9 @@
     @Prop({ required: true })
     modifiers!: Array<NiaModifierDescription>
 
+    @Prop({ required: true })
+    selectedMappingKeys!: Array<NiaKey>
+
     selectHandler(deviceKeySelectEvent: NiaDeviceKeySelectEvent) {
       this.$emit('select-key', deviceKeySelectEvent as NiaDeviceSelectEvent)
     }
@@ -132,6 +136,16 @@
     isKeyModifier(keyCode: number): boolean {
       for (const modifier of this.modifiers) {
         if (modifier.getKey().getKeyCode() === keyCode) {
+          return true
+        }
+      }
+
+      return false
+    }
+
+    isKeyInSelectedMapping(keyCode: number): boolean {
+      for (const mappingKey of this.selectedMappingKeys) {
+        if (mappingKey.getKeyCode() === keyCode) {
           return true
         }
       }

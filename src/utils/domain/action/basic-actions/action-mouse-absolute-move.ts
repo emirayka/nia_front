@@ -7,6 +7,7 @@ import {
 import {NiaAction} from '@/utils/domain/action/action'
 import {NiaActionType} from '@/utils/domain/action/action-type'
 import SerializableObject from '@/utils/serializable-object'
+import {NiaBasicAction} from '@/utils/domain/action/basic-actions/basic-action'
 
 export interface NiaActionMouseAbsoluteMoveObject {
   x: number
@@ -15,7 +16,10 @@ export interface NiaActionMouseAbsoluteMoveObject {
 
 export type NiaActionMouseAbsoluteMoveSerialized = NiaActionMouseAbsoluteMoveObject
 
-export class NiaActionMouseAbsoluteMove implements SerializablePB<NiaActionMouseAbsoluteMove, ActionMouseAbsoluteMove>, SerializableObject<NiaActionMouseAbsoluteMove, NiaActionMouseAbsoluteMoveSerialized> {
+export class NiaActionMouseAbsoluteMove implements
+  NiaBasicAction,
+  SerializablePB<NiaActionMouseAbsoluteMove, ActionMouseAbsoluteMove>,
+  SerializableObject<NiaActionMouseAbsoluteMove, NiaActionMouseAbsoluteMoveSerialized> {
   private readonly x: number
   private readonly y: number
 
@@ -26,6 +30,22 @@ export class NiaActionMouseAbsoluteMove implements SerializablePB<NiaActionMouse
 
   getActionType(): NiaActionType {
     return NiaActionType.MouseAbsoluteMove
+  }
+
+  getActionTypeName(): string {
+    return 'Mouse absolute move'
+  }
+
+  getArgumentCount(): number {
+    return 2
+  }
+
+  firstArgument(): string {
+    return `${this.x}`
+  }
+
+  secondArgument(): string {
+    return `${this.y}`
   }
 
   getX(): number {

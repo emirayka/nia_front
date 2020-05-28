@@ -30,15 +30,17 @@ const levels = {
 
 const customLabelFormat = winston.format((info, opts) => {
   if (opts.label !== undefined) {
+    const time: string = new Date().toLocaleString()
+
     if (typeof info.message === 'object' && info.message !== null) {
       let objectString: string = stringify
         .maxDepth(3)
         .maxArrayLength(10)
         (info.message)
 
-      info.message = `[${opts.label}]:\n ${objectString}\n`
+      info.message = `${time}\n[${opts.label}]:\n ${objectString}\n`
     } else {
-      info.message = `[${opts.label}]:\n ${info.message}\n`
+      info.message = `${time}\n[${opts.label}]:\n ${info.message}\n`
     }
   }
 

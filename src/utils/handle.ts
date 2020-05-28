@@ -29,7 +29,7 @@ import {
   NiaDefineMappingEventResponse,
   NiaDefineMappingEvent,
   NiaDefineMappingResponse,
-  NiaRemoveMappingEvent, NiaRemoveMappingResponse, NiaRemoveMappingEventResponse,
+  NiaRemoveMappingEvent, NiaRemoveMappingResponse, NiaRemoveMappingEventResponse, NiaEventResponseSerialized,
 } from '@/utils'
 
 import {NiaProtocol} from '@/utils'
@@ -54,14 +54,16 @@ import {NiaStopListeningEventResponse} from '@/utils/event/responses/stop-listen
 import {NiaStopListeningResponse} from '@/utils/protocol/responses/stop-listening-response'
 import {NiaStopListeningEvent} from '@/utils/event/events/stop-listening-event'
 import {NiaIsListeningResponse} from '@/utils/protocol/responses/is-listening-response'
+import {ConnectionHolder} from '@/utils/sockets/connection-holder'
+import {NiaConnectedEventResponse} from '@/utils/event/responses/connected-event-response'
+import {NiaDisconnectedEventResponse} from '@/utils/event/responses/disconnected-event-response'
 
 const logger  = loggers('handle')
 
 const handleSynchronizeEvent = async (
   niaProtocol: NiaProtocol,
-  event: NiaSynchronizeEvent,
+  // event: NiaSynchronizeEvent,
 ): Promise<NiaEventResponse> => {
-  await niaProtocol.isReady()
   logger.debug('Handling synchronize event...')
 
   logger.debug(`Sending 'Handshake' request...`)
@@ -101,7 +103,7 @@ const handleSynchronizeEvent = async (
 
   logger.debug(`Constructing synchronize event response.`)
   const synchronizeEventResponse: NiaSynchronizeEventResponse = NiaSynchronizeEventResponse.from(
-    event,
+    // event,
     handshakeResponse,
     isListeningResponse,
     getDevicesResponse,
@@ -119,8 +121,6 @@ const handleExecuteCodeEvent = async (
   niaProtocol: NiaProtocol,
   event: NiaExecuteCodeEvent,
 ): Promise<NiaEventResponse> => {
-  await niaProtocol.isReady()
-
   const executeCodeResponse: NiaExecuteCodeResponse = await niaProtocol.executeCode(event.getCode())
   const executeCodeEventResponse: NiaExecuteCodeEventResponse = NiaExecuteCodeEventResponse.from(
     event,
@@ -134,8 +134,6 @@ const handleDefineDeviceEvent = async (
   niaProtocol: NiaProtocol,
   event: NiaDefineDeviceEvent,
 ): Promise<NiaEventResponse> => {
-  await niaProtocol.isReady()
-
   const deviceId: number = event.getDeviceId()
 
   const response: NiaDefineDeviceResponse = await niaProtocol.defineDevice(deviceId)
@@ -152,8 +150,6 @@ const handleRemoveDeviceEvent = async (
   niaProtocol: NiaProtocol,
   event: NiaRemoveDeviceEvent,
 ): Promise<NiaEventResponse> => {
-  await niaProtocol.isReady()
-
   const devicePath = event.getDevicePath()
 
   const response: NiaRemoveDeviceByPathResponse = await niaProtocol.removeDeviceByPath(devicePath)
@@ -169,8 +165,6 @@ const handleDefineModifierEvent = async (
   niaProtocol: NiaProtocol,
   event: NiaDefineModifierEvent,
 ): Promise<NiaEventResponse> => {
-  await niaProtocol.isReady()
-
   const response: NiaDefineModifierResponse = await niaProtocol.defineModifier(
     event.getModifier()
   )
@@ -187,8 +181,6 @@ const handleRemoveModifierEvent = async (
   niaProtocol: NiaProtocol,
   event: NiaRemoveModifierEvent,
 ): Promise<NiaEventResponse> => {
-  await niaProtocol.isReady()
-
   const deviceId: number | null = event.getDeviceId()
   const keyCode: number = event.getKeyCode()
   const key: NiaKey = new NiaKey({
@@ -213,8 +205,6 @@ const handleDefineActionEvent = async (
   niaProtocol: NiaProtocol,
   event: NiaDefineActionEvent,
 ): Promise<NiaEventResponse> => {
-  await niaProtocol.isReady()
-
   logger.debug('Sending define action request...')
   const response: NiaDefineActionResponse = await niaProtocol.defineAction(event.getNamedAction())
   logger.debug('Got response:')
@@ -232,8 +222,6 @@ const handleRemoveActionEvent = async (
   niaProtocol: NiaProtocol,
   event: NiaRemoveActionEvent,
 ): Promise<NiaEventResponse> => {
-  await niaProtocol.isReady()
-
   logger.debug('Sent "Remove Action" request.')
   const removeActionResponse: NiaRemoveActionResponse = await niaProtocol.removeAction(event.getActionName())
   logger.debug('Got response:')
@@ -254,8 +242,6 @@ const handleDefineMappingEvent = async (
   niaProtocol: NiaProtocol,
   event: NiaDefineMappingEvent,
 ): Promise<NiaEventResponse> => {
-  await niaProtocol.isReady()
-
   logger.debug('Sent "Define Mapping" request.')
   const removeMappingResponse: NiaDefineMappingResponse = await niaProtocol.defineMapping(event.getMapping())
   logger.debug('Got response:')
@@ -276,8 +262,6 @@ const handleChangeMappingEvent = async (
   niaProtocol: NiaProtocol,
   event: NiaChangeMappingEvent,
 ): Promise<NiaEventResponse> => {
-  await niaProtocol.isReady()
-
   logger.debug('Sent "Change Mapping" request.')
   const removeMappingResponse: NiaChangeMappingResponse = await niaProtocol.changeMapping(
     event.getKeyChords(),
@@ -301,8 +285,6 @@ const handleRemoveMappingEvent = async (
   niaProtocol: NiaProtocol,
   event: NiaRemoveMappingEvent,
 ): Promise<NiaEventResponse> => {
-  await niaProtocol.isReady()
-
   logger.debug('Sent "Remove Mapping" request.')
   const removeMappingResponse: NiaRemoveMappingResponse = await niaProtocol.removeMapping(
     event.getKeyChords(),
@@ -325,8 +307,6 @@ const handleStartListeningEvent = async (
   niaProtocol: NiaProtocol,
   event: NiaStartListeningEvent,
 ): Promise<NiaEventResponse> => {
-  await niaProtocol.isReady()
-
   logger.debug('Sent "StartListening" request.')
   const startListeningResponse: NiaStartListeningResponse = await niaProtocol.startListening(
   )
@@ -348,8 +328,6 @@ const handleStopListeningEvent = async (
   niaProtocol: NiaProtocol,
   event: NiaStopListeningEvent,
 ): Promise<NiaEventResponse> => {
-  await niaProtocol.isReady()
-
   logger.debug('Sent "StopListening" request.')
   const stopListeningResponse: NiaStopListeningResponse = await niaProtocol.stopListening(
   )
@@ -374,7 +352,7 @@ const handleEvent = async (
   console.log('Got event: ', event)
 
   if (event.isSynchronizeEvent()) {
-    return handleSynchronizeEvent(niaProtocol, event.takeSynchronizeEvent())
+    return handleSynchronizeEvent(niaProtocol)
   } else if (event.isExecuteCodeEvent()) {
     return handleExecuteCodeEvent(niaProtocol, event.takeExecuteCodeEvent())
   } else if (event.isDefineDeviceEvent()) {
@@ -408,34 +386,39 @@ export type NiaHandler = (_: IpcMainEvent, serializedEvent: NiaEventSerialized) 
 
 export const startHandler = async (
   win: BrowserWindow,
-  serializedEvent: NiaEventSerialized,
 ): Promise<NiaHandler> => {
   try {
-    logger.debug('Starting handler...')
+    logger.debug('Making connection holder...')
+    const connectionHolder: ConnectionHolder = new ConnectionHolder({
+      port: 12112,
+      connectedHandler: (message) => {
+        const connectedEventResponse: NiaConnectedEventResponse = new NiaConnectedEventResponse({})
+        const eventResponse: NiaEventResponse = connectedEventResponse.toEventResponse()
+        const eventResponseSerialized: NiaEventResponseSerialized = eventResponse.serialize()
 
-    const event: NiaEvent = NiaEvent.deserialize(serializedEvent)
-    logger.debug('Got first event response. Checking type...')
+        win.webContents.send('nia-server-event-response', eventResponseSerialized)
+      },
+      disconnectedHandler: () => {
+        const disconnectedEventResponse: NiaDisconnectedEventResponse = new NiaDisconnectedEventResponse({})
+        const eventResponse: NiaEventResponse = disconnectedEventResponse.toEventResponse()
+        const eventResponseSerialized: NiaEventResponseSerialized = eventResponse.serialize()
 
-    if (!event.isSynchronizeEvent()) {
-      logger.error('The first event response is not synchronize.')
-      throw new Error('Expected synchronize event at first.')
-    }
+        win.webContents.send('nia-server-event-response', eventResponseSerialized)
+      },
+    })
+    logger.debug('Done.')
 
-    logger.debug('Connecting to server...')
-    const niaProtocol: NiaProtocol = new NiaProtocol(12112)
-    logger.debug('Connected..')
+    logger.debug('Making message handler...')
+    const niaProtocol: NiaProtocol = new NiaProtocol(connectionHolder)
+    logger.debug('Done.')
 
-    await niaProtocol.isReady()
-    logger.debug('Communication is initialized.')
-
-    const eventResponse: NiaEventResponse = await handleSynchronizeEvent(
-      niaProtocol,
-      event.takeSynchronizeEvent(),
-    )
-    const eventResponseSerialized = eventResponse.serialize()
-    win.webContents.send('nia-server-event-response', eventResponseSerialized)
-
-    logger.debug('Synchronized ')
+    // const eventResponse: NiaEventResponse = await handleSynchronizeEvent(
+    //   niaProtocol,
+    // )
+    // const eventResponseSerialized = eventResponse.serialize()
+    // win.webContents.send('nia-server-event-response', eventResponseSerialized)
+    //
+    // logger.debug('Synchronized ')
 
     return async (_: IpcMainEvent, serializedEvent: NiaEventSerialized) => {
       try {
@@ -457,6 +440,6 @@ export const startHandler = async (
     }
   } catch (e) {
     logger.error(`Error during handling the first synchronize event: ${e}.`)
-    throw e
+    // throw e
   }
 }

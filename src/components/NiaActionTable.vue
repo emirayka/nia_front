@@ -25,9 +25,45 @@
           <span
             class="nia-action-table__actions__action__action-name"
           >
-            {{ action.getActionName() }}
+            {{ getActionName(action) }}
           </span>
         </NiaTableRowItem>
+
+        <NiaTableRowItem>
+          <span
+            class="nia-action-table__actions__action__action-type"
+          >
+            {{ getActionType(action) }}
+          </span>
+        </NiaTableRowItem>
+
+        <template v-if="getActionArgumentCount(action) === 1">
+          <NiaTableRowItem>
+          <span
+            class="nia-action-table__actions__action__action-first-argument"
+          >
+            {{ getFirstArgument(action) }}
+          </span>
+          </NiaTableRowItem>
+        </template>
+
+        <template v-else>
+          <NiaTableRowItem>
+          <span
+            class="nia-action-table__actions__action__action-first-argument"
+          >
+            {{ getFirstArgument(action) }}
+          </span>
+          </NiaTableRowItem>
+
+          <NiaTableRowItem>
+          <span
+            class="nia-action-table__actions__action__action-second-argument"
+          >
+            {{ getSecondArgument(action) }}
+          </span>
+          </NiaTableRowItem>
+        </template>
       </NiaTableRow>
     </NiaTable>
   </div>
@@ -39,7 +75,7 @@
 
   import store from '@/store'
   import {NiaTableColumnDefinition} from '@/components/nia/lib'
-  import {NiaNamedAction} from '@/utils'
+  import {NiaAction, NiaNamedAction} from '@/utils'
 
   @Component({
     name: 'NiaActionTable',
@@ -66,8 +102,20 @@
     get columns(): Array<NiaTableColumnDefinition> {
       return [
         {
-          name: 'Action name',
-          width: 100,
+          name: 'Name',
+          width: 25,
+        },
+        {
+          name: 'Type',
+          width: 25,
+        },
+        {
+          name: '',
+          width: 25,
+        },
+        {
+          name: '',
+          width: 25,
         },
       ]
     }
@@ -120,6 +168,26 @@
       store.commit.Context.ActionTable.setX(event.pageX)
       store.commit.Context.ActionTable.setY(event.pageY)
       store.commit.Context.ActionTable.show()
+    }
+
+    getActionName(action: NiaNamedAction): string {
+      return action.getActionName()
+    }
+
+    getActionType(action: NiaNamedAction): string {
+      return action.getAction().getActionTypeName()
+    }
+
+    getActionArgumentCount(action: NiaNamedAction): number {
+      return action.getAction().getArgumentCount()
+    }
+
+    getFirstArgument(action: NiaNamedAction): string {
+      return action.getAction().getFirstArgument()
+    }
+
+    getSecondArgument(action: NiaNamedAction): string {
+      return action.getAction().getSecondArgument()
     }
   }
 </script>

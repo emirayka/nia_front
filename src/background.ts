@@ -23,7 +23,7 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 
 let win: BrowserWindow | null
 
-function createWindow() {
+async function createWindow() {
   win = new BrowserWindow({
     webPreferences: {
       nodeIntegration: true,
@@ -45,6 +45,9 @@ function createWindow() {
   win.on('closed', () => {
     win = null
   })
+
+  const handler: NiaHandler = await startHandler(win)
+  ipcMain.on('nia-server-event', handler)
 }
 
 (() => {
@@ -92,15 +95,3 @@ function createWindow() {
   }
 })()
 
-ipcMain.once('nia-server-event', async (_, serializedEvent: NiaEventSerialized) => {
-  try {
-    if (win === null) {
-      throw new Error('Window is not ready')
-    }
-    const handler: NiaHandler = await startHandler(win, serializedEvent)
-
-    ipcMain.on('nia-server-event', handler)
-  } catch (e) {
-    console.error(e)
-  }
-})

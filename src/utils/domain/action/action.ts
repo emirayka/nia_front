@@ -1,37 +1,57 @@
 import {
-  NiaActionExecuteCode, NiaActionExecuteCodeSerialized,
-  NiaActionExecuteFunction, NiaActionExecuteFunctionSerialized,
-  NiaActionExecuteOSCommand, NiaActionExecuteOSCommandSerialized,
-  NiaActionKeyClick, NiaActionKeyClickSerialized,
-  NiaActionKeyPress, NiaActionKeyPressSerialized,
-  NiaActionKeyRelease, NiaActionKeyReleaseSerialized,
-  NiaActionMouseAbsoluteMove, NiaActionMouseAbsoluteMoveSerialized,
-  NiaActionMouseButtonClick, NiaActionMouseButtonClickSerialized,
-  NiaActionMouseButtonPress, NiaActionMouseButtonPressSerialized,
-  NiaActionMouseButtonRelease, NiaActionMouseButtonReleaseSerialized,
-  NiaActionMouseRelativeMove, NiaActionMouseRelativeMoveSerialized,
-  NiaActionTextType, NiaActionTextTypeSerialized,
-  NiaActionWait, NiaActionWaitSerialized,
+  NiaActionExecuteCode,
+  NiaActionExecuteCodeSerialized,
+  NiaActionExecuteFunction,
+  NiaActionExecuteFunctionSerialized,
+  NiaActionExecuteOSCommand,
+  NiaActionExecuteOSCommandSerialized,
+  NiaActionKeyClick,
+  NiaActionKeyClickSerialized,
+  NiaActionKeyPress,
+  NiaActionKeyPressSerialized,
+  NiaActionKeyRelease,
+  NiaActionKeyReleaseSerialized,
+  NiaActionMouseAbsoluteMove,
+  NiaActionMouseAbsoluteMoveSerialized,
+  NiaActionMouseButtonClick,
+  NiaActionMouseButtonClickSerialized,
+  NiaActionMouseButtonPress,
+  NiaActionMouseButtonPressSerialized,
+  NiaActionMouseButtonRelease,
+  NiaActionMouseButtonReleaseSerialized,
+  NiaActionMouseRelativeMove,
+  NiaActionMouseRelativeMoveSerialized,
+  NiaActionTextType,
+  NiaActionTextTypeSerialized,
+  NiaActionWait,
+  NiaActionWaitSerialized,
 } from './basic-actions'
-import {SerializablePB} from '@/utils'
+import {NiaActionType, SerializablePB} from '@/utils'
 import {
-  Action, ActionControlKeyClick,
+  Action,
+  ActionControlKeyClick,
   ActionExecuteCode,
-  ActionExecuteFunction, ActionExecuteNamedAction,
-  ActionExecuteOSCommand, ActionFunctionKeyClick,
+  ActionExecuteFunction,
+  ActionExecuteNamedAction,
+  ActionExecuteOSCommand,
+  ActionFunctionKeyClick,
   ActionKeyClick,
   ActionKeyPress,
-  ActionKeyRelease, ActionKPKeyClick,
+  ActionKeyRelease,
+  ActionKPKeyClick,
   ActionMouseAbsoluteMove,
-  ActionMouseButtonClick, ActionMouseButtonKeyClick,
+  ActionMouseButtonClick,
+  ActionMouseButtonKeyClick,
   ActionMouseButtonPress,
   ActionMouseButtonRelease,
-  ActionMouseRelativeMove, ActionMultimediaKeyClick, ActionNumberKeyClick, ActionTextKeyClick,
+  ActionMouseRelativeMove,
+  ActionMultimediaKeyClick,
+  ActionNumberKeyClick,
+  ActionTextKeyClick,
   ActionTextType,
   ActionWait,
 } from 'nia-protocol-js'
 import {NiaActionType} from '@/utils/domain/action/action-type'
-import ActionCase = Action.ActionCase
 import SerializableObject from '@/utils/serializable-object'
 import {
   NiaActionTextKeyClick,
@@ -65,6 +85,7 @@ import {
   NiaActionExecuteNamedAction,
   NiaActionExecuteNamedActionSerialized,
 } from '@/utils/domain/action/basic-actions/action-execute-named-action'
+import ActionCase = Action.ActionCase
 
 export type NiaActionUnderlyingType =
   NiaActionKeyPress |
@@ -145,6 +166,73 @@ export class NiaAction implements SerializablePB<NiaAction, Action>, Serializabl
 
   getActionType(): NiaActionType {
     return this.actionType
+  }
+
+  getArgumentCount(): number {
+    return this.action.getArgumentCount()
+  }
+
+  getFirstArgument(): string {
+    return this.action.firstArgument()
+  }
+
+  getSecondArgument(): string {
+    return this.action.secondArgument()
+  }
+
+  getActionTypeName(): string {
+    switch (this.actionType) {
+      case NiaActionType.TextKeyClick:
+      case NiaActionType.NumberKeyClick:
+      case NiaActionType.FunctionKeyClick:
+      case NiaActionType.ControlKeyClick:
+      case NiaActionType.KPKeyClick:
+      case NiaActionType.MultimediaKeyClick:
+      case NiaActionType.MouseButtonKeyClick:
+      case NiaActionType.KeyClick:
+        return 'Key Click'
+
+      case NiaActionType.KeyPress:
+        return 'Key Press'
+
+      case NiaActionType.KeyRelease:
+        return 'Key Release'
+
+      case NiaActionType.MouseButtonClick:
+        return 'Mouse button Click'
+
+      case NiaActionType.MouseButtonPress:
+        return 'Mouse button Press'
+
+      case NiaActionType.MouseButtonRelease:
+        return 'Mouse button Release'
+
+      case NiaActionType.MouseAbsoluteMove:
+        return 'Mouse absolute move'
+
+      case NiaActionType.MouseRelativeMove:
+        return 'Mouse absolute move'
+
+      case NiaActionType.Wait:
+        return 'Wait'
+
+      case NiaActionType.TextType:
+        return 'Type text'
+
+      case NiaActionType.ExecuteCode:
+        return 'Execute code'
+
+      case NiaActionType.ExecuteNamedAction:
+        return 'Execute action'
+
+      case NiaActionType.ExecuteFunction:
+        return 'Execute function'
+
+      case NiaActionType.ExecuteOSCommand:
+        return 'Execute OS command'
+    }
+
+    return ''
   }
 
   isKeyPressAction(): boolean {

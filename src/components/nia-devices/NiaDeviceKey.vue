@@ -8,7 +8,12 @@
     @mouseover="hover = true"
     @mouseleave="hover = false"
   >
-    {{ mappedKeyCode }}
+    <div
+      class="nia-device-key-content"
+      :class="classes"
+    >
+      {{ mappedKeyCode }}
+    </div>
   </div>
 </template>
 
@@ -66,6 +71,9 @@
     @Prop({ default: false })
     modifier!: boolean
 
+    @Prop({ default: false })
+    inSelectedMapping!: boolean
+
     get style(): object {
       return {
         position: 'absolute',
@@ -79,9 +87,10 @@
 
     get classes(): object {
       return {
-        selected: this.selected,
-        modifier: this.modifier,
-        hover: this.hover,
+        'selected': this.selected,
+        'modifier': this.modifier,
+        'in-selected-mapping': this.inSelectedMapping,
+        'hover': this.hover,
       }
     }
 
@@ -179,8 +188,21 @@
     transition: 0.25s background;
   }
 
-  .nia-device__nia-device-key.modifier {
+  .nia-device-key.modifier {
     background: mediumpurple;
+  }
+
+  .nia-device-key-content.in-selected-mapping:before {
+    content: " ";
+    position: absolute;
+    z-index: 1;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    border: 2px dotted lightskyblue;
+    border-radius: 10%;
+    background-color: #33FFDD03;
   }
 
   .nia-device-key.hover {
@@ -198,7 +220,7 @@
     text-shadow: -1px -1px 0 gold;
   }
 
-  .nia-device__nia-device-key.selected:before {
+  .nia-device-key.selected:before {
     content: " ";
     position: absolute;
     z-index: 1;

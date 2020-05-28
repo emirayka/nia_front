@@ -6,6 +6,7 @@ import {
 import {NiaAction} from '@/utils/domain/action/action'
 import {NiaActionType} from '@/utils/domain/action/action-type'
 import SerializableObject from '@/utils/serializable-object'
+import {NiaBasicAction} from '@/utils/domain/action/basic-actions/basic-action'
 
 export interface NiaActionExecuteCodeObject {
   code: string
@@ -13,7 +14,10 @@ export interface NiaActionExecuteCodeObject {
 
 export type NiaActionExecuteCodeSerialized = NiaActionExecuteCodeObject
 
-export class NiaActionExecuteCode implements SerializablePB<NiaActionExecuteCode, ActionExecuteCode>, SerializableObject<NiaActionExecuteCode, NiaActionExecuteCodeSerialized> {
+export class NiaActionExecuteCode implements
+  NiaBasicAction,
+  SerializablePB<NiaActionExecuteCode, ActionExecuteCode>,
+  SerializableObject<NiaActionExecuteCode, NiaActionExecuteCodeSerialized> {
   private readonly code: string
 
   constructor(args: NiaActionExecuteCodeObject) {
@@ -23,6 +27,23 @@ export class NiaActionExecuteCode implements SerializablePB<NiaActionExecuteCode
   getActionType(): NiaActionType {
     return NiaActionType.ExecuteCode
   }
+
+  getActionTypeName(): string {
+    return 'Execute code'
+  }
+
+  getArgumentCount(): number {
+    return 1
+  }
+
+  firstArgument(): string {
+    return `${this.code}`
+  }
+
+  secondArgument(): string {
+    return ''
+  }
+
 
   getCode(): string {
     return this.code

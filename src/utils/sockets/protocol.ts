@@ -56,38 +56,19 @@ import {NiaNamedAction} from '@/utils/domain/action/named-action'
 
 import {NiaIsListeningResponse} from '@/utils/protocol/responses/is-listening-response'
 import {NiaIsListeningRequest} from '@/utils/protocol/requests/is-listening-request'
+import {ConnectionHolder, MessageHandler} from '@/utils/sockets/connection-holder'
 
 
 export class NiaProtocol {
-  private port: number
-  private ws: WebSocket
-  private ready: boolean
+  private readonly connectionHolder: ConnectionHolder
 
-  constructor(port: number) {
-    this.port = port
-    this.ws = new WebSocket(`ws://127.0.0.1:${port}`)
-    this.ready = false
-
-    this.ws.once('open', () => {
-      this.ready = true
-    })
-  }
-
-  isReady(): Promise<void> {
-    if (this.ready) {
-      return Promise.resolve()
-    } else {
-      return new Promise((resolve) => {
-        this.ws.once('open', () => {
-          resolve()
-        })
-      })
-    }
+  constructor(connectionHolder: ConnectionHolder) {
+    this.connectionHolder = connectionHolder
   }
 
   handshake(): Promise<NiaHandshakeResponse> {
     return new Promise((resolve, reject) => {
-      this.ws.once('message', message => {
+      const handler: MessageHandler = message => {
         if (message instanceof Uint8Array) {
           const response: NiaResponse = NiaResponse.fromUint8Array(message)
 
@@ -100,18 +81,18 @@ export class NiaProtocol {
         } else {
           reject(new InvalidResponseError('Got text message instead of binary'))
         }
-      })
+      }
 
       const request: NiaRequest = new NiaHandshakeRequest().toRequest()
-      const data: Uint8Array = request.toUint8Array()
+      const message: Uint8Array = request.toUint8Array()
 
-      this.ws.send(data)
+      this.connectionHolder.send(message, handler)
     })
   }
 
   getDevices(): Promise<NiaGetDevicesResponse> {
     return new Promise((resolve, reject) => {
-      this.ws.once('message', message => {
+      const handler: MessageHandler = message => {
         if (message instanceof Uint8Array) {
           const response: NiaResponse = NiaResponse.fromUint8Array(message)
 
@@ -123,17 +104,18 @@ export class NiaProtocol {
         } else {
           reject(new InvalidResponseError('Got text message instead of binary'))
         }
-      })
+      }
 
       const request: NiaRequest = new NiaGetDevicesRequest().toRequest()
-      const data: Uint8Array = request.toUint8Array()
-      this.ws.send(data)
+      const message: Uint8Array = request.toUint8Array()
+
+      this.connectionHolder.send(message, handler)
     })
   }
 
   executeCode(code: string): Promise<NiaExecuteCodeResponse> {
     return new Promise((resolve, reject) => {
-      this.ws.once('message', message => {
+      const handler: MessageHandler = message => {
         if (message instanceof Uint8Array) {
           const response: NiaResponse = NiaResponse.fromUint8Array(message)
 
@@ -145,18 +127,18 @@ export class NiaProtocol {
         } else {
           reject()
         }
-      })
+      }
 
       const request: NiaRequest = new NiaExecuteCodeRequest(code).toRequest()
-      const data: Uint8Array = request.toUint8Array()
+      const message: Uint8Array = request.toUint8Array()
 
-      this.ws.send(data)
+      this.connectionHolder.send(message, handler)
     })
   }
 
   defineDevice(deviceId: number): Promise<NiaDefineDeviceResponse> {
     return new Promise((resolve, reject) => {
-      this.ws.once('message', message => {
+      const handler: MessageHandler = message => {
         if (message instanceof Uint8Array) {
           const response: NiaResponse = NiaResponse.fromUint8Array(message)
 
@@ -168,18 +150,18 @@ export class NiaProtocol {
         } else {
           reject()
         }
-      })
+      }
 
       const request: NiaRequest = new NiaDefineDeviceRequest(deviceId).toRequest()
-      const data: Uint8Array = request.toUint8Array()
+      const message: Uint8Array = request.toUint8Array()
 
-      this.ws.send(data)
+      this.connectionHolder.send(message, handler)
     })
   }
 
   removeDeviceByPath(devicePath: string): Promise<NiaRemoveDeviceByPathResponse> {
     return new Promise((resolve, reject) => {
-      this.ws.once('message', message => {
+      const handler: MessageHandler = message => {
         if (message instanceof Uint8Array) {
           const response: NiaResponse = NiaResponse.fromUint8Array(message)
 
@@ -191,18 +173,18 @@ export class NiaProtocol {
         } else {
           reject()
         }
-      })
+      }
 
       const request: NiaRequest = new NiaRemoveDeviceByPathRequest(devicePath).toRequest()
       const data: Uint8Array = request.toUint8Array()
 
-      this.ws.send(data)
+      this.connectionHolder.send(data, handler)
     })
   }
 
   removeDeviceByName(deviceName: string): Promise<NiaRemoveDeviceByNameResponse> {
     return new Promise((resolve, reject) => {
-      this.ws.once('message', message => {
+      const handler: MessageHandler = message => {
         if (message instanceof Uint8Array) {
           const response: NiaResponse = NiaResponse.fromUint8Array(message)
 
@@ -214,18 +196,18 @@ export class NiaProtocol {
         } else {
           reject()
         }
-      })
+      }
 
       const request: NiaRequest = new NiaRemoveDeviceByNameRequest(deviceName).toRequest()
       const data: Uint8Array = request.toUint8Array()
 
-      this.ws.send(data)
+      this.connectionHolder.send(data, handler)
     })
   }
 
   getDefinedModifiers(): Promise<NiaGetDefinedModifiersResponse> {
     return new Promise((resolve, reject) => {
-      this.ws.once('message', message => {
+      const handler: MessageHandler = message => {
         if (message instanceof Uint8Array) {
           const response: NiaResponse = NiaResponse.fromUint8Array(message)
 
@@ -237,18 +219,18 @@ export class NiaProtocol {
         } else {
           reject()
         }
-      })
+      }
 
       const request: NiaRequest = new NiaGetDefinedModifiersRequest().toRequest()
       const data: Uint8Array = request.toUint8Array()
 
-      this.ws.send(data)
+      this.connectionHolder.send(data, handler)
     })
   }
 
   defineModifier(modifierDescription: NiaModifierDescription): Promise<NiaDefineModifierResponse> {
     return new Promise((resolve, reject) => {
-      this.ws.once('message', message => {
+      const handler: MessageHandler = message => {
         if (message instanceof Uint8Array) {
           const response: NiaResponse = NiaResponse.fromUint8Array(message)
 
@@ -260,7 +242,7 @@ export class NiaProtocol {
         } else {
           reject()
         }
-      })
+      }
 
       logger.debug('Need to send define modifier')
       logger.debug(modifierDescription)
@@ -273,14 +255,14 @@ export class NiaProtocol {
       const data: Uint8Array = request.toUint8Array()
 
       logger.debug('Sending define modifier request...')
-      this.ws.send(data)
+      this.connectionHolder.send(data, handler)
       logger.debug('Sent.')
     })
   }
 
   async removeModifier(key: NiaKey): Promise<NiaRemoveModifierResponse> {
     return new Promise((resolve, reject) => {
-      this.ws.once('message', message => {
+      const handler: MessageHandler = message => {
         if (message instanceof Uint8Array) {
           const response: NiaResponse = NiaResponse.fromUint8Array(message)
 
@@ -292,18 +274,17 @@ export class NiaProtocol {
         } else {
           reject()
         }
-      })
-
+      }
       const request: NiaRequest = new NiaRemoveModifierRequest(key).toRequest()
       const data: Uint8Array = request.toUint8Array()
 
-      this.ws.send(data)
+      this.connectionHolder.send(data, handler)
     })
   }
 
   async getDefinedActions(): Promise<NiaGetDefinedActionsResponse> {
     return new Promise((resolve, reject) => {
-      this.ws.once('message', message => {
+      const handler: MessageHandler = message => {
         if (message instanceof Uint8Array) {
           const response: NiaResponse = NiaResponse.fromUint8Array(message)
 
@@ -315,18 +296,18 @@ export class NiaProtocol {
         } else {
           reject()
         }
-      })
+      }
 
       const request: NiaRequest = new NiaGetDefinedActionsRequest().toRequest()
       const data: Uint8Array = request.toUint8Array()
 
-      this.ws.send(data)
+      this.connectionHolder.send(data, handler)
     })
   }
 
   async defineAction(namedAction: NiaNamedAction): Promise<NiaDefineActionResponse> {
     return new Promise((resolve, reject) => {
-      this.ws.once('message', message => {
+      const handler: MessageHandler = message => {
         if (message instanceof Uint8Array) {
           logger.debug('Got response. Deserializing...')
           const response: NiaResponse = NiaResponse.fromUint8Array(message)
@@ -341,7 +322,7 @@ export class NiaProtocol {
         } else {
           reject()
         }
-      })
+      }
 
       logger.debug('Constructing define action request...')
       const request: NiaRequest = new NiaDefineActionRequest(namedAction).toRequest()
@@ -350,13 +331,13 @@ export class NiaProtocol {
       const data: Uint8Array = request.toUint8Array()
 
       logger.debug('Sending request...')
-      this.ws.send(data)
+      this.connectionHolder.send(data, handler)
     })
   }
 
   async removeAction(actionName: string): Promise<NiaRemoveActionResponse> {
     return new Promise((resolve, reject) => {
-      this.ws.once('message', message => {
+      const handler: MessageHandler = message => {
         if (message instanceof Uint8Array) {
           const response: NiaResponse = NiaResponse.fromUint8Array(message)
 
@@ -368,18 +349,18 @@ export class NiaProtocol {
         } else {
           reject()
         }
-      })
+      }
 
       const request: NiaRequest = new NiaRemoveActionRequest(actionName).toRequest()
       const data: Uint8Array = request.toUint8Array()
 
-      this.ws.send(data)
+      this.connectionHolder.send(data, handler)
     })
   }
 
   async getDefinedMappings(): Promise<NiaGetDefinedMappingsResponse> {
     return new Promise((resolve, reject) => {
-      this.ws.once('message', message => {
+      const handler: MessageHandler = message => {
         if (message instanceof Uint8Array) {
           logger.debug('Got GetDefinedMappings response. Deserializing...')
           const response: NiaResponse = NiaResponse.fromUint8Array(message)
@@ -393,7 +374,7 @@ export class NiaProtocol {
         } else {
           reject()
         }
-      })
+      }
 
       logger.debug('Construction GetDefinedMappings request...')
       const request: NiaRequest = new NiaGetDefinedMappingsRequest().toRequest()
@@ -404,13 +385,13 @@ export class NiaProtocol {
       logger.debug('Success.')
 
       logger.debug('Sent GetDefinedMappings request')
-      this.ws.send(data)
+      this.connectionHolder.send(data, handler)
     })
   }
 
   async defineMapping(mapping: NiaMapping): Promise<NiaDefineMappingResponse> {
     return new Promise((resolve, reject) => {
-      this.ws.once('message', message => {
+      const handler: MessageHandler = message => {
         if (message instanceof Uint8Array) {
           logger.debug('Got response. Deserializing...')
           const response: NiaResponse = NiaResponse.fromUint8Array(message)
@@ -425,7 +406,7 @@ export class NiaProtocol {
         } else {
           reject()
         }
-      })
+      }
 
       logger.debug('Constructing define mapping request...')
       const request: NiaRequest = new NiaDefineMappingRequest(mapping).toRequest()
@@ -434,13 +415,13 @@ export class NiaProtocol {
       const data: Uint8Array = request.toUint8Array()
 
       logger.debug('Sending request...')
-      this.ws.send(data)
+      this.connectionHolder.send(data, handler)
     })
   }
 
   async changeMapping(keyChords: Array<NiaKeyChord>, action: NiaAction): Promise<NiaChangeMappingResponse> {
     return new Promise((resolve, reject) => {
-      this.ws.once('message', message => {
+      const handler: MessageHandler = message => {
         if (message instanceof Uint8Array) {
           logger.debug('Got response. Deserializing...')
           const response: NiaResponse = NiaResponse.fromUint8Array(message)
@@ -455,7 +436,7 @@ export class NiaProtocol {
         } else {
           reject()
         }
-      })
+      }
 
       logger.debug('Constructing change mapping request...')
       const request: NiaRequest = new NiaChangeMappingRequest(keyChords, action).toRequest()
@@ -464,13 +445,13 @@ export class NiaProtocol {
       const data: Uint8Array = request.toUint8Array()
 
       logger.debug('Sending request...')
-      this.ws.send(data)
+      this.connectionHolder.send(data, handler)
     })
   }
 
   async removeMapping(keyChords: Array<NiaKeyChord>): Promise<NiaRemoveMappingResponse> {
     return new Promise((resolve, reject) => {
-      this.ws.once('message', message => {
+      const handler: MessageHandler = message => {
         if (message instanceof Uint8Array) {
           const response: NiaResponse = NiaResponse.fromUint8Array(message)
 
@@ -482,18 +463,18 @@ export class NiaProtocol {
         } else {
           reject()
         }
-      })
+      }
 
       const request: NiaRequest = new NiaRemoveMappingRequest(keyChords).toRequest()
       const data: Uint8Array = request.toUint8Array()
 
-      this.ws.send(data)
+      this.connectionHolder.send(data, handler)
     })
   }
 
   async isListening(): Promise<NiaIsListeningResponse> {
     return new Promise((resolve, reject) => {
-      this.ws.once('message', message => {
+      const handler: MessageHandler = message => {
         if (message instanceof Uint8Array) {
           const response: NiaResponse = NiaResponse.fromUint8Array(message)
 
@@ -505,18 +486,18 @@ export class NiaProtocol {
         } else {
           reject()
         }
-      })
+      }
 
       const request: NiaRequest = new NiaIsListeningRequest().toRequest()
       const data: Uint8Array = request.toUint8Array()
 
-      this.ws.send(data)
+      this.connectionHolder.send(data, handler)
     })
   }
 
   async startListening(): Promise<NiaStartListeningResponse> {
     return new Promise((resolve, reject) => {
-      this.ws.once('message', message => {
+      const handler: MessageHandler = message => {
         if (message instanceof Uint8Array) {
           const response: NiaResponse = NiaResponse.fromUint8Array(message)
 
@@ -528,18 +509,18 @@ export class NiaProtocol {
         } else {
           reject()
         }
-      })
+      }
 
       const request: NiaRequest = new NiaStartListeningRequest().toRequest()
       const data: Uint8Array = request.toUint8Array()
 
-      this.ws.send(data)
+      this.connectionHolder.send(data, handler)
     })
   }
 
   async stopListening(): Promise<NiaStopListeningResponse> {
     return new Promise((resolve, reject) => {
-      this.ws.once('message', message => {
+      const handler: MessageHandler = message => {
         if (message instanceof Uint8Array) {
           const response: NiaResponse = NiaResponse.fromUint8Array(message)
 
@@ -551,12 +532,12 @@ export class NiaProtocol {
         } else {
           reject()
         }
-      })
+      }
 
       const request: NiaRequest = new NiaStopListeningRequest().toRequest()
       const data: Uint8Array = request.toUint8Array()
 
-      this.ws.send(data)
+      this.connectionHolder.send(data, handler)
     })
   }
 }

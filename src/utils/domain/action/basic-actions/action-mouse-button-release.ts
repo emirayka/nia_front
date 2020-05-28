@@ -7,6 +7,7 @@ import {
 import {NiaAction} from '@/utils/domain/action/action'
 import {NiaActionType} from '@/utils/domain/action/action-type'
 import SerializableObject from '@/utils/serializable-object'
+import {NiaBasicAction} from '@/utils/domain/action/basic-actions/basic-action'
 
 export interface NiaActionMouseButtonReleaseObject {
   buttonCode: number
@@ -14,7 +15,10 @@ export interface NiaActionMouseButtonReleaseObject {
 
 export type NiaActionMouseButtonReleaseSerialized = NiaActionMouseButtonReleaseObject
 
-export class NiaActionMouseButtonRelease implements SerializablePB<NiaActionMouseButtonRelease, ActionMouseButtonRelease>, SerializableObject<NiaActionMouseButtonRelease, NiaActionMouseButtonReleaseSerialized> {
+export class NiaActionMouseButtonRelease implements
+  NiaBasicAction,
+  SerializablePB<NiaActionMouseButtonRelease, ActionMouseButtonRelease>,
+  SerializableObject<NiaActionMouseButtonRelease, NiaActionMouseButtonReleaseSerialized> {
   private readonly buttonCode: number
 
   constructor(args: NiaActionMouseButtonReleaseObject) {
@@ -23,6 +27,22 @@ export class NiaActionMouseButtonRelease implements SerializablePB<NiaActionMous
 
   getActionType(): NiaActionType {
     return NiaActionType.MouseButtonRelease
+  }
+
+  getActionTypeName(): string {
+    return 'Mouse button release'
+  }
+
+  getArgumentCount(): number {
+    return 1
+  }
+
+  firstArgument(): string {
+    return `${this.buttonCode}`
+  }
+
+  secondArgument(): string {
+    return ''
   }
 
   getButtonCode(): number {

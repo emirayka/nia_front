@@ -47,8 +47,7 @@
         logger.debug('Switched to route "/Devices".')
       }
 
-      logger.debug('Attempted to connect to the server.')
-      store.dispatch.Connection.connect()
+      store.dispatch.Connection.connectIPCListener()
     }
   }
 </script>

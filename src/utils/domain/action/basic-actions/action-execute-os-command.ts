@@ -6,6 +6,7 @@ import {
 import {NiaAction} from '@/utils/domain/action/action'
 import {NiaActionType} from '@/utils/domain/action/action-type'
 import SerializableObject from '@/utils/serializable-object'
+import {NiaBasicAction} from '@/utils/domain/action/basic-actions/basic-action'
 
 export interface NiaActionExecuteOSCommandObject {
   osCommand: string
@@ -13,7 +14,10 @@ export interface NiaActionExecuteOSCommandObject {
 
 export type NiaActionExecuteOSCommandSerialized = NiaActionExecuteOSCommandObject
 
-export class NiaActionExecuteOSCommand implements SerializablePB<NiaActionExecuteOSCommand, ActionExecuteOSCommand>, SerializableObject<NiaActionExecuteOSCommand, NiaActionExecuteOSCommandSerialized> {
+export class NiaActionExecuteOSCommand implements
+  NiaBasicAction,
+  SerializablePB<NiaActionExecuteOSCommand, ActionExecuteOSCommand>,
+  SerializableObject<NiaActionExecuteOSCommand, NiaActionExecuteOSCommandSerialized> {
   private readonly osCommand: string
 
   constructor(args: NiaActionExecuteOSCommandObject) {
@@ -22,6 +26,22 @@ export class NiaActionExecuteOSCommand implements SerializablePB<NiaActionExecut
 
   getActionType(): NiaActionType {
     return NiaActionType.ExecuteOSCommand
+  }
+
+  getActionTypeName(): string {
+    return 'Execute OS command'
+  }
+
+  getArgumentCount(): number {
+    return 1
+  }
+
+  firstArgument(): string {
+    return `${this.osCommand}`
+  }
+
+  secondArgument(): string {
+    return ''
   }
 
   getOSCommand(): string {

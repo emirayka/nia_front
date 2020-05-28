@@ -7,6 +7,7 @@ import {
 import {NiaAction} from '@/utils/domain/action/action'
 import {NiaActionType} from '@/utils/domain/action/action-type'
 import SerializableObject from '@/utils/serializable-object'
+import {NiaBasicAction} from '@/utils/domain/action/basic-actions/basic-action'
 
 export interface NiaActionWaitObject {
   ms: number
@@ -14,7 +15,10 @@ export interface NiaActionWaitObject {
 
 export type NiaActionWaitSerialized = NiaActionWaitObject
 
-export class NiaActionWait implements SerializablePB<NiaActionWait, ActionWait>, SerializableObject<NiaActionWait, NiaActionWaitSerialized> {
+export class NiaActionWait implements
+  NiaBasicAction,
+  SerializablePB<NiaActionWait, ActionWait>,
+  SerializableObject<NiaActionWait, NiaActionWaitSerialized> {
   private readonly ms: number
 
   constructor(args: NiaActionWaitObject) {
@@ -23,6 +27,22 @@ export class NiaActionWait implements SerializablePB<NiaActionWait, ActionWait>,
 
   getActionType(): NiaActionType {
     return NiaActionType.Wait
+  }
+
+  getActionTypeName(): string {
+    return 'Wait'
+  }
+
+  getArgumentCount(): number {
+    return 1
+  }
+
+  firstArgument(): string {
+    return `${this.ms}ms`
+  }
+
+  secondArgument(): string {
+    return ''
   }
 
   getMs(): number {

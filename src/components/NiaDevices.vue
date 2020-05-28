@@ -20,6 +20,7 @@
             :device-height="deviceHeight"
             :device-width="deviceWidth"
             :selected-keys="getDeviceSelectedKeys(device.getDeviceId())"
+            :selected-mapping-keys="getDeviceSelectedMappingKeys(device.getDeviceId())"
             :modifiers="getDeviceModifiers(device.getDeviceId())"
             @select-key="selectKeyHandler(device, $event)"
             @toggle-key-selection="toggleKeySelectionHandler(device, $event)"
@@ -50,7 +51,7 @@
 
   import {
     NiaDeviceInfo,
-    NiaKey, NiaModifierDescription,
+    NiaKey, NiaKeyChord, NiaModifierDescription,
   } from '@/utils'
 
   import store from '@/store'
@@ -76,7 +77,7 @@
     selectKeyHandler(deviceInfo: NiaDeviceInfo, event: NiaDeviceSelectEvent): void {
       const key: NiaKey = new NiaKey({
         deviceId: deviceInfo.getDeviceId(),
-        keyCode: event.keyCode
+        keyCode: event.keyCode,
       })
 
       store.commit.UI.Devices.selectKey(key)
@@ -85,7 +86,7 @@
     toggleKeySelectionHandler(deviceInfo: NiaDeviceInfo, event: NiaDeviceToggleSelectionEvent): void {
       const key: NiaKey = new NiaKey({
         deviceId: deviceInfo.getDeviceId(),
-        keyCode: event.keyCode
+        keyCode: event.keyCode,
       })
 
       store.commit.UI.Devices.toggleKeySelection(key)
@@ -98,7 +99,7 @@
     showKeyContextMenuHandler(deviceInfo: NiaDeviceInfo, event: NiaDeviceShowContextMenuEvent): void {
       const key: NiaKey = new NiaKey({
         deviceId: deviceInfo.getDeviceId(),
-        keyCode: event.keyCode
+        keyCode: event.keyCode,
       })
 
       store.commit.Context.Key.setIsModifier(event.isModifier)
@@ -150,6 +151,21 @@
 
     get selectedKeys(): Array<NiaKey> {
       return store.getters.UI.Devices.selectedKeys
+    }
+
+    get selectedMappingKeyChords(): Array<NiaKeyChord> {
+      return store.getters.UI.MappingTable.selectedMapping?.getKeyChords() ?? []
+    }
+
+    get selectedMappingKeys(): Array<NiaKey> {
+      return this.selectedMappingKeyChords
+        .map((keyChord: NiaKeyChord) => [...keyChord.getModifiers(), keyChord.getOrdinaryKey()])
+        .flat()
+    }
+
+    getDeviceSelectedMappingKeys(deviceId: number): Array<NiaKey> {
+      return this.selectedMappingKeys
+      .filter((key: NiaKey) => key.getDeviceId() === null || key.getDeviceId() === deviceId)
     }
 
     get noDevices(): boolean {

@@ -7,6 +7,7 @@ import {
 import {NiaAction} from '@/utils/domain/action/action'
 import {NiaActionType} from '@/utils/domain/action/action-type'
 import SerializableObject from '@/utils/serializable-object'
+import {NiaBasicAction} from '@/utils/domain/action/basic-actions/basic-action'
 
 export interface NiaActionMouseRelativeMoveObject {
   dx: number
@@ -15,7 +16,10 @@ export interface NiaActionMouseRelativeMoveObject {
 
 export type NiaActionMouseRelativeMoveSerialized = NiaActionMouseRelativeMoveObject
 
-export class NiaActionMouseRelativeMove implements SerializablePB<NiaActionMouseRelativeMove, ActionMouseRelativeMove>, SerializableObject<NiaActionMouseRelativeMove, NiaActionMouseRelativeMoveSerialized> {
+export class NiaActionMouseRelativeMove implements
+  NiaBasicAction,
+  SerializablePB<NiaActionMouseRelativeMove, ActionMouseRelativeMove>,
+  SerializableObject<NiaActionMouseRelativeMove, NiaActionMouseRelativeMoveSerialized> {
   private readonly dx: number
   private readonly dy: number
 
@@ -26,6 +30,22 @@ export class NiaActionMouseRelativeMove implements SerializablePB<NiaActionMouse
 
   getActionType(): NiaActionType {
     return NiaActionType.MouseRelativeMove
+  }
+
+  getActionTypeName(): string {
+    return 'Mouse relative move'
+  }
+
+  getArgumentCount(): number {
+    return 2
+  }
+
+  firstArgument(): string {
+    return `${this.dx}`
+  }
+
+  secondArgument(): string {
+    return `${this.dy}`
   }
 
   getDx(): number {

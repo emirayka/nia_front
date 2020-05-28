@@ -7,6 +7,7 @@ import {
 import {NiaAction} from '@/utils/domain/action/action'
 import {NiaActionType} from '@/utils/domain/action/action-type'
 import SerializableObject from '@/utils/serializable-object'
+import {NiaBasicAction} from '@/utils/domain/action/basic-actions/basic-action'
 
 export interface NiaActionKPKeyClickObject {
   keyCode: number
@@ -14,7 +15,10 @@ export interface NiaActionKPKeyClickObject {
 
 export type NiaActionKPKeyClickSerialized = NiaActionKPKeyClickObject
 
-export class NiaActionKPKeyClick implements SerializablePB<NiaActionKPKeyClick, ActionKPKeyClick>, SerializableObject<NiaActionKPKeyClick, NiaActionKPKeyClickSerialized> {
+export class NiaActionKPKeyClick implements
+  NiaBasicAction,
+  SerializablePB<NiaActionKPKeyClick, ActionKPKeyClick>,
+  SerializableObject<NiaActionKPKeyClick, NiaActionKPKeyClickSerialized> {
   private readonly keyCode: number
 
   constructor(args: NiaActionKPKeyClickObject) {
@@ -23,6 +27,22 @@ export class NiaActionKPKeyClick implements SerializablePB<NiaActionKPKeyClick, 
 
   getActionType(): NiaActionType {
     return NiaActionType.KPKeyClick
+  }
+
+  getActionTypeName(): string {
+    return 'Key click'
+  }
+
+  getArgumentCount(): number {
+    return 1
+  }
+
+  firstArgument(): string {
+    return `${this.keyCode}`
+  }
+
+  secondArgument(): string {
+    return ''
   }
 
   getKeyCode(): number {

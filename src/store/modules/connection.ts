@@ -5,6 +5,9 @@ const {
   ipcRenderer,
 } = window.require("electron");
 
+import loggers from '@/utils/logger'
+const logger = loggers('store/Connection')
+
 import {moduleActionContext, moduleGetterContext, rootActionContext} from '@/store'
 
 import {
@@ -49,20 +52,22 @@ import {NiaStopListeningEventResponse} from '@/utils/event/responses/stop-listen
 import {NiaStartListeningEventResponse} from '@/utils/event/responses/start-listening-event-response'
 import {NiaStopListeningEvent} from '@/utils/event/events/stop-listening-event'
 import {NiaStartListeningEvent} from '@/utils/event/events/start-listening-event'
+import {NiaConnectedEventResponse} from '@/utils/event/responses/connected-event-response'
+import {NiaDisconnectedEventResponse} from '@/utils/event/responses/disconnected-event-response'
 
-import loggers from '@/utils/logger'
-const logger = loggers('store/Connection')
 
 type IPCListener = (_: any, eventResponse: NiaEventResponseSerialized) => void;
 
 export interface ConnectionModuleState {
   ipcListener: IPCListener | null,
+  connected: boolean,
 }
 
 const ConnectionModule = defineModule({
   namespaced: true,
   state: {
     ipcListener: null,
+    connected: false,
   } as ConnectionModuleState,
   getters: {
     isConnected: (state: ConnectionModuleState): boolean => {
@@ -76,16 +81,23 @@ const ConnectionModule = defineModule({
     setIPCListener(state: ConnectionModuleState, listener: IPCListener | null): void {
       state.ipcListener = listener
     },
+    setConnected(state: ConnectionModuleState): void {
+      state.connected = true
+    },
+    setDisconnected(state: ConnectionModuleState): void {
+      state.connected = false
+    },
   },
   actions: {
     // connectors
-    connect(context, payload: undefined): void {
+    connectIPCListener(context): void {
       const { commit, dispatch, getters } = ConnectionModuleActionContext(context)
 
       if (getters.isConnected) {
         return
       }
 
+      logger.debug('Connecting to the main process..')
       const listener = (_: any, eventResponseSerialized: NiaEventResponseSerialized) => {
         const eventResponse: NiaEventResponse = NiaEventResponse.deserialize(eventResponseSerialized)
 
@@ -93,16 +105,15 @@ const ConnectionModule = defineModule({
       }
 
       commit.setIPCListener(listener)
-
       ipcRenderer.on('nia-server-event-response', listener)
 
-      const synchronizeEvent: NiaSynchronizeEvent = new NiaSynchronizeEvent({})
-      const event: NiaEvent = synchronizeEvent.toEvent()
-
-      ipcRenderer.send('nia-server-event', event.serialize())
+      // const synchronizeEvent: NiaSynchronizeEvent = new NiaSynchronizeEvent({})
+      // const event: NiaEvent = synchronizeEvent.toEvent()
+      //
+      // ipcRenderer.send('nia-server-event', event.serialize())
     },
 
-    disconnect(context, payload: undefined): void {
+    disconnectIPCListener(context): void {
       const { commit, getters } = ConnectionModuleActionContext(context)
 
       if (!getters.isConnected) {
@@ -117,6 +128,14 @@ const ConnectionModule = defineModule({
     // event senders
     sendEvent(context, event: NiaEvent): void {
       ipcRenderer.send('nia-server-event', event.serialize())
+    },
+    synchronize(context): void {
+      const { dispatch } = ConnectionModuleActionContext(context)
+
+      const synchronizeEvent: NiaSynchronizeEvent = new NiaSynchronizeEvent({})
+      const event: NiaEvent = synchronizeEvent.toEvent()
+
+      dispatch.sendEvent(event)
     },
     executeCode(context, args: NiaExecuteCodeEventObject): void {
       const { dispatch } = ConnectionModuleActionContext(context)
@@ -231,7 +250,24 @@ const ConnectionModule = defineModule({
     },
 
     // event response handlers
+    handleConnectedEventResponse(context, response: NiaConnectedEventResponse): void {
+      logger.debug('Handling connected event response...')
+
+      const { commit, dispatch } = ConnectionModuleActionContext(context)
+
+      commit.setConnected()
+      dispatch.synchronize()
+    },
+    handleDisconnectedEventResponse(context, response: NiaDisconnectedEventResponse): void {
+      logger.debug('Handling disconnected event response...')
+      const { commit } = ConnectionModuleActionContext(context)
+
+      commit.setDisconnected()
+    },
+
     handleSynchronizeEventResponse(context, response: NiaSynchronizeEventResponse): void {
+      logger.debug('Handling synchronized event response...')
+
       const { rootCommit } = rootActionContext(context)
 
       const version: string = response.getVersion()
@@ -391,7 +427,11 @@ const ConnectionModule = defineModule({
     handleEventResponse(context, response: NiaEventResponse): void {
       const { dispatch } = ConnectionModuleActionContext(context)
 
-      if (response.isSynchronizeEventResponse()) {
+      if (response.isConnectedEventResponse()) {
+        dispatch.handleConnectedEventResponse(response.takeConnectedEventResponse())
+      } else if (response.isDisconnectedEventResponse()) {
+        dispatch.handleDisconnectedEventResponse(response.takeDisconnectedEventResponse())
+      } else if (response.isSynchronizeEventResponse()) {
         dispatch.handleSynchronizeEventResponse(response.takeSynchronizeEventResponse())
       } else if (response.isExecuteCodeEventResponse()) {
         dispatch.handleExecuteCodeEventResponse(response.takeExecuteCodeEventResponse())

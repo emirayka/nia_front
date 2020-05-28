@@ -7,6 +7,7 @@ import {
 import {NiaAction} from '@/utils/domain/action/action'
 import {NiaActionType} from '@/utils/domain/action/action-type'
 import SerializableObject from '@/utils/serializable-object'
+import {NiaBasicAction} from '@/utils/domain/action/basic-actions/basic-action'
 
 export interface NiaActionTextTypeObject {
   text: string
@@ -14,7 +15,10 @@ export interface NiaActionTextTypeObject {
 
 export type NiaActionTextTypeSerialized = NiaActionTextTypeObject
 
-export class NiaActionTextType implements SerializablePB<NiaActionTextType, ActionTextType>, SerializableObject<NiaActionTextType, NiaActionTextTypeSerialized> {
+export class NiaActionTextType implements
+  NiaBasicAction,
+  SerializablePB<NiaActionTextType, ActionTextType>,
+  SerializableObject<NiaActionTextType, NiaActionTextTypeSerialized> {
   private readonly text: string
 
   constructor(args: NiaActionTextTypeObject) {
@@ -23,6 +27,22 @@ export class NiaActionTextType implements SerializablePB<NiaActionTextType, Acti
 
   getActionType(): NiaActionType {
     return NiaActionType.TextType
+  }
+
+  getActionTypeName(): string {
+    return 'Type text'
+  }
+
+  getArgumentCount(): number {
+    return 1
+  }
+
+  firstArgument(): string {
+    return `${this.text}`
+  }
+
+  secondArgument(): string {
+    return ''
   }
 
   getText(): string {

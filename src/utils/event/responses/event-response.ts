@@ -40,8 +40,19 @@ import {
   NiaStopListeningEventResponse,
   NiaStopListeningEventResponseSerialized,
 } from '@/utils/event/responses/stop-listening-event-response'
+import {
+  NiaConnectedEventResponse,
+  NiaConnectedEventResponseSerialized,
+} from '@/utils/event/responses/connected-event-response'
+import {
+  NiaDisconnectedEventResponse,
+  NiaDisconnectedEventResponseSerialized,
+} from '@/utils/event/responses/disconnected-event-response'
 
 export enum NiaEventResponseType {
+  Connected,
+  Disconnected,
+
   Synchronize,
   ExecuteCode,
 
@@ -63,32 +74,48 @@ export enum NiaEventResponseType {
 }
 
 export type NiaEventResponseUnderlyingType =
+  NiaConnectedEventResponse |
+  NiaDisconnectedEventResponse |
+
   NiaSynchronizeEventResponse |
   NiaExecuteCodeEventResponse |
+
   NiaDefineDeviceEventResponse |
   NiaRemoveDeviceEventResponse |
+
   NiaDefineModifierEventResponse |
   NiaRemoveModifierEventResponse |
+
   NiaDefineActionEventResponse |
   NiaRemoveActionEventResponse |
+
   NiaDefineMappingEventResponse |
   NiaChangeMappingEventResponse |
   NiaRemoveMappingEventResponse |
+
   NiaStartListeningEventResponse |
   NiaStopListeningEventResponse
 
 export type NiaEventResponseUnderlyingTypeSerialized =
+  NiaConnectedEventResponseSerialized |
+  NiaDisconnectedEventResponseSerialized |
+
   NiaSynchronizeEventResponseSerialized |
   NiaExecuteCodeEventResponseSerialized |
+
   NiaDefineDeviceEventResponseSerialized |
   NiaRemoveDeviceResponseSerialized |
+
   NiaDefineModifierEventResponseSerialized |
   NiaRemoveModifierEventResponseSerialized |
+
   NiaDefineActionEventResponseSerialized |
   NiaRemoveActionEventResponseSerialized |
+
   NiaDefineMappingEventResponseSerialized |
   NiaChangeMappingEventResponseSerialized |
   NiaRemoveMappingEventResponseSerialized |
+
   NiaStartListeningEventResponseSerialized |
   NiaStopListeningEventResponseSerialized
 
@@ -102,6 +129,14 @@ export class NiaEventResponse implements SerializableObject<NiaEventResponse, Ni
 
   constructor(event: NiaEventResponseUnderlyingType) {
     this.event = event
+  }
+
+  isConnectedEventResponse(): boolean {
+    return this.event instanceof NiaConnectedEventResponse
+  }
+
+  isDisconnectedEventResponse(): boolean {
+    return this.event instanceof NiaDisconnectedEventResponse
   }
 
   isSynchronizeEventResponse(): boolean {
@@ -157,6 +192,13 @@ export class NiaEventResponse implements SerializableObject<NiaEventResponse, Ni
   }
 
   // take
+  takeConnectedEventResponse(): NiaConnectedEventResponse {
+    return this.event as NiaConnectedEventResponse
+  }
+
+  takeDisconnectedEventResponse(): NiaDisconnectedEventResponse {
+    return this.event as NiaDisconnectedEventResponse
+  }
 
   takeSynchronizeEventResponse(): NiaSynchronizeEventResponse {
     return this.event as NiaSynchronizeEventResponse
@@ -212,6 +254,16 @@ export class NiaEventResponse implements SerializableObject<NiaEventResponse, Ni
 
   static deserialize(serialized: NiaEventResponseSerialized): NiaEventResponse {
     switch (serialized.eventType) {
+      case NiaEventResponseType.Connected:
+        const connectedEventResponseSerialized = serialized.eventResponse as NiaConnectedEventResponseSerialized
+        const connectedEventResponse = NiaConnectedEventResponse.deserialize(connectedEventResponseSerialized)
+        return new NiaEventResponse(connectedEventResponse)
+
+      case NiaEventResponseType.Disconnected:
+        const disconnectedEventResponseSerialized = serialized.eventResponse as NiaDisconnectedEventResponseSerialized
+        const disconnectedEventResponse = NiaDisconnectedEventResponse.deserialize(disconnectedEventResponseSerialized)
+        return new NiaEventResponse(disconnectedEventResponse)
+
       case NiaEventResponseType.Synchronize:
         const synchronizeEventResponseSerialized = serialized.eventResponse as NiaSynchronizeEventResponseSerialized
         const synchronizeEventResponse = NiaSynchronizeEventResponse.deserialize(synchronizeEventResponseSerialized)
@@ -284,7 +336,18 @@ export class NiaEventResponse implements SerializableObject<NiaEventResponse, Ni
 
   serialize(): NiaEventResponseSerialized {
     // todo: probably remove type as type casting, because they may be unnecessary
-    if (this.event instanceof NiaSynchronizeEventResponse) {
+    if (this.event instanceof NiaConnectedEventResponse) {
+      return {
+        eventType: NiaEventResponseType.Connected,
+        eventResponse: (this.event as NiaConnectedEventResponse).serialize(),
+      }
+    }
+    else if (this.event instanceof NiaDisconnectedEventResponse) {
+      return {
+        eventType: NiaEventResponseType.Disconnected,
+        eventResponse: (this.event as NiaDisconnectedEventResponse).serialize(),
+      }
+    } else if (this.event instanceof NiaSynchronizeEventResponse) {
       return {
         eventType: NiaEventResponseType.Synchronize,
         eventResponse: (this.event as NiaSynchronizeEventResponse).serialize(),
