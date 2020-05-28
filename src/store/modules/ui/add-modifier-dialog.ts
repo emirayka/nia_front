@@ -5,7 +5,7 @@ import {moduleActionContext, moduleGetterContext} from '@/store'
 
 export interface AddModifierDialogState {
   isShown: boolean,
-  selectedDevice: string,
+  selectedDeviceId: number,
   selectedKeyCode: number,
   selectedModifierAlias: string,
 }
@@ -14,13 +14,13 @@ const AddModifierDialogModule = defineModule({
   namespaced: true,
   state: {
     isShown: false,
-    selectedDevice: '',
+    selectedDeviceId: 0,
     selectedKeyCode: -1,
     selectedModifierAlias: '',
   } as AddModifierDialogState,
   getters: {
     isShown: (state: AddModifierDialogState) => state.isShown,
-    selectedDevice: (state: AddModifierDialogState) => state.selectedDevice,
+    selectedDeviceId: (state: AddModifierDialogState) => state.selectedDeviceId,
     selectedKeyCode: (state: AddModifierDialogState) => state.selectedKeyCode,
     selectedModifierAlias: (state: AddModifierDialogState) => state.selectedModifierAlias,
   },
@@ -32,8 +32,8 @@ const AddModifierDialogModule = defineModule({
       state.isShown = false
     },
 
-    setSelectedDeviceName: (state: AddModifierDialogState, name: string) => {
-      state.selectedDevice = name
+    setSelectedDeviceId: (state: AddModifierDialogState, id: number) => {
+      state.selectedDeviceId = id
     },
     setSelectedKeyCode: (state: AddModifierDialogState, code: number) => {
       state.selectedKeyCode = code

@@ -2,6 +2,7 @@
   <div
     class="nia-container"
     :style="style"
+    @contextmenu.prevent.stop="$emit('contextmenu', $event)"
   >
     <slot></slot>
   </div>

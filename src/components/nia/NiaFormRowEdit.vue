@@ -71,7 +71,13 @@
     }
 
     mounted(): void {
-      this.changeHandler(this.$refs.inputElement.value)
+      const initialValue: string | undefined = this.editProperty.initialValue
+
+      if (initialValue !== undefined) {
+        this.$refs.inputElement.value = initialValue
+      } else {
+        this.changeHandler(this.$refs.inputElement.value)
+      }
     }
   }
 </script>

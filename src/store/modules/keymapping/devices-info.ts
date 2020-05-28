@@ -18,14 +18,14 @@ const DevicesInfoModule = defineModule({
     devices: (state: KeymappingModuleState) => state.devicesInfo,
 
     atLeastOneDeviceIsDefined: (state: KeymappingModuleState) => state.devicesInfo
-        .reduce((acc, deviceInfo) => acc + (deviceInfo.isDefined() ? 1 : 0), 0) > 0,
+      .reduce((acc, deviceInfo) => acc + (deviceInfo.isDefined() ? 1 : 0), 0) > 0,
 
     deviceNames: (state: KeymappingModuleState) => {
       return state.devicesInfo
         .map((deviceInfo: NiaDeviceInfo) => deviceInfo.getDeviceName())
     },
 
-    getDevicePathByName: (state: KeymappingModuleState) => (deviceName: string) => {
+    getDevicePathByName: (state: KeymappingModuleState) => (deviceName: string): string | null => {
       const filtered: Array<NiaDeviceInfo> = state.devicesInfo
         .filter((deviceInfo: NiaDeviceInfo) => deviceInfo.getDeviceName() === deviceName)
 
@@ -33,7 +33,14 @@ const DevicesInfoModule = defineModule({
         ? filtered[0].getDevicePath()
         : null
     },
-    getDeviceById: (state: KeymappingModuleState) => (deviceId: number) => {
+
+    getDeviceByIndex: (state: KeymappingModuleState) => (index: number): NiaDeviceInfo | null => {
+      return typeof (state.devicesInfo[index]) !== 'undefined'
+        ? state.devicesInfo[index]
+        : null
+    },
+
+    getDeviceById: (state: KeymappingModuleState) => (deviceId: number): NiaDeviceInfo | null => {
       let filtered: Array<NiaDeviceInfo> = state
         .devicesInfo
         .filter((deviceInfo: NiaDeviceInfo) => deviceInfo.getDeviceId() === deviceId)
@@ -43,7 +50,7 @@ const DevicesInfoModule = defineModule({
         : null
     },
 
-    getDeviceByName: (state: KeymappingModuleState) => (deviceName: string) => {
+    getDeviceByName: (state: KeymappingModuleState) => (deviceName: string): NiaDeviceInfo | null => {
       let filtered: Array<NiaDeviceInfo> = state
         .devicesInfo
         .filter((deviceInfo: NiaDeviceInfo) => deviceInfo.getDeviceName() === deviceName)
@@ -53,7 +60,7 @@ const DevicesInfoModule = defineModule({
         : null
     },
 
-    getDeviceByPath: (state: KeymappingModuleState) => (deviceName: string) => {
+    getDeviceByPath: (state: KeymappingModuleState) => (deviceName: string): NiaDeviceInfo | null => {
       let filtered: Array<NiaDeviceInfo> = state
         .devicesInfo
         .filter((deviceInfo: NiaDeviceInfo) => deviceInfo.getDevicePath() === deviceName)
@@ -63,10 +70,10 @@ const DevicesInfoModule = defineModule({
         : null
     },
 
-    isDeviceDefined: (state: KeymappingModuleState) => (devicePath: string) => {
+    isDeviceDefined: (state: KeymappingModuleState) => (devicePath: string): boolean | null => {
       for (let deviceInfo of state.devicesInfo) {
         if (deviceInfo.getDevicePath() === devicePath) {
-          return deviceInfo.isDefined
+          return deviceInfo.isDefined()
         }
       }
 

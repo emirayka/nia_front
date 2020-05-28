@@ -3,6 +3,7 @@
     class="nia-table-row"
     :style="style"
     @click="$emit('click', $event)"
+    @contextmenu.prevent.stop="$emit('contextmenu', $event)"
     @mouseover="$emit('hover', true)"
     @mouseleave="$emit('hover', false)"
   >

@@ -7,8 +7,8 @@
 
       <NiaNavbarItem>
         <NiaNavbarNav
-          title="Keyboards"
-          path="/Keyboards"
+          title="Devices"
+          path="/Devices"
           @nav="$emit('nav', $event)"
         />
         <NiaNavbarNav

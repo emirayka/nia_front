@@ -1,5 +1,8 @@
 <template>
-  <NiaContainer class="nia-mapping-table">
+  <NiaContainer
+    class="nia-mapping-table"
+    @contextmenu="mappingTableContextMenuHandler($event)"
+  >
     <NiaContainer>
       <NiaButton @click="showAddMappingDialogHandler()">
         +
@@ -15,6 +18,7 @@
         :class="mappingRowClasses(mapping, index)"
         @hover="hoverHandler(index, $event)"
         @click="clickHandler(mapping)"
+        @contextmenu="mappingRowContextMenuHandler(mapping, $event)"
         :key="index"
       >
         <NiaTableRowItem>
@@ -45,15 +49,15 @@
     }
 
     get selectedMapping(): NiaMapping | null {
-      return store.getters.UI.General.selectedMapping
+      return store.getters.UI.MappingTable.selectedMapping
     }
 
     get columns(): Array<NiaTableColumnDefinition> {
       return [
         {
           name: 'Mappings',
-          width: 100
-        }
+          width: 100,
+        },
       ]
     }
 
@@ -62,18 +66,17 @@
 
       if (selectedMapping !== null && selectedMapping.same(mapping)) {
         return {
-          selected: true
+          selected: true,
         }
       }
 
       if (this.hoveredIndex === index) {
         return {
-          hover: true
+          hover: true,
         }
       }
 
-      return {
-      }
+      return {}
     }
 
     hoverHandler(index: number, hoverState: boolean): void {
@@ -85,8 +88,21 @@
     }
 
     clickHandler(mapping: NiaMapping): void {
-      store.commit.UI.General.selectMapping(mapping)
+      store.commit.UI.MappingTable.selectMapping(mapping)
       store.commit.UI.SelectedMappingInfoView.setCurrentAction(mapping.getAction())
+    }
+
+    mappingRowContextMenuHandler(mapping: NiaMapping, event: MouseEvent): void {
+      store.commit.Context.Mapping.setX(event.pageX)
+      store.commit.Context.Mapping.setY(event.pageY)
+      store.commit.Context.Mapping.setMapping(mapping)
+      store.commit.Context.Mapping.show()
+    }
+
+    mappingTableContextMenuHandler(event: MouseEvent): void {
+      store.commit.Context.MappingTable.setX(event.pageX)
+      store.commit.Context.MappingTable.setY(event.pageY)
+      store.commit.Context.MappingTable.show()
     }
 
     showAddMappingDialogHandler(): void {
@@ -95,14 +111,14 @@
     }
 
     handleRemoveMapping(): void {
-      const mapping: NiaMapping | null = store.getters.UI.General.selectedMapping
+      const mapping: NiaMapping | null = store.getters.UI.MappingTable.selectedMapping
 
       if (mapping === null) {
         return
       }
 
       store.dispatch.Connection.removeMapping({
-        keyChords: mapping.getKeyChords()
+        keyChords: mapping.getKeyChords(),
       })
     }
   }

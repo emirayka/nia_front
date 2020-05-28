@@ -5,14 +5,14 @@ import {
 import {NiaRequest, NiaRequestType, SerializablePB} from '@/utils'
 
 export class NiaRemoveDeviceByNameRequest implements SerializablePB<NiaRemoveDeviceByNameRequest, RemoveDeviceByNameRequest> {
-  private readonly keyboardName: string
+  private readonly deviceName: string
 
-  constructor(keyboardName: string) {
-    this.keyboardName = keyboardName
+  constructor(deviceName: string) {
+    this.deviceName = deviceName
   }
 
   getDeviceName(): string {
-    return this.keyboardName
+    return this.deviceName
   }
 
   getType(): NiaRequestType {
@@ -25,7 +25,7 @@ export class NiaRemoveDeviceByNameRequest implements SerializablePB<NiaRemoveDev
 
   toPB(): RemoveDeviceByNameRequest {
     const removeDeviceByNameRequest = new RemoveDeviceByNameRequest()
-    removeDeviceByNameRequest.setDeviceName(this.keyboardName)
+    removeDeviceByNameRequest.setDeviceName(this.deviceName)
 
     return removeDeviceByNameRequest
   }

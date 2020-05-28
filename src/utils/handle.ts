@@ -154,9 +154,9 @@ const handleRemoveDeviceEvent = async (
 ): Promise<NiaEventResponse> => {
   await niaProtocol.isReady()
 
-  const keyboardPath = event.getDevicePath()
+  const devicePath = event.getDevicePath()
 
-  const response: NiaRemoveDeviceByPathResponse = await niaProtocol.removeDeviceByPath(keyboardPath)
+  const response: NiaRemoveDeviceByPathResponse = await niaProtocol.removeDeviceByPath(devicePath)
   const removeDeviceEventResponse: NiaRemoveDeviceEventResponse = NiaRemoveDeviceEventResponse.from(
     event,
     response,

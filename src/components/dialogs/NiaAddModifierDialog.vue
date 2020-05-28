@@ -55,19 +55,25 @@
   })
   export default class NiaAddModifierDialog extends Vue {
     constructFormProperties() {
-      const selectedDeviceName = store.getters.UI.AddModifierDialog.selectedDevice
+      const selectedDeviceId = store.getters.UI.AddModifierDialog.selectedDeviceId
+      const selectedKeyCode = store.getters.UI.AddModifierDialog.selectedKeyCode
+
       const deviceNames: Array<string> = store.getters.Keymapping.DevicesInfo.deviceNames
       let keys: Array<string> = [];
 
-      if (selectedDeviceName !== null) {
-        const selectedDevice: NiaDeviceInfo | null = store.getters.Keymapping.DevicesInfo.getDeviceByName(selectedDeviceName)
+      const selectedDevice: NiaDeviceInfo | null = store.getters.Keymapping.DevicesInfo.getDeviceById(selectedDeviceId)
 
-        if (selectedDevice !== null) {
-          keys = selectedDevice
-            .getDeviceModel()
-            .getKeyDescriptions()
-            .map((key) => mapKeyCodeToString(key.getKeyCode()))
-        }
+      let selectedDeviceIndex = 0
+      let selectedKeyIndex = 0
+
+      if (selectedDevice !== null) {
+        keys = selectedDevice
+          .getDeviceModel()
+          .getKeyDescriptions()
+          .map((key) => mapKeyCodeToString(key.getKeyCode()))
+
+        selectedDeviceIndex = deviceNames.indexOf(selectedDevice.getDeviceName())
+        selectedKeyIndex = keys.indexOf(mapKeyCodeToString(selectedKeyCode))
       }
 
       return [
@@ -76,17 +82,20 @@
           name: PROPERTY_DEVICE,
           validator: () => true,
           selectValues: deviceNames,
+          initialValue: selectedDeviceIndex,
         } as NiaFormSelectProperty,
         {
           type: NiaFormPropertyType.Select,
           name: PROPERTY_KEY,
           validator: () => true,
           selectValues: keys,
+          initialValue: selectedKeyIndex,
         } as NiaFormSelectProperty,
         {
           type: NiaFormPropertyType.Edit,
           name: PROPERTY_MODIFIER_ALIAS,
           validator: () => true,
+          initialValue: store.getters.UI.AddModifierDialog.selectedModifierAlias,
         } as NiaFormEditProperty,
       ]
     }
@@ -94,7 +103,7 @@
     changeHandler(event: NiaFormPropertyEvent): void {
       switch (event.propertyName) {
         case PROPERTY_DEVICE:
-          this.selectDeviceHandler((event.selectEvent as NiaFormSelectEvent).value)
+          this.selectDeviceHandler((event.selectEvent as NiaFormSelectEvent).index)
           break;
         case PROPERTY_KEY:
           this.selectKeyCodeHandler((event.selectEvent as NiaFormSelectEvent).value)
@@ -107,15 +116,7 @@
 
 
     addModifierHandler(): void {
-      const deviceName: string = store.getters.UI.AddModifierDialog.selectedDevice
-      const device: NiaDeviceInfo | null = store.getters.Keymapping.DevicesInfo.getDeviceByName(deviceName)
-
-      if (device === null) {
-        // todo: show error here
-        return
-      }
-
-      const deviceId: number = device.getDeviceId()
+      const deviceId: number = store.getters.UI.AddModifierDialog.selectedDeviceId
       const keyCode: number = store.getters.UI.AddModifierDialog.selectedKeyCode
       const modifierAlias: string = store.getters.UI.AddModifierDialog.selectedModifierAlias
 
@@ -126,14 +127,14 @@
 
       const key: NiaKey = new NiaKey({
         deviceId: deviceId,
-        keyCode: keyCode
+        keyCode: keyCode,
       })
 
       store.dispatch.Connection.defineModifier({
         modifier: new NiaModifierDescription({
           key,
-          alias: modifierAlias
-        })
+          alias: modifierAlias,
+        }),
       })
 
       store.commit.UI.AddModifierDialog.hide()
@@ -143,8 +144,8 @@
       store.commit.UI.AddModifierDialog.hide()
     }
 
-    selectDeviceHandler(keyboardName: string): void {
-      store.commit.UI.AddModifierDialog.setSelectedDeviceName(keyboardName)
+    selectDeviceHandler(deviceId: number): void {
+      store.commit.UI.AddModifierDialog.setSelectedDeviceId(deviceId)
     }
 
     selectKeyCodeHandler(keyCodeName: string): void {

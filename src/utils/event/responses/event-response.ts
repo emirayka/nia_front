@@ -223,14 +223,14 @@ export class NiaEventResponse implements SerializableObject<NiaEventResponse, Ni
         return new NiaEventResponse(executeCodeEventResponse)
 
       case NiaEventResponseType.DefineDevice:
-        const defineKeyboardEventResponseSerialized = serialized.eventResponse as NiaDefineDeviceEventResponseSerialized
-        const defineKeyboardEventResponse = NiaDefineDeviceEventResponse.deserialize(defineKeyboardEventResponseSerialized)
-        return new NiaEventResponse(defineKeyboardEventResponse)
+        const defineDeviceEventResponseSerialized = serialized.eventResponse as NiaDefineDeviceEventResponseSerialized
+        const defineDeviceEventResponse = NiaDefineDeviceEventResponse.deserialize(defineDeviceEventResponseSerialized)
+        return new NiaEventResponse(defineDeviceEventResponse)
 
       case NiaEventResponseType.RemoveDevice:
-        const removeKeyboardEventResponseSerialized = serialized.eventResponse as NiaRemoveDeviceResponseSerialized
-        const removeKeyboardEventResponse = NiaRemoveDeviceEventResponse.deserialize(removeKeyboardEventResponseSerialized)
-        return new NiaEventResponse(removeKeyboardEventResponse)
+        const removeDeviceEventResponseSerialized = serialized.eventResponse as NiaRemoveDeviceResponseSerialized
+        const removeDeviceEventResponse = NiaRemoveDeviceEventResponse.deserialize(removeDeviceEventResponseSerialized)
+        return new NiaEventResponse(removeDeviceEventResponse)
 
       case NiaEventResponseType.DefineModifier:
         const defineModifierEventResponseSerialized = serialized.eventResponse as NiaDefineModifierEventResponseSerialized

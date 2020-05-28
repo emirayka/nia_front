@@ -59,6 +59,7 @@
     display: inline-block;
     vertical-align: top;
     width: 25%;
+    height: 100%;
   }
 
   .nia-mapping-view__mapping_content {

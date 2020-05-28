@@ -47,9 +47,9 @@ export class NiaDefineActionResponse {
 
   static fromPB(defineActionResponsePB: DefineActionResponse): NiaDefineActionResponse {
     let message: string = ''
-    let success: boolean = true
-    let error: boolean = true
-    let failure: boolean = true
+    let success: boolean = false
+    let error: boolean = false
+    let failure: boolean = false
 
     switch (defineActionResponsePB.getResultCase()) {
       case DefineActionResponse.ResultCase.SUCCESS_RESULT:

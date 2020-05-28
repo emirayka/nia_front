@@ -68,7 +68,7 @@
 >
 
   .nia-editor {
-    height: 100%;
+    height: 1023px;
   }
 
   .nia-editor__content {

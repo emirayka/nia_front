@@ -259,19 +259,36 @@ const ConnectionModule = defineModule({
     handleDefineDeviceResponse(context, response: NiaDefineDeviceEventResponse): void {
       const { rootCommit } = ConnectionModuleActionContext(context)
 
-      rootCommit.Keymapping.DevicesInfo.makeDeviceDefined(response.getDeviceId())
+      if (response.isSuccess()) {
+        rootCommit.Keymapping.DevicesInfo.makeDeviceDefined(response.getDeviceId())
+      } else if (response.isError()) {
+        rootCommit.UI.ErrorDialog.show(response.getMessage())
+      } else {
+        rootCommit.UI.ErrorDialog.show(response.getMessage())
+      }
     },
     handleRemoveDeviceResponse(context, response: NiaRemoveDeviceEventResponse): void {
       const { rootCommit } = ConnectionModuleActionContext(context)
 
-      rootCommit.Keymapping.DevicesInfo.makeDeviceRemoved(response.getDevicePath())
+      if (response.isSuccess()) {
+        rootCommit.Keymapping.DevicesInfo.makeDeviceRemoved(response.getDevicePath())
+      } else if (response.isError()) {
+        rootCommit.UI.ErrorDialog.show(response.getMessage())
+      } else {
+        rootCommit.UI.ErrorDialog.show(response.getMessage())
+      }
     },
     handleDefineModifierResponse(context, response: NiaDefineModifierEventResponse): void {
       const { rootCommit } = ConnectionModuleActionContext(context)
 
-      const modifier: NiaModifierDescription = response.getModifier()
-
-      rootCommit.Keymapping.Modifiers.defineModifier(modifier)
+      if (response.isSuccess()) {
+        const modifier: NiaModifierDescription = response.getModifier()
+        rootCommit.Keymapping.Modifiers.defineModifier(modifier)
+      } else if (response.isError()) {
+        rootCommit.UI.ErrorDialog.show(response.getMessage())
+      } else {
+        rootCommit.UI.ErrorDialog.show(response.getMessage())
+      }
     },
     handleRemoveModifierResponse(context, response: NiaRemoveModifierEventResponse): void {
       const { rootCommit } = ConnectionModuleActionContext(context)
@@ -280,9 +297,9 @@ const ConnectionModule = defineModule({
         const modifierKey: NiaKey = response.toModifierKey()
         rootCommit.Keymapping.Modifiers.removeModifier(modifierKey)
       } else if (response.isError()) {
-        // show error
+        rootCommit.UI.ErrorDialog.show(response.getMessage())
       } else {
-        // show failure
+        rootCommit.UI.ErrorDialog.show(response.getMessage())
       }
     },
     handleDefineActionResponse(context, response: NiaDefineActionEventResponse): void {
@@ -292,15 +309,21 @@ const ConnectionModule = defineModule({
         rootCommit.Keymapping.Actions.defineAction(response.getAction())
         rootCommit.UI.AddActionDialog.hide()
       } else if (response.isError()) {
-        // show error
+        rootCommit.UI.ErrorDialog.show(response.getMessage())
       } else {
-        // show failure
+        rootCommit.UI.ErrorDialog.show(response.getMessage())
       }
     },
     handleRemoveActionResponse(context, response: NiaRemoveActionEventResponse): void {
       const { rootCommit } = ConnectionModuleActionContext(context)
 
-      rootCommit.Keymapping.Actions.removeAction(response.getActionName())
+      if (response.isSuccess()) {
+        rootCommit.Keymapping.Actions.removeAction(response.getActionName())
+      } else if (response.isError()) {
+        rootCommit.UI.ErrorDialog.show(response.getMessage())
+      } else {
+        rootCommit.UI.ErrorDialog.show(response.getMessage())
+      }
     },
     handleDefineMappingResponse(context, response: NiaDefineMappingEventResponse): void {
       const { rootCommit } = ConnectionModuleActionContext(context)
@@ -308,6 +331,10 @@ const ConnectionModule = defineModule({
       if (response.isSuccess()) {
         rootCommit.Keymapping.Mappings.defineMapping(response.getMapping())
         rootCommit.UI.AddMappingDialog.hide()
+      } else if (response.isError()) {
+        rootCommit.UI.ErrorDialog.show(response.getMessage())
+      } else {
+        rootCommit.UI.ErrorDialog.show(response.getMessage())
       }
     },
     handleChangeMappingResponse(context, response: NiaChangeMappingEventResponse): void {
@@ -319,6 +346,10 @@ const ConnectionModule = defineModule({
             action: response.getAction(),
           },
         )
+      } else if (response.isError()) {
+        rootCommit.UI.ErrorDialog.show(response.getMessage())
+      } else {
+        rootCommit.UI.ErrorDialog.show(response.getMessage())
       }
     },
     handleRemoveMappingResponse(context, response: NiaRemoveMappingEventResponse): void {
@@ -326,18 +357,22 @@ const ConnectionModule = defineModule({
 
       if (response.isSuccess()) {
         rootCommit.Keymapping.Mappings.removeMapping(response.getKeyChords())
-        rootCommit.UI.General.unselectMapping()
+        rootCommit.UI.MappingTable.unselectMapping()
+      } else if (response.isError()) {
+        rootCommit.UI.ErrorDialog.show(response.getMessage())
       } else {
-        // errors ...
+        rootCommit.UI.ErrorDialog.show(response.getMessage())
       }
     },
     handleStartListeningResponse(context, response: NiaStartListeningEventResponse): void {
       const { rootCommit } = ConnectionModuleActionContext(context)
 
-      if (response.getSuccess()) {
+      if (response.isSuccess()) {
         rootCommit.Keymapping.Listening.setListening(true)
+      } else if (response.isError()) {
+        rootCommit.UI.ErrorDialog.show(response.getMessage())
       } else {
-        // errors ...
+        rootCommit.UI.ErrorDialog.show(response.getMessage())
       }
     },
     handleStopListeningResponse(context, response: NiaStopListeningEventResponse): void {
@@ -345,10 +380,12 @@ const ConnectionModule = defineModule({
       logger.debug('Got stop listening event response:')
       logger.debug(response)
 
-      if (response.getSuccess()) {
+      if (response.isSuccess()) {
         rootCommit.Keymapping.Listening.setListening(false)
+      } else if (response.isError()) {
+        rootCommit.UI.ErrorDialog.show(response.getMessage())
       } else {
-        // errors ...
+        rootCommit.UI.ErrorDialog.show(response.getMessage())
       }
     },
     handleEventResponse(context, response: NiaEventResponse): void {

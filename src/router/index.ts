@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter, {RouteConfig} from 'vue-router'
 
-import Keyboards from '../views/Keyboards.vue'
+import Devices from '../views/Devices.vue'
 import Editor from '../views/Editor.vue'
 import Settings from '../views/Settings.vue'
 
@@ -9,9 +9,9 @@ Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
   {
-    path: '/Keyboards',
-    name: 'Keyboards',
-    component: Keyboards,
+    path: '/Devices',
+    name: 'Devices',
+    component: Devices,
   },
   {
     path: '/Editor',

@@ -3,7 +3,11 @@ import AddModifierDialog from './add-modifier-dialog'
 import AddMappingDialog from './add-mapping-dialog'
 import ErrorDialog from './error-dialog'
 import SelectedMappingInfoView from './selected-mapping-info-view'
-import General from './general'
+
+import Devices from './devices'
+import ActionTable from './action-table'
+import MappingTable from './mapping-table'
+import ModifierTable from './modifier-table'
 
 import {defineModule} from 'direct-vuex'
 import {moduleActionContext, moduleGetterContext} from '@/store'
@@ -16,7 +20,10 @@ const UIModule = defineModule({
     AddMappingDialog,
     ErrorDialog,
     SelectedMappingInfoView,
-    General,
+    Devices,
+    ActionTable,
+    MappingTable,
+    ModifierTable
   }
 })
 

@@ -15,7 +15,7 @@
   import Component from 'vue-class-component'
   import {Prop} from 'vue-property-decorator'
 
-  import {NiaFormEvent, NiaFormProperty, NiaFormPropertyEvent} from './lib'
+  import {NiaFormEvent, NiaFormProperty, NiaFormPropertyEvent, NiaFormPropertyValue} from './lib'
   import NiaFormRow from './NiaFormRow.vue'
 
   @Component({

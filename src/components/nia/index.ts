@@ -5,6 +5,7 @@ import NiaCodeEditor from './NiaCodeEditor.vue'
 import NiaColoredDiv from './NiaColoredDiv.vue'
 import NiaConsole from './NiaConsole.vue'
 import NiaContainer from './NiaContainer.vue'
+import NiaContextMenu from './NiaContextMenu.vue'
 import NiaDialog from './NiaDialog.vue'
 import NiaDialogFooterButton from './NiaDialogFooterButton.vue'
 import NiaForm from './NiaForm.vue'
@@ -42,6 +43,7 @@ Vue.component('NiaCodeEditor', NiaCodeEditor)
 Vue.component('NiaColoredDiv', NiaColoredDiv)
 Vue.component('NiaConsole', NiaConsole)
 Vue.component('NiaContainer', NiaContainer)
+Vue.component('NiaContextMenu', NiaContextMenu)
 Vue.component('NiaDialog', NiaDialog)
 Vue.component('NiaDialogFooterButton', NiaDialogFooterButton)
 Vue.component('NiaForm', NiaForm)

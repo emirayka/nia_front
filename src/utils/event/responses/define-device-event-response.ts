@@ -7,7 +7,7 @@ import serializable from '@/utils/serializable-object'
 import {NiaDefineDeviceResponse} from '@/utils/protocol/responses/define-device-response'
 import SerializableObject from '@/utils/serializable-object'
 
-export interface NiaDefineKeyboardEventResponseObject {
+export interface NiaDefineDeviceEventResponseObject {
   deviceId: number
   message: string
   success: boolean
@@ -15,7 +15,7 @@ export interface NiaDefineKeyboardEventResponseObject {
   failure: boolean
 }
 
-export type NiaDefineDeviceEventResponseSerialized = NiaDefineKeyboardEventResponseObject
+export type NiaDefineDeviceEventResponseSerialized = NiaDefineDeviceEventResponseObject
 
 export class NiaDefineDeviceEventResponse implements SerializableObject<NiaDefineDeviceEventResponse, NiaDefineDeviceEventResponseSerialized> {
   private readonly deviceId: number
@@ -25,7 +25,7 @@ export class NiaDefineDeviceEventResponse implements SerializableObject<NiaDefin
   private readonly error: boolean
   private readonly success: boolean
 
-  constructor(args: NiaDefineKeyboardEventResponseObject) {
+  constructor(args: NiaDefineDeviceEventResponseObject) {
     this.deviceId = args.deviceId
     this.message = args.message
     this.failure = args.failure
@@ -34,7 +34,7 @@ export class NiaDefineDeviceEventResponse implements SerializableObject<NiaDefin
   }
 
   static from(event: NiaDefineDeviceEvent, response: NiaDefineDeviceResponse): NiaDefineDeviceEventResponse {
-    const args: NiaDefineKeyboardEventResponseObject = {
+    const args: NiaDefineDeviceEventResponseObject = {
       deviceId: event.getDeviceId(),
       message: response.getMessage(),
       success: response.isSuccess(),
@@ -53,15 +53,15 @@ export class NiaDefineDeviceEventResponse implements SerializableObject<NiaDefin
     return this.message
   }
 
-  getFailure(): boolean {
+  isFailure(): boolean {
     return this.failure
   }
 
-  getError(): boolean {
+  isError(): boolean {
     return this.error
   }
 
-  getSuccess(): boolean {
+  isSuccess(): boolean {
     return this.success
   }
 
@@ -72,12 +72,12 @@ export class NiaDefineDeviceEventResponse implements SerializableObject<NiaDefin
   }
 
   static deserialize(obj: NiaDefineDeviceEventResponseSerialized): NiaDefineDeviceEventResponse {
-    const args: NiaDefineKeyboardEventResponseObject = obj
+    const args: NiaDefineDeviceEventResponseObject = obj
 
     return new NiaDefineDeviceEventResponse(args)
   }
 
-  serialize(): NiaDefineKeyboardEventResponseObject {
+  serialize(): NiaDefineDeviceEventResponseObject {
     return {
       deviceId: this.deviceId,
       message: this.message,

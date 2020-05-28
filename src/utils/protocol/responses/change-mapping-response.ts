@@ -47,9 +47,9 @@ export class NiaChangeMappingResponse {
 
   static fromPB(changeMappingResponsePB: ChangeMappingResponse): NiaChangeMappingResponse {
     let message: string = ''
-    let success: boolean = true
-    let error: boolean = true
-    let failure: boolean = true
+    let success: boolean = false
+    let error: boolean = false
+    let failure: boolean = false
 
     switch (changeMappingResponsePB.getResultCase()) {
       case ChangeMappingResponse.ResultCase.SUCCESS_RESULT:

@@ -67,7 +67,7 @@ export class NiaRemoveModifierEventResponse implements SerializableObject<NiaRem
     return this.message
   }
 
-  getFailure(): boolean {
+  isFailure(): boolean {
     return this.failure
   }
 

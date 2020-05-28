@@ -1,5 +1,5 @@
 <template>
-  <div class="keyboards">
+  <div class="devices">
     <NiaGridLayout
       :column-number="100"
       :row-number="100"
@@ -44,7 +44,7 @@
         :w="70"
         :h="60"
       >
-        <NiaKeyboards/>
+        <NiaDevices/>
       </NiaGridItem>
 
       <NiaGridItem
@@ -61,6 +61,15 @@
     <NiaAddActionDialog v-if="addActionDialogIsShown" />
     <NiaAddMappingDialog v-if="addMappingDialogIsShown" />
     <NiaErrorDialog v-if="errorDialogIsShown" />
+
+    <NiaActionContextMenu />
+    <NiaActionTableContextMenu />
+    <NiaKeyContextMenu />
+    <NiaDeviceContextMenu />
+    <NiaMappingContextMenu />
+    <NiaMappingTableContextMenu />
+    <NiaModifierContextMenu />
+    <NiaModifierTableContextMenu />
   </div>
 </template>
 
@@ -68,7 +77,7 @@
   import Vue from 'vue'
   import Component from 'vue-class-component'
 
-  import NiaKeyboards from '@/components/NiaKeyboards.vue'
+  import NiaDevices from '@/components/NiaDevices.vue'
   import NiaModifierTable from '@/components/NiaModifierTable.vue'
   import NiaActionTable from '@/components/NiaActionTable.vue'
   import NiaDeviceTable from '@/components/NiaDeviceTable.vue'
@@ -79,31 +88,42 @@
   import NiaAddMappingDialog from '@/components/dialogs/NiaAddMappingDialog.vue'
   import NiaErrorDialog from '@/components/dialogs/NiaErrorDialog.vue'
 
+  import NiaKeyContextMenu from '@/components/contexts/NiaKeyContextMenu.vue'
+  import NiaDeviceContextMenu from '@/components/contexts/NiaDeviceContextMenu.vue'
+  import NiaMappingContextMenu from '@/components/contexts/NiaMappingContextMenu.vue'
+  import NiaMappingTableContextMenu from '@/components/contexts/NiaMappingTableContextMenu.vue'
+  import NiaModifierContextMenu from '@/components/contexts/NiaModifierContextMenu.vue'
+  import NiaModifierTableContextMenu from '@/components/contexts/NiaModifierTableContextMenu.vue'
+  import NiaActionContextMenu from '@/components/contexts/NiaActionContextMenu.vue'
+  import NiaActionTableContextMenu from '@/components/contexts/NiaActionTableContextMenu.vue'
+
   import store from '@/store'
-  import {mapStringToKeyCode} from '@/utils/utils'
-  import {
-    NiaAction,
-    NiaDefineModifierEvent,
-    NiaDeviceInfo,
-    NiaKey,
-    NiaModifierDescription,
-  } from '@/utils'
 
   @Component({
-    name: 'Keyboards',
+    name: 'Devices',
     components: {
       NiaActionTable,
-      NiaKeyboards,
+      NiaDevices,
       NiaModifierTable,
       NiaDeviceTable,
+
       NiaAddModifierDialog,
       NiaAddActionDialog,
       NiaAddMappingDialog,
       NiaErrorDialog,
       NiaMappingView,
+
+      NiaKeyContextMenu,
+      NiaDeviceContextMenu,
+      NiaMappingContextMenu,
+      NiaMappingTableContextMenu,
+      NiaModifierContextMenu,
+      NiaModifierTableContextMenu,
+      NiaActionContextMenu,
+      NiaActionTableContextMenu,
     },
   })
-  export default class Keyboards extends Vue {
+  export default class Devices extends Vue {
     get addModifierDialogIsShown(): boolean {
       return store.getters.UI.AddModifierDialog.isShown
     }
@@ -123,7 +143,7 @@
   scoped
   lang="scss"
 >
-  .keyboards {
+  .devices {
   }
 
   .nia-grid-layout {

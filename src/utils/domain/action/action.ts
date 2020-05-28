@@ -15,33 +15,72 @@ import {
 } from './basic-actions'
 import {SerializablePB} from '@/utils'
 import {
-  Action,
+  Action, ActionControlKeyClick,
   ActionExecuteCode,
   ActionExecuteFunction,
-  ActionExecuteOSCommand,
+  ActionExecuteOSCommand, ActionFunctionKeyClick,
   ActionKeyClick,
   ActionKeyPress,
-  ActionKeyRelease,
+  ActionKeyRelease, ActionKPKeyClick,
   ActionMouseAbsoluteMove,
-  ActionMouseButtonClick,
+  ActionMouseButtonClick, ActionMouseButtonKeyClick,
   ActionMouseButtonPress,
   ActionMouseButtonRelease,
-  ActionMouseRelativeMove,
+  ActionMouseRelativeMove, ActionMultimediaKeyClick, ActionNumberKeyClick, ActionTextKeyClick,
   ActionTextType,
   ActionWait,
 } from 'nia-protocol-js'
 import {NiaActionType} from '@/utils/domain/action/action-type'
 import ActionCase = Action.ActionCase
 import SerializableObject from '@/utils/serializable-object'
+import {
+  NiaActionTextKeyClick,
+  NiaActionTextKeyClickSerialized,
+} from '@/utils/domain/action/basic-actions/action-text-key-click'
+import {
+  NiaActionNumberKeyClick,
+  NiaActionNumberKeyClickSerialized,
+} from '@/utils/domain/action/basic-actions/action-number-key-click'
+import {
+  NiaActionFunctionKeyClick,
+  NiaActionFunctionKeyClickSerialized,
+} from '@/utils/domain/action/basic-actions/action-function-key-click'
+import {
+  NiaActionControlKeyClick,
+  NiaActionControlKeyClickSerialized,
+} from '@/utils/domain/action/basic-actions/action-control-key-click'
+import {
+  NiaActionKPKeyClick,
+  NiaActionKPKeyClickSerialized,
+} from '@/utils/domain/action/basic-actions/action-kp-key-click'
+import {
+  NiaActionMultimediaKeyClick,
+  NiaActionMultimediaKeyClickSerialized,
+} from '@/utils/domain/action/basic-actions/action-multimedia-key-click'
+import {
+  NiaActionMouseButtonKeyClick,
+  NiaActionMouseButtonKeyClickSerialized,
+} from '@/utils/domain/action/basic-actions/action-mouse-button-key-click'
 
 export type NiaActionUnderlyingType = NiaActionKeyPress |
   NiaActionKeyClick |
   NiaActionKeyRelease |
+
   NiaActionMouseButtonPress |
   NiaActionMouseButtonClick |
   NiaActionMouseButtonRelease |
+
+  NiaActionTextKeyClick |
+  NiaActionNumberKeyClick |
+  NiaActionFunctionKeyClick |
+  NiaActionControlKeyClick |
+  NiaActionKPKeyClick |
+  NiaActionMultimediaKeyClick |
+  NiaActionMouseButtonKeyClick |
+
   NiaActionMouseRelativeMove |
   NiaActionMouseAbsoluteMove |
+
   NiaActionTextType |
   NiaActionWait |
   NiaActionExecuteCode |
@@ -51,9 +90,19 @@ export type NiaActionUnderlyingType = NiaActionKeyPress |
 export type NiaActionUnderlyingTypeSerialized = NiaActionExecuteCodeSerialized |
   NiaActionExecuteFunctionSerialized |
   NiaActionExecuteOSCommandSerialized |
+
   NiaActionKeyClickSerialized |
   NiaActionKeyPressSerialized |
   NiaActionKeyReleaseSerialized |
+
+  NiaActionTextKeyClickSerialized |
+  NiaActionNumberKeyClickSerialized |
+  NiaActionFunctionKeyClickSerialized |
+  NiaActionControlKeyClickSerialized |
+  NiaActionKPKeyClickSerialized |
+  NiaActionMultimediaKeyClickSerialized |
+  NiaActionMouseButtonKeyClickSerialized |
+
   NiaActionMouseAbsoluteMoveSerialized |
   NiaActionMouseButtonClickSerialized |
   NiaActionMouseButtonPressSerialized |
@@ -190,6 +239,62 @@ export class NiaAction implements SerializablePB<NiaAction, Action>, Serializabl
 
         actionPB = new Action()
         actionPB.setActionMouseButtonRelease(mouseButtonReleaseActionPB)
+        break
+
+      case NiaActionType.TextKeyClick:
+        const textKeyClickAction: NiaActionTextKeyClick = this.action as NiaActionTextKeyClick
+        const textKeyClickActionPB: ActionKeyClick = textKeyClickAction.toPB()
+
+        actionPB = new Action()
+        actionPB.setActionTextKeyClick(textKeyClickActionPB)
+        break
+
+      case NiaActionType.NumberKeyClick:
+        const numberKeyClickAction: NiaActionNumberKeyClick = this.action as NiaActionNumberKeyClick
+        const numberKeyClickActionPB: ActionKeyClick = numberKeyClickAction.toPB()
+
+        actionPB = new Action()
+        actionPB.setActionNumberKeyClick(numberKeyClickActionPB)
+        break
+
+      case NiaActionType.FunctionKeyClick:
+        const functionKeyClickAction: NiaActionFunctionKeyClick = this.action as NiaActionFunctionKeyClick
+        const functionKeyClickActionPB: ActionKeyClick = functionKeyClickAction.toPB()
+
+        actionPB = new Action()
+        actionPB.setActionFunctionKeyClick(functionKeyClickActionPB)
+        break
+
+      case NiaActionType.ControlKeyClick:
+        const controlKeyClickAction: NiaActionControlKeyClick = this.action as NiaActionControlKeyClick
+        const controlKeyClickActionPB: ActionKeyClick = controlKeyClickAction.toPB()
+
+        actionPB = new Action()
+        actionPB.setActionControlKeyClick(controlKeyClickActionPB)
+        break
+
+      case NiaActionType.KPKeyClick:
+        const kpKeyClickAction: NiaActionKPKeyClick = this.action as NiaActionKPKeyClick
+        const kpKeyClickActionPB: ActionKeyClick = kpKeyClickAction.toPB()
+
+        actionPB = new Action()
+        actionPB.setActionKpKeyClick(kpKeyClickActionPB)
+        break
+
+      case NiaActionType.MultimediaKeyClick:
+        const multimediaKeyClickAction: NiaActionMultimediaKeyClick = this.action as NiaActionMultimediaKeyClick
+        const multimediaKeyClickActionPB: ActionKeyClick = multimediaKeyClickAction.toPB()
+
+        actionPB = new Action()
+        actionPB.setActionMultimediaKeyClick(multimediaKeyClickActionPB)
+        break
+
+      case NiaActionType.MouseButtonKeyClick:
+        const mouseButtonKeyClickAction: NiaActionMouseButtonKeyClick = this.action as NiaActionMouseButtonKeyClick
+        const mouseButtonKeyClickActionPB: ActionKeyClick = mouseButtonKeyClickAction.toPB()
+
+        actionPB = new Action()
+        actionPB.setActionMouseButtonKeyClick(mouseButtonKeyClickActionPB)
         break
 
       case NiaActionType.MouseRelativeMove:
@@ -350,6 +455,111 @@ export class NiaAction implements SerializablePB<NiaAction, Action>, Serializabl
 
         break
 
+      case ActionCase.ACTION_TEXT_KEY_CLICK:
+        const textKeyClickActionPB: ActionTextKeyClick | undefined = actionPB.getActionTextKeyClick()
+
+        if (textKeyClickActionPB === undefined) {
+          throw new Error('TextKeyClickAction was not set in Action')
+        }
+
+        const textKeyClickAction: NiaActionTextKeyClick = NiaActionTextKeyClick.fromPB(textKeyClickActionPB)
+
+        action = new NiaAction({
+          action: textKeyClickAction,
+        })
+
+        break
+
+      case ActionCase.ACTION_NUMBER_KEY_CLICK:
+        const numberKeyClickActionPB: ActionNumberKeyClick | undefined = actionPB.getActionNumberKeyClick()
+
+        if (numberKeyClickActionPB === undefined) {
+          throw new Error('NumberKeyClickAction was not set in Action')
+        }
+
+        const numberKeyClickAction: NiaActionNumberKeyClick = NiaActionNumberKeyClick.fromPB(numberKeyClickActionPB)
+
+        action = new NiaAction({
+          action: numberKeyClickAction,
+        })
+
+        break
+
+      case ActionCase.ACTION_FUNCTION_KEY_CLICK:
+        const functionKeyClickActionPB: ActionFunctionKeyClick | undefined = actionPB.getActionFunctionKeyClick()
+
+        if (functionKeyClickActionPB === undefined) {
+          throw new Error('KeyClickAction was not set in Action')
+        }
+
+        const functionKeyClickAction: NiaActionFunctionKeyClick = NiaActionFunctionKeyClick.fromPB(functionKeyClickActionPB)
+
+        action = new NiaAction({
+          action: functionKeyClickAction,
+        })
+
+        break
+
+      case ActionCase.ACTION_CONTROL_KEY_CLICK:
+        const controlKeyClickActionPB: ActionControlKeyClick | undefined = actionPB.getActionControlKeyClick()
+
+        if (controlKeyClickActionPB === undefined) {
+          throw new Error('ControlKeyClickAction was not set in Action')
+        }
+
+        const controlKeyClickAction: NiaActionControlKeyClick = NiaActionControlKeyClick.fromPB(controlKeyClickActionPB)
+
+        action = new NiaAction({
+          action: controlKeyClickAction,
+        })
+
+        break
+
+      case ActionCase.ACTION_KP_KEY_CLICK:
+        const kpKeyClickActionPB: ActionKPKeyClick | undefined = actionPB.getActionKpKeyClick()
+
+        if (kpKeyClickActionPB === undefined) {
+          throw new Error('KPKeyClickAction was not set in Action')
+        }
+
+        const kpKeyClickAction: NiaActionKPKeyClick = NiaActionKPKeyClick.fromPB(kpKeyClickActionPB)
+
+        action = new NiaAction({
+          action: kpKeyClickAction,
+        })
+
+        break
+
+      case ActionCase.ACTION_MULTIMEDIA_KEY_CLICK:
+        const multimediaKeyClickActionPB: ActionMultimediaKeyClick | undefined = actionPB.getActionMultimediaKeyClick()
+
+        if (multimediaKeyClickActionPB === undefined) {
+          throw new Error('MultimediaKeyClickAction was not set in Action')
+        }
+
+        const multimediaKeyClickAction: NiaActionMultimediaKeyClick = NiaActionMultimediaKeyClick.fromPB(multimediaKeyClickActionPB)
+
+        action = new NiaAction({
+          action: multimediaKeyClickAction,
+        })
+
+        break
+
+      case ActionCase.ACTION_MOUSE_BUTTON_CLICK:
+        const mouseButtonKeyClickActionPB: ActionMouseButtonKeyClick | undefined = actionPB.getActionMouseButtonKeyClick()
+
+        if (mouseButtonKeyClickActionPB === undefined) {
+          throw new Error('KeyClickAction was not set in Action')
+        }
+
+        const mouseButtonKeyClickAction: NiaActionMouseButtonKeyClick = NiaActionMouseButtonKeyClick.fromPB(mouseButtonKeyClickActionPB)
+
+        action = new NiaAction({
+          action: mouseButtonKeyClickAction,
+        })
+
+        break
+
       case ActionCase.ACTION_MOUSE_RELATIVE_MOVE:
         const mouseRelativeMoveActionPB: ActionMouseRelativeMove | undefined = actionPB.getActionMouseRelativeMove()
 
@@ -457,7 +667,7 @@ export class NiaAction implements SerializablePB<NiaAction, Action>, Serializabl
     }
 
     if (action === null) {
-      throw new Error()
+      throw new Error('Action was not deserialized')
     }
 
     return action
@@ -472,21 +682,6 @@ export class NiaAction implements SerializablePB<NiaAction, Action>, Serializabl
 
   static deserialize(serialized: NiaActionSerialized): NiaAction {
     switch (serialized.actionType) {
-      case NiaActionType.ExecuteCode:
-        return new NiaAction({
-          action: NiaActionExecuteCode.deserialize(serialized.action as NiaActionExecuteCodeSerialized)
-        })
-
-      case NiaActionType.ExecuteFunction:
-        return new NiaAction({
-          action: NiaActionExecuteFunction.deserialize(serialized.action as NiaActionExecuteFunctionSerialized)
-        })
-
-      case NiaActionType.ExecuteOSCommand:
-        return new NiaAction({
-          action: NiaActionExecuteOSCommand.deserialize(serialized.action as NiaActionExecuteOSCommandSerialized)
-        })
-
       case NiaActionType.KeyClick:
         return new NiaAction({
           action: NiaActionKeyClick.deserialize(serialized.action as NiaActionKeyClickSerialized)
@@ -500,11 +695,6 @@ export class NiaAction implements SerializablePB<NiaAction, Action>, Serializabl
       case NiaActionType.KeyRelease:
         return new NiaAction({
           action: NiaActionKeyRelease.deserialize(serialized.action as NiaActionKeyReleaseSerialized)
-        })
-
-      case NiaActionType.MouseAbsoluteMove:
-        return new NiaAction({
-          action: NiaActionMouseAbsoluteMove.deserialize(serialized.action as NiaActionMouseAbsoluteMoveSerialized)
         })
 
       case NiaActionType.MouseButtonClick:
@@ -522,6 +712,46 @@ export class NiaAction implements SerializablePB<NiaAction, Action>, Serializabl
           action: NiaActionMouseButtonRelease.deserialize(serialized.action as NiaActionMouseButtonReleaseSerialized)
         })
 
+      case NiaActionType.TextKeyClick:
+        return new NiaAction({
+          action: NiaActionTextKeyClick.deserialize(serialized.action as NiaActionTextKeyClickSerialized)
+        })
+
+      case NiaActionType.NumberKeyClick:
+        return new NiaAction({
+          action: NiaActionNumberKeyClick.deserialize(serialized.action as NiaActionNumberKeyClickSerialized)
+        })
+
+      case NiaActionType.FunctionKeyClick:
+        return new NiaAction({
+          action: NiaActionFunctionKeyClick.deserialize(serialized.action as NiaActionFunctionKeyClickSerialized)
+        })
+
+      case NiaActionType.ControlKeyClick:
+        return new NiaAction({
+          action: NiaActionControlKeyClick.deserialize(serialized.action as NiaActionControlKeyClickSerialized)
+        })
+
+      case NiaActionType.KPKeyClick:
+        return new NiaAction({
+          action: NiaActionKPKeyClick.deserialize(serialized.action as NiaActionKPKeyClickSerialized)
+        })
+
+      case NiaActionType.MultimediaKeyClick:
+        return new NiaAction({
+          action: NiaActionMultimediaKeyClick.deserialize(serialized.action as NiaActionMultimediaKeyClickSerialized)
+        })
+
+      case NiaActionType.MouseButtonKeyClick:
+        return new NiaAction({
+          action: NiaActionMouseButtonKeyClick.deserialize(serialized.action as NiaActionMouseButtonKeyClickSerialized)
+        })
+
+      case NiaActionType.MouseAbsoluteMove:
+        return new NiaAction({
+          action: NiaActionMouseAbsoluteMove.deserialize(serialized.action as NiaActionMouseAbsoluteMoveSerialized)
+        })
+
       case NiaActionType.MouseRelativeMove:
         return new NiaAction({
           action: NiaActionMouseRelativeMove.deserialize(serialized.action as NiaActionMouseRelativeMoveSerialized)
@@ -530,6 +760,21 @@ export class NiaAction implements SerializablePB<NiaAction, Action>, Serializabl
       case NiaActionType.TextType:
         return new NiaAction({
           action: NiaActionTextType.deserialize(serialized.action as NiaActionTextTypeSerialized)
+        })
+
+      case NiaActionType.ExecuteCode:
+        return new NiaAction({
+          action: NiaActionExecuteCode.deserialize(serialized.action as NiaActionExecuteCodeSerialized)
+        })
+
+      case NiaActionType.ExecuteFunction:
+        return new NiaAction({
+          action: NiaActionExecuteFunction.deserialize(serialized.action as NiaActionExecuteFunctionSerialized)
+        })
+
+      case NiaActionType.ExecuteOSCommand:
+        return new NiaAction({
+          action: NiaActionExecuteOSCommand.deserialize(serialized.action as NiaActionExecuteOSCommandSerialized)
         })
 
       case NiaActionType.Wait:

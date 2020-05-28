@@ -23,6 +23,15 @@ const ModifiersModule = defineModule({
 
       return false
     },
+    isKeyModifier: (state: ModifiersModuleState) => (key: NiaKey) => {
+      for (const modifier of state.definedModifiers) {
+        if (modifier.getKey().same(key)) {
+          return true
+        }
+      }
+
+      return false
+    }
   },
   mutations: {
     setModifiers(state: ModifiersModuleState, modifiers: Array<NiaModifierDescription>) {

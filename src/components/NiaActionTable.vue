@@ -1,12 +1,14 @@
 <template>
-  <div class="nia-action-table">
+  <div class="nia-action-table"
+       @contextmenu="actionTableContextMenuHandler(action, $event)"
+  >
     <NiaContainer class="nia-action-table__controls">
       <NiaButton @click.stop="addActionHandler()">+</NiaButton>
       <NiaButton @click.stop="removeSelectedActionsHandler()">-</NiaButton>
     </NiaContainer>
 
     <NiaTable
-      class="nia-action-action"
+      class="nia-action-table__actions"
       :columns="columns"
     >
 
@@ -15,7 +17,8 @@
         class="nia-action-table__actions__action"
         :class="actionRowClasses(action)"
         :key="index"
-        @click.stop="toggleActionSelectionHandler(action)"
+        @click="toggleActionSelectionHandler(action)"
+        @contextmenu="actionRowContextMenuHandler(action, $event)"
         @hover="hoverHandler(action, $event)"
       >
         <NiaTableRowItem>
@@ -33,11 +36,10 @@
 <script lang="ts">
   import Vue from 'vue'
   import Component from 'vue-class-component'
-  import {Prop} from 'vue-property-decorator'
 
   import store from '@/store'
-  import {mapKeyCodeToString, NiaDeviceInfo, NiaNamedAction} from '@/utils'
   import {NiaTableColumnDefinition} from '@/components/nia/lib'
+  import {NiaNamedAction} from '@/utils'
 
   @Component({
     name: 'NiaActionTable',
@@ -75,7 +77,7 @@
     }
 
     get selectedActions(): Array<NiaNamedAction> {
-      return store.getters.UI.General.selectedActions
+      return store.getters.UI.ActionTable.selectedActions
     }
 
     // handlers
@@ -92,7 +94,7 @@
     }
 
     removeSelectedActionsHandler() {
-      const selectedActions: Array<NiaNamedAction> = store.getters.UI.General.selectedActions
+      const selectedActions: Array<NiaNamedAction> = store.getters.UI.ActionTable.selectedActions
 
       for (const selectedAction of selectedActions) {
         store.dispatch.Connection.removeAction({
@@ -100,16 +102,33 @@
         })
       }
 
-      store.commit.UI.General.unselectActions()
+      store.commit.UI.ActionTable.unselectActions()
     }
 
     toggleActionSelectionHandler(action: NiaNamedAction) {
-      store.commit.UI.General.toggleActionSelection(action)
+      store.commit.UI.ActionTable.toggleActionSelection(action)
+    }
+
+    actionRowContextMenuHandler(action: NiaNamedAction, event: MouseEvent) {
+      store.commit.Context.Action.setAction(action)
+      store.commit.Context.Action.setX(event.pageX)
+      store.commit.Context.Action.setY(event.pageY)
+      store.commit.Context.Action.show()
+    }
+
+    actionTableContextMenuHandler(action: NiaNamedAction, event: MouseEvent) {
+      store.commit.Context.ActionTable.setX(event.pageX)
+      store.commit.Context.ActionTable.setY(event.pageY)
+      store.commit.Context.ActionTable.show()
     }
   }
 </script>
 
 <style scoped>
+  .nia-action-table {
+    min-height: 350px;
+  }
+
   .nia-action-table__actions__action.selected {
     background-color: lightgoldenrodyellow !important;
     color: black !important;

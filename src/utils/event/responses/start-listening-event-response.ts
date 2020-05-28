@@ -46,15 +46,15 @@ export class NiaStartListeningEventResponse implements serializable<NiaStartList
     return this.message
   }
 
-  getFailure(): boolean {
+  isFailure(): boolean {
     return this.failure
   }
 
-  getError(): boolean {
+  isError(): boolean {
     return this.error
   }
 
-  getSuccess(): boolean {
+  isSuccess(): boolean {
     return this.success
   }
 

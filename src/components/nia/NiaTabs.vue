@@ -17,6 +17,7 @@
           :style="niaTabsTabsListItemStyle(isSelected(tab), hover === tab)"
           :key="index"
           @click="selectTab(tab)"
+          @contextmenu.prevent.stop="contextMenuHandler(index, $event)"
           @mouseover="hover = tab"
           @mouseleave="hover = null"
         >
@@ -43,6 +44,12 @@
   import store from '@/store'
   import NiaTab from '@/components/nia/NiaTab.vue'
 
+  export interface NiaTabContextMenuEvent {
+    pageX: number;
+    pageY: number;
+    index: number;
+  }
+
   @Component({
     name: "NiaTabs.ts",
   })
@@ -65,6 +72,16 @@
 
       // @ts-ignore
       this.tabs.forEach((tab: NiaTab) => tab.selected = tab === this.selectedTab)
+    }
+
+    contextMenuHandler(index: number, mouseEvent: MouseEvent) {
+      const event: NiaTabContextMenuEvent = {
+        pageX: mouseEvent.pageX,
+        pageY: mouseEvent.pageY,
+        index: index,
+      }
+
+      this.$emit('contextmenu', event)
     }
 
     isSelected(tab: Vue): boolean {

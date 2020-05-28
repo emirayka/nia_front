@@ -35,13 +35,14 @@ import {NiaActionType} from '@/utils'
     NiaFormEditEvent,
     NiaFormEvent, NiaFormProperty,
     NiaFormPropertyEvent,
-    NiaFormPropertyType,
+    NiaFormPropertyType, NiaFormPropertyValue,
     NiaFormSelectEvent,
     NiaFormSelectProperty,
   } from '@/components/nia/lib'
   import {NiaAction, NiaActionType, NiaNamedAction} from '@/utils'
 
   import loggers from '@/utils/logger'
+
   const logger = loggers('AddActionDialog')
 
   interface ActionDataItem {
@@ -56,10 +57,10 @@ import {NiaActionType} from '@/utils'
   }
 
   // key code definitions
-  const makeKeyCodeDefinition = (name: string, keyCode: number) => ({name, keyCode})
+  const makeKeyCodeDefinition = (name: string, keyCode: number) => ({ name, keyCode })
 
   // button definitions
-  const makeButtonDefinition = (name: string, buttonCode: number) => ({name, buttonCode})
+  const makeButtonDefinition = (name: string, buttonCode: number) => ({ name, buttonCode })
 
   const BUTTON_DEFINITIONS: Array<ButtonDefinition> = [
     makeButtonDefinition('Left', 1),
@@ -98,7 +99,7 @@ import {NiaActionType} from '@/utils'
   const makeActionType = (actionType: NiaActionType, name: string, extraFields: Array<NiaFormProperty>): ActionDataItem => ({
     name,
     actionType,
-    extraFields
+    extraFields,
   })
 
   const ACTION_DATA = [
@@ -111,7 +112,7 @@ import {NiaActionType} from '@/utils'
           name: PROPERTY_KEY_CODE,
           validator: defaultValidator,
         },
-      ]
+      ],
     ),
 
     makeActionType(
@@ -123,7 +124,7 @@ import {NiaActionType} from '@/utils'
           name: PROPERTY_KEY_CODE,
           validator: defaultValidator,
         },
-      ]
+      ],
     ),
     makeActionType(
       NiaActionType.KeyRelease,
@@ -134,7 +135,7 @@ import {NiaActionType} from '@/utils'
           name: PROPERTY_KEY_CODE,
           validator: defaultValidator,
         },
-      ]
+      ],
     ),
     makeActionType(
       NiaActionType.MouseButtonPress,
@@ -144,9 +145,9 @@ import {NiaActionType} from '@/utils'
           type: NiaFormPropertyType.Select,
           name: PROPERTY_BUTTON_CODE,
           validator: defaultValidator,
-          selectValues: BUTTON_NAMES
+          selectValues: BUTTON_NAMES,
         },
-      ]
+      ],
     ),
     makeActionType(
       NiaActionType.MouseButtonClick,
@@ -156,9 +157,9 @@ import {NiaActionType} from '@/utils'
           type: NiaFormPropertyType.Select,
           name: PROPERTY_BUTTON_CODE,
           validator: defaultValidator,
-          selectValues: BUTTON_NAMES
+          selectValues: BUTTON_NAMES,
         },
-      ]
+      ],
     ),
     makeActionType(
       NiaActionType.MouseButtonRelease,
@@ -168,9 +169,9 @@ import {NiaActionType} from '@/utils'
           type: NiaFormPropertyType.Select,
           name: PROPERTY_BUTTON_CODE,
           validator: defaultValidator,
-          selectValues: BUTTON_NAMES
+          selectValues: BUTTON_NAMES,
         },
-      ]
+      ],
     ),
     makeActionType(
       NiaActionType.MouseRelativeMove,
@@ -186,7 +187,7 @@ import {NiaActionType} from '@/utils'
           name: PROPERTY_DY,
           validator: defaultValidator,
         },
-      ]
+      ],
     ),
     makeActionType(
       NiaActionType.MouseAbsoluteMove,
@@ -202,7 +203,7 @@ import {NiaActionType} from '@/utils'
           name: PROPERTY_Y,
           validator: defaultValidator,
         },
-      ]
+      ],
     ),
     makeActionType(
       NiaActionType.ExecuteOSCommand,
@@ -213,7 +214,7 @@ import {NiaActionType} from '@/utils'
           name: PROPERTY_OS_COMMAND,
           validator: defaultValidator,
         },
-      ]
+      ],
     ),
     makeActionType(
       NiaActionType.ExecuteFunction,
@@ -224,7 +225,7 @@ import {NiaActionType} from '@/utils'
           name: PROPERTY_FUNCTION_NAME,
           validator: defaultValidator,
         },
-      ]
+      ],
     ),
     makeActionType(
       NiaActionType.ExecuteCode,
@@ -235,7 +236,7 @@ import {NiaActionType} from '@/utils'
           name: PROPERTY_CODE,
           validator: defaultValidator,
         },
-      ]
+      ],
     ),
     makeActionType(
       NiaActionType.TextType,
@@ -246,7 +247,7 @@ import {NiaActionType} from '@/utils'
           name: PROPERTY_TEXT,
           validator: defaultValidator,
         },
-      ]
+      ],
     ),
     makeActionType(
       NiaActionType.Wait,
@@ -257,7 +258,7 @@ import {NiaActionType} from '@/utils'
           name: PROPERTY_WAIT_MS_AMOUNT,
           validator: defaultValidator,
         },
-      ]
+      ],
     ),
   ]
 
@@ -269,11 +270,12 @@ import {NiaActionType} from '@/utils'
     }
 
     throw new Error('Did not found action item.' +
-      ' If that exception were raised, that means that some action type is not implemented.'
+      ' If that exception were raised, that means that some action type is not implemented.',
     )
   }
 
-  const ACTION_TYPE_NAMES = ACTION_DATA.map((actionType) => actionType.name)
+  const ACTION_TYPES: Array<NiaActionType> = ACTION_DATA.map((actionType) => actionType.actionType)
+  const ACTION_TYPE_NAMES: Array<string> = ACTION_DATA.map((actionType) => actionType.name)
 
   // Component
   @Component({
@@ -291,7 +293,23 @@ import {NiaActionType} from '@/utils'
       return actionDataItem.extraFields
     }
 
-    constructFormProperties() {
+    get currentExtraFieldValues(): Array<NiaFormPropertyValue> {
+      const selectedActionType: NiaActionType = this.selectedActionType
+      const actionDataItem: ActionDataItem = getActionDataItem(selectedActionType)
+
+      switch (selectedActionType) {
+        case NiaActionType.ExecuteCode:
+          return [{value: store.getters.UI.AddActionDialog.selectedCode}]
+
+        case NiaActionType.KeyRelease:
+          return [{value: store.getters.UI.AddActionDialog.selectedCode}]
+
+        default:
+          return []
+      }
+    }
+
+    constructFormProperties(): Array<NiaFormProperty> {
       const properties = [
         {
           type: NiaFormPropertyType.Edit,
@@ -304,7 +322,25 @@ import {NiaActionType} from '@/utils'
           validator: defaultValidator,
           selectValues: ACTION_TYPE_NAMES,
         },
-        ...this.currentExtraFields
+        ...this.currentExtraFields,
+      ]
+
+      return properties
+    }
+
+    constructFormValues(): Array<NiaFormPropertyValue> {
+      const selectedActionTypeIndex: number = ACTION_TYPES.indexOf(
+        store.getters.UI.AddActionDialog.selectedActionType,
+      )
+
+      const properties = [
+        {
+          value: store.getters.UI.AddActionDialog.selectedActionName,
+        },
+        {
+          value: selectedActionTypeIndex
+        },
+        ...this.currentExtraFieldValues,
       ]
 
       return properties
@@ -318,7 +354,7 @@ import {NiaActionType} from '@/utils'
       const namedAction: NiaNamedAction = store.getters.UI.AddActionDialog.constructAction()
 
       store.dispatch.Connection.defineAction({
-        namedAction
+        namedAction,
       })
     }
 

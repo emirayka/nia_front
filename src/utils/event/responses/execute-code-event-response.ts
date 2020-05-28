@@ -55,15 +55,15 @@ export class NiaExecuteCodeEventResponse implements serializable<NiaExecuteCodeE
     return this.message
   }
 
-  getFailure(): boolean {
+  isFailure(): boolean {
     return this.failure
   }
 
-  getError(): boolean {
+  isError(): boolean {
     return this.error
   }
 
-  getSuccess(): boolean {
+  isSuccess(): boolean {
     return this.success
   }
 

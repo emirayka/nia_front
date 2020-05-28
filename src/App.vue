@@ -39,12 +39,12 @@
     mounted() {
       logger.debug('App mounted.')
 
-      if (this.$router.currentRoute.path !== '/Keyboards') {
+      if (this.$router.currentRoute.path !== '/Devices') {
         this.$router.push({
-          path: '/Keyboards',
+          path: '/Devices',
         })
 
-        logger.debug('Switched to route "/Keyboards".')
+        logger.debug('Switched to route "/Devices".')
       }
 
       logger.debug('Attempted to connect to the server.')

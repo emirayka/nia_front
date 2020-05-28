@@ -84,7 +84,13 @@
     }
 
     mounted(): void {
-      this.changeHandler()
+      const initialValue: number | undefined = this.selectProperty.initialValue
+
+      if (initialValue !== undefined) {
+        this.$refs.selectElement.selectedIndex = initialValue + 1
+      } else {
+        this.changeHandler()
+      }
     }
   }
 </script>

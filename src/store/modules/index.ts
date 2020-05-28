@@ -1,3 +1,4 @@
+export {default as Context} from './context'
 export {default as Connection} from './connection'
 export {default as Keymapping} from './keymapping'
 export {default as Theme} from './theme'

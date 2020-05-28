@@ -47,9 +47,9 @@ export class NiaDefineModifierResponse {
 
   static fromPB(defineModifierResponsePB: DefineModifierResponse): NiaDefineModifierResponse {
     let message: string = ''
-    let success: boolean = true
-    let error: boolean = true
-    let failure: boolean = true
+    let success: boolean = false
+    let error: boolean = false
+    let failure: boolean = false
 
     switch (defineModifierResponsePB.getResultCase()) {
       case DefineModifierResponse.ResultCase.SUCCESS_RESULT:

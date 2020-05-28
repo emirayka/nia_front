@@ -1,9 +1,10 @@
 <template>
   <div
-    class="nia-keyboard-key"
+    class="nia-device-key"
     :class="classes"
     :style="style"
-    @click.stop="$emit('click', code)"
+    @click.prevent.stop="clickHandler($event)"
+    @contextmenu.prevent.stop="contextMenuHandler($event)"
     @mouseover="hover = true"
     @mouseleave="hover = false"
   >
@@ -20,31 +21,49 @@
     mapKeyCodeToString,
   } from '@/utils/utils'
 
+  export interface NiaDeviceKeySelectEvent {
+    keyCode: number;
+    isModifier: boolean;
+  }
+
+  export interface NiaDeviceKeyToggleSelectionEvent {
+    keyCode: number;
+    isModifier: boolean;
+  }
+
+  export interface NiaDeviceKeyShowContextMenuEvent {
+    keyCode: number;
+    isModifier: boolean;
+    isSelected: boolean;
+    pageX: number;
+    pageY: number;
+  }
+
   @Component({
-    name: 'NiaKeyboardKey',
+    name: 'NiaDeviceKey',
   })
-  export default class NiaKeyboardKey extends Vue {
+  export default class NiaDeviceKey extends Vue {
     hover = false
 
-    @Prop({required: true})
+    @Prop({ required: true })
     x!: number
 
-    @Prop({required: true})
+    @Prop({ required: true })
     y!: number
 
-    @Prop({required: true})
+    @Prop({ required: true })
     height!: number
 
-    @Prop({required: true})
+    @Prop({ required: true })
     width!: number
 
-    @Prop({required: true})
+    @Prop({ required: true })
     code!: number
 
-    @Prop({default: false})
+    @Prop({ default: false })
     selected!: boolean
 
-    @Prop({default: false})
+    @Prop({ default: false })
     modifier!: boolean
 
     get style(): object {
@@ -88,6 +107,37 @@
           return `${Math.max(0.25, 0.9 - length * 0.05)}em`
       }
     }
+
+    clickHandler(mouseEvent: MouseEvent): void {
+      if (mouseEvent.shiftKey) {
+        const event: NiaDeviceKeyToggleSelectionEvent = {
+          isModifier: this.modifier,
+          keyCode: this.code,
+        }
+
+        this.$emit('toggle-key-selection', event)
+        return
+      }
+
+      const event: NiaDeviceKeySelectEvent = {
+        isModifier: this.modifier,
+        keyCode: this.code,
+      }
+
+      this.$emit('select-key', event)
+    }
+
+    contextMenuHandler(mouseEvent: MouseEvent): void {
+      const event: NiaDeviceKeyShowContextMenuEvent = {
+        keyCode: this.code,
+        isModifier: this.modifier,
+        isSelected: this.selected,
+        pageX: mouseEvent.pageX,
+        pageY: mouseEvent.pageY,
+      }
+
+      this.$emit('show-key-context-menu', event)
+    }
   }
 </script>
 
@@ -96,7 +146,7 @@
   lang="scss"
 >
 
-  .nia-keyboard-key {
+  .nia-device-key {
     box-sizing: content-box;
 
     -moz-user-select: none;
@@ -129,11 +179,11 @@
     transition: 0.25s background;
   }
 
-  .nia-keyboard__nia-keyboard-key.modifier {
+  .nia-device__nia-device-key.modifier {
     background: mediumpurple;
   }
 
-  .nia-keyboard-key.hover {
+  .nia-device-key.hover {
     background: #FFDD03;
     /*background: -moz-linear-gradient(top, gold, orange);*/
     /*background: -webkit-gradient(linear, orange, gold);*/
@@ -148,7 +198,7 @@
     text-shadow: -1px -1px 0 gold;
   }
 
-  .nia-keyboard__nia-keyboard-key.selected:before {
+  .nia-device__nia-device-key.selected:before {
     content: " ";
     position: absolute;
     z-index: 1;
@@ -160,5 +210,4 @@
     border-radius: 10%;
     background-color: #33FFDD03;
   }
-
 </style>

@@ -94,26 +94,6 @@
       return store.getters.Keymapping.DevicesInfo.devices
     }
 
-    get selectedDevice(): NiaDeviceInfo | null {
-      return store.getters.UI.General.selectedDevice
-    }
-
-    deviceRowClasses(device: NiaDeviceInfo): object {
-      if (this.selectedDevice?.getDeviceId() === device.getDeviceId()) {
-        return {
-          selected: true,
-        }
-      }
-
-      if (this.hoverDevice?.getDeviceId() === device.getDeviceId()) {
-        return {
-          hover: true,
-        }
-      }
-
-      return {}
-    }
-
     hoverHandler(device: NiaDeviceInfo, hover: boolean): void {
       if (hover) {
         this.hoverDevice = device

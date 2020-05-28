@@ -1,5 +1,8 @@
 import WebSocket from 'ws'
 
+import loggers from '@/utils/logger'
+const logger = loggers('protocol')
+
 import {InvalidResponseError} from '@/utils/error'
 
 import {
@@ -51,10 +54,9 @@ import {NiaStopListeningRequest} from '@/utils/protocol/requests/stop-listening-
 import {NiaStopListeningResponse} from '@/utils/protocol/responses/stop-listening-response'
 import {NiaNamedAction} from '@/utils/domain/action/named-action'
 
-import loggers from '@/utils/logger'
 import {NiaIsListeningResponse} from '@/utils/protocol/responses/is-listening-response'
 import {NiaIsListeningRequest} from '@/utils/protocol/requests/is-listening-request'
-const logger = loggers('protocol')
+
 
 export class NiaProtocol {
   private port: number
@@ -152,7 +154,7 @@ export class NiaProtocol {
     })
   }
 
-  defineDevice(keyboardId: number): Promise<NiaDefineDeviceResponse> {
+  defineDevice(deviceId: number): Promise<NiaDefineDeviceResponse> {
     return new Promise((resolve, reject) => {
       this.ws.once('message', message => {
         if (message instanceof Uint8Array) {
@@ -168,14 +170,14 @@ export class NiaProtocol {
         }
       })
 
-      const request: NiaRequest = new NiaDefineDeviceRequest(keyboardId).toRequest()
+      const request: NiaRequest = new NiaDefineDeviceRequest(deviceId).toRequest()
       const data: Uint8Array = request.toUint8Array()
 
       this.ws.send(data)
     })
   }
 
-  removeDeviceByPath(keyboardPath: string): Promise<NiaRemoveDeviceByPathResponse> {
+  removeDeviceByPath(devicePath: string): Promise<NiaRemoveDeviceByPathResponse> {
     return new Promise((resolve, reject) => {
       this.ws.once('message', message => {
         if (message instanceof Uint8Array) {
@@ -191,14 +193,14 @@ export class NiaProtocol {
         }
       })
 
-      const request: NiaRequest = new NiaRemoveDeviceByPathRequest(keyboardPath).toRequest()
+      const request: NiaRequest = new NiaRemoveDeviceByPathRequest(devicePath).toRequest()
       const data: Uint8Array = request.toUint8Array()
 
       this.ws.send(data)
     })
   }
 
-  removeDeviceByName(keyboardName: string): Promise<NiaRemoveDeviceByNameResponse> {
+  removeDeviceByName(deviceName: string): Promise<NiaRemoveDeviceByNameResponse> {
     return new Promise((resolve, reject) => {
       this.ws.once('message', message => {
         if (message instanceof Uint8Array) {
@@ -214,7 +216,7 @@ export class NiaProtocol {
         }
       })
 
-      const request: NiaRequest = new NiaRemoveDeviceByNameRequest(keyboardName).toRequest()
+      const request: NiaRequest = new NiaRemoveDeviceByNameRequest(deviceName).toRequest()
       const data: Uint8Array = request.toUint8Array()
 
       this.ws.send(data)
@@ -379,7 +381,9 @@ export class NiaProtocol {
     return new Promise((resolve, reject) => {
       this.ws.once('message', message => {
         if (message instanceof Uint8Array) {
+          logger.debug('Got GetDefinedMappings response. Deserializing...')
           const response: NiaResponse = NiaResponse.fromUint8Array(message)
+          logger.debug('Success.')
 
           if (response.getResponseType() == NiaResponseType.GetDefinedMappings) {
             resolve(response.getResponse() as NiaGetDefinedMappingsResponse)
@@ -391,9 +395,15 @@ export class NiaProtocol {
         }
       })
 
+      logger.debug('Construction GetDefinedMappings request...')
       const request: NiaRequest = new NiaGetDefinedMappingsRequest().toRequest()
-      const data: Uint8Array = request.toUint8Array()
+      logger.debug('Success.')
 
+      logger.debug('Constructing binary message...')
+      const data: Uint8Array = request.toUint8Array()
+      logger.debug('Success.')
+
+      logger.debug('Sent GetDefinedMappings request')
       this.ws.send(data)
     })
   }

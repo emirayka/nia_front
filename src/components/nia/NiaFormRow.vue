@@ -1,5 +1,3 @@
-import {NiaFormEventType} from '@/components/nia/lib.js'
-import {NiaFormPropertyType} from '@/components/nia/lib.js'
 <template>
   <div class="nia-form-row">
     <NiaFormRowEdit

@@ -7,6 +7,14 @@ export enum NiaActionType {
   MouseButtonClick,
   MouseButtonRelease,
 
+  TextKeyClick,
+  NumberKeyClick,
+  FunctionKeyClick,
+  ControlKeyClick,
+  KPKeyClick,
+  MultimediaKeyClick,
+  MouseButtonKeyClick,
+
   MouseRelativeMove,
   MouseAbsoluteMove,
 

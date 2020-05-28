@@ -258,21 +258,22 @@
     }
 
     get noMappingIsSelected(): boolean {
-      return store.getters.UI.General.selectedMapping === null
+      return store.getters.UI.MappingTable.noMappingIsSelected
     }
 
     updatedHandler(): void {
-      const mapping: NiaMapping | null = store.getters.UI.General.selectedMapping
+      const mapping: NiaMapping | null = store.getters.UI.MappingTable.selectedMapping
 
       if (mapping === null) {
         return
       }
 
       const action: NiaAction = store.getters.UI.SelectedMappingInfoView.getCurrentAction
+      console.log(action)
 
       store.dispatch.Connection.changeMapping({
         keyChords: mapping.getKeyChords(),
-        action
+        action,
       })
     }
   }

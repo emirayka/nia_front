@@ -47,9 +47,9 @@ export class NiaDefineMappingResponse {
 
   static fromPB(defineMappingResponsePB: DefineMappingResponse): NiaDefineMappingResponse {
     let message: string = ''
-    let success: boolean = true
-    let error: boolean = true
-    let failure: boolean = true
+    let success: boolean = false
+    let error: boolean = false
+    let failure: boolean = false
 
     switch (defineMappingResponsePB.getResultCase()) {
       case DefineMappingResponse.ResultCase.SUCCESS_RESULT:
@@ -59,6 +59,7 @@ export class NiaDefineMappingResponse {
 
       case DefineMappingResponse.ResultCase.ERROR_RESULT:
         message = defineMappingResponsePB.getErrorResult()?.getMessage() ?? ''
+        console.log(message)
         error = true
         break;
 

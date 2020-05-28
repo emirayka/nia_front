@@ -3,7 +3,16 @@ import {moduleActionContext, moduleGetterContext} from '@/store'
 
 import {
   GROUP_ALL_KEYS,
-  GROUP_ALL_MOUSE_BUTTONS, mapMouseButtonCodeToIndex, mapKeyCodeToIndex, mapKeyCodeToString,
+  GROUP_ALL_MOUSE_BUTTONS,
+  GROUP_CONTROL_KEYS,
+  GROUP_FUNCTION_KEYS,
+  GROUP_KP_KEYS, GROUP_MOUSE_BUTTON_KEYS,
+  GROUP_MULTIMEDIA_KEYS,
+  GROUP_NUMBER_KEYS,
+  GROUP_TEXT_KEYS,
+  mapKeyCodeToIndex,
+  mapKeyCodeToString,
+  mapMouseButtonCodeToIndex,
   mapStringToKeyCode,
   NiaAction,
   NiaActionExecuteCode,
@@ -20,6 +29,13 @@ import {
 } from '@/utils'
 
 import * as Groups from '@/utils/utils/key-groups'
+import {NiaActionKPKeyClick} from '@/utils/domain/action/basic-actions/action-kp-key-click'
+import {NiaActionMouseButtonKeyClick} from '@/utils/domain/action/basic-actions/action-mouse-button-key-click'
+import {NiaActionControlKeyClick} from '@/utils/domain/action/basic-actions/action-control-key-click'
+import {NiaActionMultimediaKeyClick} from '@/utils/domain/action/basic-actions/action-multimedia-key-click'
+import {NiaActionFunctionKeyClick} from '@/utils/domain/action/basic-actions/action-function-key-click'
+import {NiaActionNumberKeyClick} from '@/utils/domain/action/basic-actions/action-number-key-click'
+import {NiaActionTextKeyClick} from '@/utils/domain/action/basic-actions/action-text-key-click'
 
 export enum SelectedActionCategory {
   KeysText,
@@ -191,37 +207,37 @@ const SelectedMappingInfoViewModule = defineModule({
 
       switch (state.selectedCategory) {
         case SelectedActionCategory.KeysKP:
-          return new NiaActionKeyClick({
+          return new NiaActionKPKeyClick({
             keyCode: mapStringToKeyCode(getters.itemsKeysKP[getters.keysKPIndex]),
           }).toAction()
 
         case SelectedActionCategory.KeysMouseButton:
-          return new NiaActionKeyClick({
+          return new NiaActionMouseButtonKeyClick({
             keyCode: mapStringToKeyCode(getters.itemsKeysMouseButton[getters.keysMouseButtonIndex]),
           }).toAction()
 
         case SelectedActionCategory.KeysControl:
-          return new NiaActionKeyClick({
+          return new NiaActionControlKeyClick({
             keyCode: mapStringToKeyCode(getters.itemsKeysControl[getters.keysControlIndex]),
           }).toAction()
 
         case SelectedActionCategory.KeysMultimedia:
-          return new NiaActionKeyClick({
+          return new NiaActionMultimediaKeyClick({
             keyCode: mapStringToKeyCode(getters.itemsKeysMultimedia[getters.keysMultimediaIndex]),
           }).toAction()
 
         case SelectedActionCategory.KeysFunction:
-          return new NiaActionKeyClick({
+          return new NiaActionFunctionKeyClick({
             keyCode: mapStringToKeyCode(getters.itemsKeysFunction[getters.keysFunctionIndex]),
           }).toAction()
 
         case SelectedActionCategory.KeysNumber:
-          return new NiaActionKeyClick({
+          return new NiaActionNumberKeyClick({
             keyCode: mapStringToKeyCode(getters.itemsKeysNumber[getters.keysNumberIndex]),
           }).toAction()
 
         case SelectedActionCategory.KeysText:
-          return new NiaActionKeyClick({
+          return new NiaActionTextKeyClick({
             keyCode: mapStringToKeyCode(getters.itemsKeysText[getters.keysTextIndex]),
           }).toAction()
 
@@ -337,6 +353,55 @@ const SelectedMappingInfoViewModule = defineModule({
     // set current action
     setCurrentAction: (state: SelectedMappingInfoViewState, action: NiaAction) => {
       switch (action.getActionType()) {
+        case NiaActionType.TextKeyClick:
+          const textKeyClickAction: NiaActionTextKeyClick = (action.getAction() as NiaActionTextKeyClick)
+
+          state.selectedCategory = SelectedActionCategory.KeysText
+          state.keysTextIndex = GROUP_TEXT_KEYS.indexOf(mapKeyCodeToString(textKeyClickAction.getKeyCode()))
+          break
+
+        case NiaActionType.NumberKeyClick:
+          const numberKeyClickAction: NiaActionNumberKeyClick = (action.getAction() as NiaActionNumberKeyClick)
+
+          state.selectedCategory = SelectedActionCategory.KeysNumber
+          state.keysNumberIndex = GROUP_NUMBER_KEYS.indexOf(mapKeyCodeToString(numberKeyClickAction.getKeyCode()))
+          break
+
+        case NiaActionType.FunctionKeyClick:
+          const functionKeyClickAction: NiaActionFunctionKeyClick = (action.getAction() as NiaActionFunctionKeyClick)
+
+          state.selectedCategory = SelectedActionCategory.KeysFunction
+          state.keysFunctionIndex = GROUP_FUNCTION_KEYS.indexOf(mapKeyCodeToString(functionKeyClickAction.getKeyCode()))
+          break
+
+        case NiaActionType.ControlKeyClick:
+          const controlKeyClickAction: NiaActionControlKeyClick = (action.getAction() as NiaActionControlKeyClick)
+
+          state.selectedCategory = SelectedActionCategory.KeysControl
+          state.keysControlIndex = GROUP_CONTROL_KEYS.indexOf(mapKeyCodeToString(controlKeyClickAction.getKeyCode()))
+          break
+
+        case NiaActionType.KPKeyClick:
+          const kpKeyClickAction: NiaActionKPKeyClick = (action.getAction() as NiaActionKPKeyClick)
+
+          state.selectedCategory = SelectedActionCategory.KeysKP
+          state.keysKPIndex = GROUP_KP_KEYS.indexOf(mapKeyCodeToString(kpKeyClickAction.getKeyCode()))
+          break
+
+        case NiaActionType.MultimediaKeyClick:
+          const multimediaKeyClickAction: NiaActionMultimediaKeyClick = (action.getAction() as NiaActionMultimediaKeyClick)
+
+          state.selectedCategory = SelectedActionCategory.KeysMultimedia
+          state.keysMultimediaIndex = GROUP_MULTIMEDIA_KEYS.indexOf(mapKeyCodeToString(multimediaKeyClickAction.getKeyCode()))
+          break
+
+        case NiaActionType.MouseButtonKeyClick:
+          const mouseButtonKeyClickAction: NiaActionMouseButtonKeyClick = (action.getAction() as NiaActionMouseButtonKeyClick)
+
+          state.selectedCategory = SelectedActionCategory.KeysMouseButton
+          state.keysMouseButtonIndex = GROUP_MOUSE_BUTTON_KEYS.indexOf(mapKeyCodeToString(mouseButtonKeyClickAction.getKeyCode()))
+          break
+
         case NiaActionType.ExecuteCode:
           const executeCodeAction: NiaActionExecuteCode = (action.getAction() as NiaActionExecuteCode)
 

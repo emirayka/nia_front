@@ -214,14 +214,14 @@ export class NiaEvent implements SerializableObject<NiaEvent, NiaEventSerialized
         return new NiaEvent(executeCodeEvent)
 
       case NiaEventType.DefineDevice:
-        const defineKeyboardEventSerialized = serialized.event as NiaDefineDeviceEventSerialized
-        const defineKeyboardEvent = NiaDefineDeviceEvent.deserialize(defineKeyboardEventSerialized)
-        return new NiaEvent(defineKeyboardEvent)
+        const defineDeviceEventSerialized = serialized.event as NiaDefineDeviceEventSerialized
+        const defineDeviceEvent = NiaDefineDeviceEvent.deserialize(defineDeviceEventSerialized)
+        return new NiaEvent(defineDeviceEvent)
 
       case NiaEventType.RemoveDevice:
-        const removeKeyboardEventSerialized = serialized.event as NiaRemoveDeviceEventSerialized
-        const removeKeyboardEvent = NiaRemoveDeviceEvent.deserialize(removeKeyboardEventSerialized)
-        return new NiaEvent(removeKeyboardEvent)
+        const removeDeviceEventSerialized = serialized.event as NiaRemoveDeviceEventSerialized
+        const removeDeviceEvent = NiaRemoveDeviceEvent.deserialize(removeDeviceEventSerialized)
+        return new NiaEvent(removeDeviceEvent)
 
       case NiaEventType.DefineModifier:
         const defineModifierEventSerialized = serialized.event as NiaDefineModifierEventSerialized

@@ -1,5 +1,8 @@
 <template>
-  <div class="nia-modifier-table">
+  <div
+    class="nia-modifier-table"
+    @contextmenu.prevent.stop="modifierTableContextMenuHandler($event)"
+  >
     <div class="nia-modifier-table__controls">
       <NiaButton @click.stop="addModifierHandler()">+</NiaButton>
       <NiaButton @click.stop="removeSelectedModifiersHandler()">-</NiaButton>
@@ -15,7 +18,8 @@
         class="nia-modifier-table__modifiers__modifier"
         :class="modifierRowClasses(modifier)"
         :key="index"
-        @click.stop="toggleModifierSelectionHandler(modifier)"
+        @click="toggleModifierSelectionHandler(modifier)"
+        @contextmenu="modifierRowContextMenuHandler(modifier, $event)"
         @hover="hoverHandler(modifier, $event)"
       >
         <NiaTableRowItem>
@@ -56,6 +60,7 @@
   import {NiaTableColumnDefinition} from '@/components/nia/lib'
 
   import loggers from '@/utils/logger'
+
   const logger = loggers('NiaModifierTable')
 
   @Component({
@@ -82,7 +87,7 @@
     }
 
     get selectedModifiers(): Array<NiaModifierDescription> {
-      return store.getters.UI.General.selectedModifiers
+      return store.getters.UI.ModifierTable.selectedModifiers
     }
 
     get definedModifiers(): Array<NiaModifierDescription> {
@@ -130,10 +135,20 @@
     }
 
     toggleModifierSelectionHandler(modifier: NiaModifierDescription): void {
-      logger.debug('Sending toggle modifier mutation:')
-      logger.debug(modifier)
+      store.commit.UI.ModifierTable.toggleModifierSelection(modifier)
+    }
 
-      store.commit.UI.General.toggleModifierSelection(modifier)
+    modifierRowContextMenuHandler(modifier: NiaModifierDescription, event: MouseEvent): void {
+      store.commit.Context.Modifier.setModifier(modifier)
+      store.commit.Context.Modifier.setX(event.pageX)
+      store.commit.Context.Modifier.setY(event.pageY)
+      store.commit.Context.Modifier.show()
+    }
+
+    modifierTableContextMenuHandler(event: MouseEvent) {
+      store.commit.Context.ModifierTable.setX(event.pageX)
+      store.commit.Context.ModifierTable.setY(event.pageY)
+      store.commit.Context.ModifierTable.show()
     }
 
     addModifierHandler(): void {
@@ -150,12 +165,16 @@
         })
       }
 
-      store.commit.UI.General.unselectModifiers()
+      store.commit.UI.ModifierTable.unselectModifiers()
     }
   }
 </script>
 
 <style scoped>
+  .nia-modifier-table {
+    min-height: 350px;
+  }
+
   .nia-table-row.nia-modifier-table__modifiers__modifier.selected {
     background-color: lightgoldenrodyellow !important;
     color: black !important;
