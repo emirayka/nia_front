@@ -9,15 +9,14 @@ import {
   BrowserWindow,
   ipcMain,
 } from 'electron'
-import IpcMainEvent = Electron.IpcMainEvent
 
 import {
   createProtocol,
   installVueDevtools,
 } from 'vue-cli-plugin-electron-builder/lib'
 
-import {NiaEventSerialized} from '@/utils'
-import {NiaHandler, startHandler} from '@/utils/handle'
+import {NiaServerEventHandler} from '@/utils/server-event-handle'
+import {NiaFileEventHandler} from '@/utils/file-event-handle'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -46,8 +45,24 @@ async function createWindow() {
     win = null
   })
 
-  const handler: NiaHandler = await startHandler(win)
-  ipcMain.on('nia-server-event', handler)
+  let serverEventHandler: NiaServerEventHandler | null = null
+  let fileEventHandler: NiaFileEventHandler | null = null
+
+  ipcMain.on('nia-client-ready', async () => {
+    if (win === null) {
+      throw new Error('Somehow, window were not initialized')
+    }
+
+    if (serverEventHandler === null) {
+      serverEventHandler = new NiaServerEventHandler(win)
+    } else {
+      serverEventHandler.restart()
+    }
+
+    if (fileEventHandler === null) {
+      fileEventHandler = new NiaFileEventHandler(win)
+    }
+  })
 }
 
 (() => {

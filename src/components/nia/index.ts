@@ -22,6 +22,7 @@ import NiaNavbar from './NiaNavbar.vue'
 import NiaNavbarBrand from './NiaNavbarBrand.vue'
 import NiaNavbarNav from './NiaNavbarNav.vue'
 import NiaNavbarItem from './NiaNavbarItem.vue'
+import NiaScrollBar from './NiaScrollBar.vue'
 import NiaSelect from './NiaSelect.vue'
 import NiaSelectable from './NiaSelectable.vue'
 import NiaSwitchButton from './NiaSwitchButton.vue'
@@ -33,6 +34,7 @@ import NiaTableRowItem from './NiaTableRowItem.vue'
 import NiaTabs from './NiaTabs.vue'
 import NiaToolbar from './NiaToolbar.vue'
 import NiaToolbarItem from './NiaToolbarItem.vue'
+import NiaTreeView from './NiaTreeView.vue'
 
 import Vue from 'vue'
 
@@ -60,6 +62,7 @@ Vue.component('NiaHeader1', NiaHeader1)
 Vue.component('NiaHeader2', NiaHeader2)
 Vue.component('NiaHeader3', NiaHeader3)
 Vue.component('NiaHeader4', NiaHeader4)
+Vue.component('NiaScrollBar', NiaScrollBar)
 Vue.component('NiaSelect', NiaSelect)
 Vue.component('NiaSelectable', NiaSelectable)
 Vue.component('NiaSwitchButton', NiaSwitchButton)
@@ -70,4 +73,5 @@ Vue.component('NiaTableRowItem', NiaTableRowItem)
 Vue.component('NiaTabs', NiaTabs)
 Vue.component('NiaToolbar', NiaToolbar)
 Vue.component('NiaToolbarItem', NiaToolbarItem)
+Vue.component('NiaTreeView', NiaTreeView)
 

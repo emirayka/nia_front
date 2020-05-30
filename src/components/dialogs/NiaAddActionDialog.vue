@@ -1,4 +1,3 @@
-import {NiaActionType} from '@/utils'
 <template>
   <NiaDialog>
     <template v-slot:header>

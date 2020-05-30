@@ -6,6 +6,8 @@
     >
       <NiaTabs
         class="nia-devices__nia-tabs"
+        :selected-tab-index="selectedDeviceTabIndex"
+        @tab-selected="selectedDeviceTabIndex = $event"
         @contextmenu="tabContextMenuHandler($event)"
       >
         <NiaTab
@@ -69,6 +71,8 @@
     },
   })
   export default class NiaDevices extends Vue {
+    selectedDeviceTabIndex = 0
+
     $refs!: {
       tabs: HTMLDivElement;
     }

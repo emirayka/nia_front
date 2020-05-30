@@ -43,17 +43,19 @@
   }
 
   .nia-console-item.success {
-    background-color: lightgreen;
-    color: black;
+    background-color: #333333;
+    color: green;
+    font-weight: bold;
   }
 
   .nia-console-item.error {
-    background-color: lightcoral;
+    background-color: #333333;
     color: black;
+    font-weight: bold;
   }
 
   .nia-console-item.failure {
-    background-color: darkred;
+    background-color: #333333;
     font-weight: bold;
   }
 </style>

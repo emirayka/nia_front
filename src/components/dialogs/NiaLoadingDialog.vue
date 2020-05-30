@@ -1,18 +1,23 @@
 <template>
   <NiaDialog>
     <template v-slot:header>
-      Loading...
+      Waiting...
     </template>
 
     <template v-slot:body>
-      <NiaLoader></NiaLoader>
+      <NiaLoader />
     </template>
   </NiaDialog>
 </template>
 
-<script>
-  export default {
-    name: "NiaLoadingDialog",
+<script lang="ts">
+  import Vue from 'vue'
+  import Component from 'vue-class-component'
+
+  @Component({
+    name: 'NiaLoadingDialog',
+  })
+  export default class NiaLoadingDialog extends Vue {
   }
 </script>
 

@@ -1,4 +1,3 @@
-import Vue from 'vue'
 import {defineModule} from 'direct-vuex'
 
 const {
@@ -71,7 +70,7 @@ const ConnectionModule = defineModule({
   } as ConnectionModuleState,
   getters: {
     isConnected: (state: ConnectionModuleState): boolean => {
-      return state.ipcListener !== null
+      return state.connected
     },
     ipcListener: (state: ConnectionModuleState): IPCListener | null => {
       return state.ipcListener
@@ -93,7 +92,7 @@ const ConnectionModule = defineModule({
     connectIPCListener(context): void {
       const { commit, dispatch, getters } = ConnectionModuleActionContext(context)
 
-      if (getters.isConnected) {
+      if (getters.ipcListener !== null) {
         return
       }
 
@@ -107,10 +106,7 @@ const ConnectionModule = defineModule({
       commit.setIPCListener(listener)
       ipcRenderer.on('nia-server-event-response', listener)
 
-      // const synchronizeEvent: NiaSynchronizeEvent = new NiaSynchronizeEvent({})
-      // const event: NiaEvent = synchronizeEvent.toEvent()
-      //
-      // ipcRenderer.send('nia-server-event', event.serialize())
+      ipcRenderer.send('nia-client-ready', true)
     },
 
     disconnectIPCListener(context): void {

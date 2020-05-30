@@ -200,7 +200,7 @@
     left: -3px;
     right: -3px;
     bottom: -3px;
-    border: 2px dotted lightskyblue;
+    border: 2px dotted deepskyblue;
     border-radius: 10%;
     background-color: #33FFDD03;
   }

@@ -59,3 +59,11 @@ export interface NiaContextMenuItemData {
   name: string;
   text: string;
 }
+
+// tree view
+export interface NiaTreeViewObject {
+  name: string;
+  fullPath: string;
+  isDirectory: boolean;
+  children: Array<NiaTreeViewObject>;
+}

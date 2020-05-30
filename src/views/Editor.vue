@@ -9,23 +9,49 @@
       </NiaToolbarItem>
     </NiaToolbar>
 
-    <div class="nia-editor__content">
-      <div class="nia-editor__content__nia-code-editor-wrapper">
-        <NiaCodeEditor
-          class="nia-editor__nia-code-editor"
-          :code="code"
-          @change="changeHandler($event)"
-          @execute="executeHandler"
-        />
-      </div>
+    <NiaGridLayout
+      class="nia-editor__grid_layout"
+      :column-number="100"
+      :row-number="100"
+      :margin="[10, 10]"
+    >
+      <NiaGridItem
+        :x="1"
+        :y="1"
+        :w="20"
+        :h="100"
+      >
+        <NiaEditorFileTree />
+      </NiaGridItem>
 
-      <div class="nia-editor__content__nia-console-wrapper">
-        <NiaConsole
-          class="nia-editor__nia-console"
-          :log="log"
-        />
-      </div>
-    </div>
+      <NiaGridItem
+        :x="21"
+        :y="1"
+        :w="80"
+        :h="70"
+      >
+        <NiaOpenedFiles />
+      </NiaGridItem>
+
+      <NiaGridItem
+        :x="21"
+        :y="71"
+        :w="80"
+        :h="30"
+      >
+        <div>
+          <NiaConsole
+            class="nia-editor__nia-console"
+            :log="log"
+          />
+        </div>
+      </NiaGridItem>
+    </NiaGridLayout>
+
+    <NiaEditorFileTreeContextMenu />
+    <NiaOpenedFileContextMenu />
+    <NiaNewFileDialog v-if="newFileDialogIsShown"/>
+    <NiaNewDirectoryDialog v-if="newDirectoryDialogIsShown"/>
   </div>
 </template>
 
@@ -38,8 +64,24 @@
     ExecutionResult
   } from '@/store/models'
 
+  import NiaEditorFileTree from './editor/NiaEditorFileTree.vue'
+  import NiaOpenedFiles from './editor/NiaOpenedFiles.vue'
+  import NiaNewFileDialog from '@/components/dialogs/NiaNewFileDialog.vue'
+  import NiaNewDirectoryDialog from '@/components/dialogs/NiaNewDirectoryDialog.vue'
+
+  import NiaEditorFileTreeContextMenu from '@/components/contexts/NiaEditorFileTreeContextMenu.vue'
+  import NiaOpenedFileContextMenu from '@/components/contexts/NiaOpenedFileContextMenu.vue'
+
   @Component({
     name: "Editor",
+    components: {
+      NiaEditorFileTree,
+      NiaOpenedFiles,
+      NiaEditorFileTreeContextMenu,
+      NiaOpenedFileContextMenu,
+      NiaNewFileDialog,
+      NiaNewDirectoryDialog,
+    },
   })
   export default class Editor extends Vue{
     get log(): Array<ExecutionResult> {
@@ -50,6 +92,14 @@
       return store.getters.Editor.code
     }
 
+    get newFileDialogIsShown(): boolean {
+      return store.getters.UI.NewFileDialog.isShown
+    }
+
+    get newDirectoryDialogIsShown(): boolean {
+      return store.getters.UI.NewDirectoryDialog.isShown
+    }
+
     changeHandler(code: string): void {
       store.commit.Editor.setCode(code)
     }
@@ -58,6 +108,10 @@
       store.dispatch.Connection.executeCode({
         code
       })
+    }
+
+    mounted() {
+      store.dispatch.FileConnection.listConfigDirectory()
     }
   }
 </script>
@@ -77,10 +131,21 @@
     flex-wrap: wrap;
   }
 
-  .nia-editor__content__nia-code-editor-wrapper {
+  .nia-editor__grid_layout {
+    box-sizing: border-box;
+    height: 985px;
   }
 
-  .nia-editor__content__nia-console-wrapper {
+  .nia-editor__grid_layout__nia-code-editor {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
   }
 
+  .nia-editor__nia-console {
+    width: 100%;
+    height: 255px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+  }
 </style>

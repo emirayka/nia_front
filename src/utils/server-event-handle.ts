@@ -384,14 +384,24 @@ const handleEvent = async (
 
 export type NiaHandler = (_: IpcMainEvent, serializedEvent: NiaEventSerialized) => void
 
-export const startHandler = async (
-  win: BrowserWindow,
-): Promise<NiaHandler> => {
-  try {
+export class NiaServerEventHandler {
+  private readonly connectionHolder: ConnectionHolder
+  private readonly protocol: NiaProtocol
+  private readonly win: BrowserWindow
+  private readonly handler: NiaHandler
+
+  constructor(
+    win: BrowserWindow,
+  ) {
+    this.win = win
+
     logger.debug('Making connection holder...')
-    const connectionHolder: ConnectionHolder = new ConnectionHolder({
+    this.connectionHolder = new ConnectionHolder({
       port: 12112,
-      connectedHandler: (message) => {
+      timeout: 100,
+      connectedHandler: () => {
+        logger.debug('Executing connected handler')
+
         const connectedEventResponse: NiaConnectedEventResponse = new NiaConnectedEventResponse({})
         const eventResponse: NiaEventResponse = connectedEventResponse.toEventResponse()
         const eventResponseSerialized: NiaEventResponseSerialized = eventResponse.serialize()
@@ -399,6 +409,8 @@ export const startHandler = async (
         win.webContents.send('nia-server-event-response', eventResponseSerialized)
       },
       disconnectedHandler: () => {
+        logger.debug('Executing disconnected handler')
+
         const disconnectedEventResponse: NiaDisconnectedEventResponse = new NiaDisconnectedEventResponse({})
         const eventResponse: NiaEventResponse = disconnectedEventResponse.toEventResponse()
         const eventResponseSerialized: NiaEventResponseSerialized = eventResponse.serialize()
@@ -406,27 +418,18 @@ export const startHandler = async (
         win.webContents.send('nia-server-event-response', eventResponseSerialized)
       },
     })
-    logger.debug('Done.')
 
     logger.debug('Making message handler...')
-    const niaProtocol: NiaProtocol = new NiaProtocol(connectionHolder)
+    this.protocol = new NiaProtocol(this.connectionHolder)
     logger.debug('Done.')
 
-    // const eventResponse: NiaEventResponse = await handleSynchronizeEvent(
-    //   niaProtocol,
-    // )
-    // const eventResponseSerialized = eventResponse.serialize()
-    // win.webContents.send('nia-server-event-response', eventResponseSerialized)
-    //
-    // logger.debug('Synchronized ')
-
-    return async (_: IpcMainEvent, serializedEvent: NiaEventSerialized) => {
+    this.handler = async (_: IpcMainEvent, serializedEvent: NiaEventSerialized) => {
       try {
         const event: NiaEvent = NiaEvent.deserialize(serializedEvent)
         logger.debug(`Got an event:`)
         logger.debug(event)
 
-        const eventResponse = await handleEvent(niaProtocol, event)
+        const eventResponse = await handleEvent(this.protocol, event)
         logger.debug(`Made event response:`)
         logger.debug(eventResponse)
 
@@ -438,8 +441,11 @@ export const startHandler = async (
         logger.error(`Error during handling event: ${e}.`)
       }
     }
-  } catch (e) {
-    logger.error(`Error during handling the first synchronize event: ${e}.`)
-    // throw e
+
+    ipcMain.on('nia-server-event', this.handler)
+  }
+
+  restart(): void {
+    this.connectionHolder.close()
   }
 }

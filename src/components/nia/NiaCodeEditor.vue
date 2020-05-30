@@ -3,7 +3,7 @@
     class="nia-code-editor"
   >
     <div
-      class="nia-code-editor__codemirror"
+      class="nia-code-editor__scrollbar__codemirror"
       ref="editorElement"
     >
     </div>
@@ -22,6 +22,8 @@
   import 'codemirror/theme/darcula.css'
   import Component from 'vue-class-component'
   import {Prop, Watch} from 'vue-property-decorator'
+
+  import _ from 'underscore'
 
   @Component({
     name: 'NiaCodeEditor',
@@ -53,7 +55,7 @@
       )
 
       this.editor.setOption("extraKeys", {
-        "Ctrl-Enter": (instance: CodeMirror.Editor) => {
+        "Ctrl-Enter": _.throttle((instance: CodeMirror.Editor) => {
           let selectedCode = instance.getSelection()
 
           if (selectedCode === '') {
@@ -61,7 +63,7 @@
           }
 
           this.$emit('execute', selectedCode)
-        },
+        }, 1000),
         "Tab": function (instance: CodeMirror.Editor) {
           const indentUnit: number = instance.getOption("indentUnit") || 2
           const spaces: string = Array(indentUnit + 1).join(" ");
@@ -71,6 +73,7 @@
       });
 
       this.editor?.setOption('readOnly', !this.enabled)
+      this.editor?.setSize('100%', '100%')
 
       this.changeHandler = (instance) => {
         const newCode = instance.getValue()
@@ -100,7 +103,11 @@
   scoped
   lang="scss"
 >
-  .nia-code-editor__codemirror {
+  .nia-code-editor {
+    height: 100%;
+  }
+
+  .nia-code-editor__scrollbar__codemirror {
     height: 100%;
   }
 </style>

@@ -7,6 +7,8 @@
         @nav="handleNav"
       />
     </keep-alive>
+
+    <NiaLoadingDialog v-if="!connected"/>
   </div>
 </template>
 
@@ -16,6 +18,8 @@
   import NiaAppNavbar from '@/components/NiaAppNavbar.vue'
   import Component from 'vue-class-component'
 
+  import NiaLoadingDialog from '@/components/dialogs/NiaLoadingDialog.vue'
+
   import store from '@/store'
 
   import loggers from '@/utils/logger'
@@ -24,9 +28,14 @@
   @Component({
     components: {
       NiaAppNavbar,
+      NiaLoadingDialog,
     },
   })
   export default class extends Vue {
+    get connected(): boolean {
+      return store.getters.Connection.isConnected
+    }
+
     handleNav(event: string) {
       if (this.$router.currentRoute.path === event) {
         return
@@ -48,6 +57,13 @@
       }
 
       store.dispatch.Connection.connectIPCListener()
+      store.dispatch.FileConnection.connectIPCListener()
+      store.dispatch.FileConnection.startAutoSaving()
+    }
+    destroyed() {
+      store.dispatch.Connection.disconnectIPCListener()
+      store.dispatch.FileConnection.disconnectIPCListener()
+      store.dispatch.FileConnection.stopAutoSaving()
     }
   }
 </script>

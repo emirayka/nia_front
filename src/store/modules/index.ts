@@ -1,5 +1,7 @@
 export {default as Context} from './context'
 export {default as Connection} from './connection'
+export {default as File} from './file'
+export {default as FileConnection} from './file-connection'
 export {default as Keymapping} from './keymapping'
 export {default as Theme} from './theme'
 export {default as Editor} from './editor'

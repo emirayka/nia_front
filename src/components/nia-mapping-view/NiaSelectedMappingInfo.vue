@@ -3,7 +3,10 @@
     class="nia-selected-mapping-info"
   >
     <NiaContainer v-if="!noMappingIsSelected">
-      <NiaTabs>
+      <NiaTabs
+        :selected-tab-index="selectedTabIndex"
+        @tab-selected="selectedTabIndex = $event"
+      >
         <NiaTab title="Keys">
           <NiaContainer
             class="nia-selected-mapping-info__action-keys"
@@ -285,6 +288,8 @@
     },
   })
   export default class NiaSelectedMappingInfo extends Vue {
+    selectedTabIndex = 0
+
     get getters(): (typeof getters) {
       return getters
     }

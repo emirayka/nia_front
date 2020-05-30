@@ -14,17 +14,17 @@
         <li
           class="nia-tabs__tabs__list__item"
           v-for="(tab, index) in tabs"
-          :style="niaTabsTabsListItemStyle(isSelected(tab), hover === tab)"
+          :style="niaTabsTabsListItemStyle(isSelected(index), hover === tab)"
           :key="index"
-          @click="selectTab(tab)"
+          @click="selectTab(index)"
           @contextmenu.prevent.stop="contextMenuHandler(index, $event)"
           @mouseover="hover = tab"
           @mouseleave="hover = null"
         >
           <a
             class="nia-tabs__tabs__list__item__link"
-            :style="niaTabsTabsListItemLinkStyle(isSelected(tab), hover === tab)"
-            :class="{'selected': isSelected(tab)}"
+            :style="niaTabsTabsListItemLinkStyle(isSelected(index), hover === tab)"
+            :class="{'selected': isSelected(index)}"
           >{{ tab.title }}</a>
         </li>
       </ul>
@@ -39,7 +39,7 @@
 <script lang="ts">
   import Vue from 'vue'
   import Component from 'vue-class-component'
-  import {Watch} from 'vue-property-decorator'
+  import {Prop, Watch} from 'vue-property-decorator'
 
   import store from '@/store'
   import NiaTab from '@/components/nia/NiaTab.vue'
@@ -55,23 +55,15 @@
   })
   export default class NiaTabs extends Vue {
     tabs: Array<Vue> = []
-    selectedTab: Vue | null = null
     hover: Vue | null = null
 
-    updateTabs(): void {
-      Vue.nextTick(() => {
-        if (this.tabs.length > 0) {
-          // @ts-ignore
-          this.selectTab(this.tabs[0])
-        }
-      })
-    }
+    @Prop({required: true})
+    selectedTabIndex!: number
 
-    selectTab(selectedTab: NiaTab) {
-      this.selectedTab = selectedTab
-
+    selectTab(selectedTabIndex: number) {
       // @ts-ignore
-      this.tabs.forEach((tab: NiaTab) => tab.selected = tab === this.selectedTab)
+      this.tabs.forEach((tab: NiaTab, tabIndex: number) => tab.selected = tabIndex === this.selectedTabIndex)
+      this.$emit('tab-selected', selectedTabIndex)
     }
 
     contextMenuHandler(index: number, mouseEvent: MouseEvent) {
@@ -84,21 +76,12 @@
       this.$emit('contextmenu', event)
     }
 
-    isSelected(tab: Vue): boolean {
-      return this.selectedTab === tab
+    isSelected(tabIndex: number): boolean {
+      return this.selectedTabIndex === tabIndex
     }
 
     created(): void {
       this.tabs = this.$children;
-    }
-
-    mounted(): void {
-      this.updateTabs()
-    }
-
-    @Watch('tabs')
-    onTabsChanged(): void {
-      this.updateTabs()
     }
 
     get niaTabsStyle(): object {
@@ -135,6 +118,24 @@
       return {
         color,
       }
+    }
+
+    updateTabs(): void {
+      this.tabs.forEach((tab: NiaTab, tabIndex: number) => tab.selected = tabIndex === this.selectedTabIndex)
+    }
+
+    @Watch('selectedTabIndex')
+    onSelectedTabIndexChanged(): void {
+      this.updateTabs()
+    }
+
+    @Watch('tabs')
+    onTabsChanged(): void {
+      this.updateTabs()
+    }
+
+    mounted() {
+      this.updateTabs()
     }
   }
 </script>

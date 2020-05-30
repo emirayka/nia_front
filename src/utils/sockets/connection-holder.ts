@@ -5,12 +5,13 @@ const logger = loggers('Connection Holder')
 
 type WSMessage = string | Buffer | ArrayBuffer | Buffer[]
 
-export type ConnectedHandler = (ws: WebSocket) => void
+export type ConnectedHandler = () => void
 export type MessageHandler = (message: WSMessage) => void
 export type DisconnectedHandler = () => void
 
 export interface ConnectionHolderArgs {
   port: number
+  timeout: number
   connectedHandler?: ConnectedHandler
   disconnectedHandler?: DisconnectedHandler
 }
@@ -29,13 +30,15 @@ export class ConnectionHolder {
   constructor(args: ConnectionHolderArgs) {
     const connectedHandler: ConnectedHandler = args.connectedHandler ?? connectedHandlerStub
     const disconnectedHandler: DisconnectedHandler = args.disconnectedHandler ?? disconnectedHandlerStub
+    const timeout: number = args.timeout ?? 1000
+    const port: number = args.port
 
     this.work = () => {
-      logger.silly('Working...')
+      // logger.silly('Working...')
 
       if (!this.ok) {
         logger.debug('Trying to connect...')
-        this.ws = new WebSocket(`ws://127.0.0.1:12112`)
+        this.ws = new WebSocket(`ws://127.0.0.1:${port}`)
 
         this.ws.on('open', () => {
           if (this.ws === null) {
@@ -45,7 +48,7 @@ export class ConnectionHolder {
 
           logger.debug('Connected.')
 
-          connectedHandler(this.ws)
+          connectedHandler()
           this.ok = true
         })
 
@@ -75,7 +78,7 @@ export class ConnectionHolder {
           this.ok = false
         })
       } else {
-        logger.silly('Sending messages from the buffer...')
+        // logger.silly('Sending messages from the buffer...')
 
         while (true) {
           if (this.ws === null) {
@@ -93,11 +96,19 @@ export class ConnectionHolder {
       }
     }
 
-    setInterval(() => this.work && this.work(), 1000);
+    setInterval(() => this.work && this.work(), timeout);
   }
 
   send(message: WSMessage, handler: MessageHandler) {
     this.handlers.push(handler)
     this.messages.push(message)
+  }
+
+  close(): void {
+    this.ws?.close()
+    this.handlers = []
+    this.messages = []
+
+    this.ws = null
   }
 }

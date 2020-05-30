@@ -4,6 +4,8 @@ import {createDirectStore} from 'direct-vuex'
 
 import {
   Connection,
+  File,
+  FileConnection,
   Context,
   Editor,
   Keymapping,
@@ -22,6 +24,8 @@ const {
 } = createDirectStore({
   modules: {
     Connection,
+    File,
+    FileConnection,
     Context,
     Keymapping,
     Theme,

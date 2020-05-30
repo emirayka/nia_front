@@ -1,11 +1,11 @@
 <template>
-  <div class="nia-console">
+  <NiaScrollBar class="nia-console">
     <NiaConsoleItem
       v-for="(logItem, index) of log"
       :key="index"
       :log-item="logItem"
     />
-  </div>
+  </NiaScrollBar>
 </template>
 
 <script lang="ts">
@@ -23,14 +23,13 @@
     },
   })
   export default class NiaConsole extends Vue {
-    @Prop({required: true})
+    @Prop({ required: true })
     log!: Array<ExecutionResult>
   }
 </script>
 
 <style scoped>
   .nia-console {
-    overflow-x: hidden;
-    overflow-y: scroll;
+    background-color: #222222;
   }
 </style>
