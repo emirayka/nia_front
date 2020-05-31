@@ -109,6 +109,34 @@ export class NiaKeyChord implements SerializablePB<NiaKeyChord, KeyChord>, Seria
     return true
   }
 
+  hasKey(targetKey: NiaKey): boolean {
+    for (const modifierKey of this.modifiers) {
+      if (modifierKey.equals(targetKey)) {
+        return true
+      }
+    }
+
+    if (this.ordinaryKey.equals(targetKey)) {
+      return true
+    }
+
+    return false
+  }
+
+  hasKeyExact(targetKey: NiaKey): boolean {
+    for (const modifierKey of this.modifiers) {
+      if (modifierKey.same(targetKey)) {
+        return true
+      }
+    }
+
+    if (this.ordinaryKey.same(targetKey)) {
+      return true
+    }
+
+    return false
+  }
+
   static vectorsAreEqual(first: Array<NiaKeyChord>, second: Array<NiaKeyChord>): boolean {
     if (first.length !== second.length) {
       return false

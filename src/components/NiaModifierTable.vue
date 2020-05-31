@@ -8,45 +8,47 @@
       <NiaButton @click.stop="removeSelectedModifiersHandler()">-</NiaButton>
     </div>
 
-    <NiaTable
-      class="nia-modifier-table__modifiers"
-      :columns="columns"
-    >
-
-      <NiaTableRow
-        v-for="(modifier, index) in definedModifiers"
-        class="nia-modifier-table__modifiers__modifier"
-        :class="modifierRowClasses(modifier)"
-        :key="index"
-        @click="toggleModifierSelectionHandler(modifier)"
-        @contextmenu="modifierRowContextMenuHandler(modifier, $event)"
-        @hover="hoverHandler(modifier, $event)"
+    <NiaScrollBar>
+      <NiaTable
+        class="nia-modifier-table__modifiers"
+        :columns="columns"
       >
-        <NiaTableRowItem>
+
+        <NiaTableRow
+          v-for="(modifier, index) in definedModifiers"
+          class="nia-modifier-table__modifiers__modifier"
+          :class="modifierRowClasses(modifier)"
+          :key="index"
+          @click="toggleModifierSelectionHandler(modifier)"
+          @contextmenu="modifierRowContextMenuHandler(modifier, $event)"
+          @hover="hoverHandler(modifier, $event)"
+        >
+          <NiaTableRowItem>
           <span
             class="nia-modifier-table__modifiers__modifier__device-id"
           >
             {{ getDeviceName(modifier.getKey().getDeviceId()) }}
           </span>
-        </NiaTableRowItem>
+          </NiaTableRowItem>
 
-        <NiaTableRowItem>
+          <NiaTableRowItem>
           <span
             class="nia-modifier-table__modifiers__modifier__key-name"
           >
             {{ getModifierName(modifier.getKey().getKeyCode()) }}
           </span>
-        </NiaTableRowItem>
+          </NiaTableRowItem>
 
-        <NiaTableRowItem>
+          <NiaTableRowItem>
           <span
             class="nia-modifier-table__modifiers__modifier__alias"
           >
             {{ modifier.getAlias() }}
           </span>
-        </NiaTableRowItem>
-      </NiaTableRow>
-    </NiaTable>
+          </NiaTableRowItem>
+        </NiaTableRow>
+      </NiaTable>
+    </NiaScrollBar>
   </div>
 </template>
 
@@ -172,7 +174,11 @@
 
 <style scoped>
   .nia-modifier-table {
-    min-height: 350px;
+    height: 350px;
+  }
+
+  .ps {
+    height: 300px;
   }
 
   .nia-table-row.nia-modifier-table__modifiers__modifier.selected {

@@ -34,7 +34,7 @@ const MappingTableModule = defineModule({
     },
     noMappingIsSelected: (state: MappingTableState) => {
       return state.selectedMappings.length === 0
-    }
+    },
   },
 })
 

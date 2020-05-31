@@ -32,6 +32,12 @@
 
       store.dispatch.FileConnection.saveFile(file)
       store.commit.File.closePath(file.fullPath)
+
+      const firstFile: NiaFile | undefined = Object.values(store.getters.File.openedFiles)[0]
+
+      if (firstFile) {
+        store.commit.UI.OpenedFiles.setOpenedFile(firstFile)
+      }
     }
 
     clickHandler(name: string): void {

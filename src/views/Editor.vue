@@ -39,19 +39,17 @@
         :w="80"
         :h="30"
       >
-        <div>
-          <NiaConsole
-            class="nia-editor__nia-console"
-            :log="log"
-          />
-        </div>
+        <NiaConsole
+          class="nia-editor__nia-console"
+          :log="log"
+        />
       </NiaGridItem>
     </NiaGridLayout>
 
     <NiaEditorFileTreeContextMenu />
     <NiaOpenedFileContextMenu />
-    <NiaNewFileDialog v-if="newFileDialogIsShown"/>
-    <NiaNewDirectoryDialog v-if="newDirectoryDialogIsShown"/>
+    <NiaNewFileDialog v-if="newFileDialogIsShown" />
+    <NiaNewDirectoryDialog v-if="newDirectoryDialogIsShown" />
   </div>
 </template>
 
@@ -61,7 +59,7 @@
 
   import store from '@/store'
   import {
-    ExecutionResult
+    ExecutionResult,
   } from '@/store/models'
 
   import NiaEditorFileTree from './editor/NiaEditorFileTree.vue'
@@ -83,7 +81,7 @@
       NiaNewDirectoryDialog,
     },
   })
-  export default class Editor extends Vue{
+  export default class Editor extends Vue {
     get log(): Array<ExecutionResult> {
       return store.getters.Editor.executionLog
     }
@@ -106,7 +104,7 @@
 
     executeHandler(code: string): void {
       store.dispatch.Connection.executeCode({
-        code
+        code,
       })
     }
 

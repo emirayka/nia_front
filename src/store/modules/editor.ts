@@ -21,25 +21,11 @@ const EditorModule = defineModule({
   mutations: {
     setCode: (state: EditorState, code: string) => state.code = code,
     addExecutionResult(state: EditorState, executionResult: ExecutionResult) {
-      const logItem: ExecutionResult = {
-        success: false,
-        error: false,
-        failure: false,
-        message: '',
+      if (state.executionLog.length > 100) {
+        state.executionLog.splice(0, state.executionLog.length - 100)
       }
 
-      if (executionResult.success) {
-        logItem.success = true
-        logItem.message = executionResult.message
-      } else if (executionResult.error) {
-        logItem.error = true
-        logItem.message = executionResult.message
-      } else if (executionResult.failure) {
-        logItem.failure = true
-        logItem.message = executionResult.message
-      }
-
-      state.executionLog.push(logItem)
+      state.executionLog.push(executionResult)
     },
   },
 })

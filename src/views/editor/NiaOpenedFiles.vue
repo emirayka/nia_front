@@ -2,7 +2,7 @@
   <NiaContainer class="nia-opened-files">
     <NiaTabs
       :selected-tab-index="selectedTabIndex"
-      @tab-selected="selectedTabIndex = $event"
+      @tab-selected="tabSelectedHandler($event)"
       @contextmenu="contextMenuHandler($event)"
     >
       <NiaTab
@@ -16,6 +16,7 @@
             :enabled="true"
             :code="openedFile.fileContent"
             @change="setFileContent(openedFile.fullPath, $event)"
+            @execute="executeHandler($event)"
           >
           </NiaCodeEditor>
         </NiaContainer>
@@ -37,10 +38,29 @@
     name: 'NiaOpenedFiles',
   })
   export default class NiaOpenedFiles extends Vue {
-    selectedTabIndex = 0
-
     get openedFiles(): Array<NiaFile> {
       return Object.values(store.getters.File.openedFiles)
+    }
+
+    get selectedTabIndex(): number {
+      let index = 0
+      const selectedFile: NiaFile | null = store.getters.UI.OpenedFiles.openedFile
+
+      for (const openedFile of this.openedFiles) {
+        if (openedFile.fullPath === selectedFile?.fullPath) {
+          break
+        }
+
+        index += 1
+      }
+
+      return index
+    }
+
+    tabSelectedHandler(index: number): void {
+      const selectedFile: NiaFile | null = this.openedFiles[index] ?? null
+
+      store.commit.UI.OpenedFiles.setOpenedFile(selectedFile)
     }
 
     contextMenuHandler(event: NiaTabContextMenuEvent): void {
@@ -57,6 +77,12 @@
       store.commit.File.setFileContent({
         fullPath,
         newContent,
+      })
+    }
+
+    executeHandler(code: string): void {
+      store.dispatch.Connection.executeCode({
+        code
       })
     }
   }

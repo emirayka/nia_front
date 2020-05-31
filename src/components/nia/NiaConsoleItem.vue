@@ -1,9 +1,16 @@
 <template>
   <div
     class="nia-console-item"
-    :class="classObject"
   >
-    {{ message }}
+    <div class="nia-console-item__code">
+      <pre>>> {{ code }}</pre>
+    </div>
+    <div
+      class="nia-console-item__result"
+      :class="classObject"
+    >
+      {{ result }}
+    </div>
   </div>
 </template>
 
@@ -15,7 +22,7 @@
   import {ExecutionResult} from '@/store/models'
 
   @Component({
-    name: "NiaConsoleItem",
+    name: 'NiaConsoleItem',
   })
   export default class NiaConsoleItem extends Vue {
     @Prop({ required: true })
@@ -29,8 +36,12 @@
       }
     }
 
-    get message(): string {
-      return this.logItem.message
+    get result(): string {
+      return this.logItem.result
+    }
+
+    get code(): string {
+      return this.logItem.code
     }
   }
 </script>
@@ -39,23 +50,31 @@
   .nia-console-item {
     width: 100%;
     margin: 0;
-    padding: 0 0 0 1em;
+    padding: 0;
+
+    font-family: Consolas, Arial, monospace;
+    font-size: 1.1em;
   }
 
-  .nia-console-item.success {
-    background-color: #333333;
+  .nia-console-item__code {
+    font-style: italic;
+  }
+
+  .nia-console-item__result {
+    padding: 0 0 0 1.5em;
+  }
+
+  .nia-console-item__result.success {
     color: green;
     font-weight: bold;
   }
 
-  .nia-console-item.error {
-    background-color: #333333;
-    color: black;
+  .nia-console-item__result.error {
+    color: red;
     font-weight: bold;
   }
 
-  .nia-console-item.failure {
-    background-color: #333333;
+  .nia-console-item__result.failure {
     font-weight: bold;
   }
 </style>

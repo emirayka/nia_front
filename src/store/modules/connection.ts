@@ -363,6 +363,7 @@ const ConnectionModule = defineModule({
       if (response.isSuccess()) {
         rootCommit.Keymapping.Mappings.defineMapping(response.getMapping())
         rootCommit.UI.AddMappingDialog.hide()
+        rootCommit.UI.MappingTable.selectMapping(response.getMapping())
       } else if (response.isError()) {
         rootCommit.UI.ErrorDialog.show(response.getMessage())
       } else {
@@ -385,11 +386,19 @@ const ConnectionModule = defineModule({
       }
     },
     handleRemoveMappingResponse(context, response: NiaRemoveMappingEventResponse): void {
-      const { rootCommit } = ConnectionModuleActionContext(context)
+      const { rootCommit, rootGetters } = ConnectionModuleActionContext(context)
 
       if (response.isSuccess()) {
         rootCommit.Keymapping.Mappings.removeMapping(response.getKeyChords())
         rootCommit.UI.MappingTable.unselectMapping()
+
+        const mapping: NiaMapping | null = rootGetters.Keymapping.Mappings.firstMapping
+
+        if (mapping !== null) {
+          rootCommit.UI.MappingTable.selectMapping(mapping)
+        } else {
+          rootCommit.UI.MappingTable.unselectMapping()
+        }
       } else if (response.isError()) {
         rootCommit.UI.ErrorDialog.show(response.getMessage())
       } else {

@@ -1,5 +1,6 @@
 export interface ExecutionResult {
-  message: string
+  code: string,
+  result: string
   success: boolean
   error: boolean
   failure: boolean

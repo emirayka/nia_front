@@ -44,6 +44,15 @@ const FileModule = defineModule({
     configTree: (state: FileModuleState) => state.configTree,
     openedFiles: (state: FileModuleState) => state.openedFiles,
     isFileOpened: (state: FileModuleState) => (fullPath: string) => state.openedFiles[fullPath] !== undefined,
+    getFileByPath: (state: FileModuleState) => (fullPath: string): NiaFile | null => {
+      for (const file of Object.values(state.openedFiles)) {
+        if (file.fullPath === fullPath) {
+          return file
+        }
+      }
+
+      return null
+    },
   },
   mutations: {
     setConfigTree: (state: FileModuleState, configTree: TreePart) => {

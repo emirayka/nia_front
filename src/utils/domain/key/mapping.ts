@@ -58,6 +58,26 @@ export class NiaMapping implements SerializablePB<NiaMapping, Mapping>, Serializ
     return true
   }
 
+  hasKey(key: NiaKey): boolean {
+    for (const keyChord of this.keyChords) {
+      if (keyChord.hasKey(key)) {
+        return true
+      }
+    }
+
+    return false
+  }
+
+  hasKeyExact(key: NiaKey): boolean {
+    for (const keyChord of this.keyChords) {
+      if (keyChord.hasKeyExact(key)) {
+        return true
+      }
+    }
+
+    return false
+  }
+
   stringify(): string {
     return this.keyChords.map((keyChord: NiaKeyChord) => keyChord.stringify())
       .join(' ')

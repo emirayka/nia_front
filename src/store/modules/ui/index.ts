@@ -1,12 +1,13 @@
 import AddActionDialog from './add-action-dialog'
 import AddModifierDialog from './add-modifier-dialog'
 import AddMappingDialog from './add-mapping-dialog'
-import EditorFileTree from './editor-file-tree'
 import ErrorDialog from './error-dialog'
 import NewFileDialog from './new-file-dialog'
 import NewDirectoryDialog from './new-directory-dialog'
 import SelectedMappingInfoView from './selected-mapping-info-view'
 
+import EditorFileTree from './editor-file-tree'
+import OpenedFiles from './opened-files'
 import Devices from './devices'
 import ActionTable from './action-table'
 import MappingTable from './mapping-table'
@@ -21,11 +22,12 @@ const UIModule = defineModule({
     AddActionDialog,
     AddModifierDialog,
     AddMappingDialog,
-    EditorFileTree,
     ErrorDialog,
     NewFileDialog,
     NewDirectoryDialog,
 
+    EditorFileTree,
+    OpenedFiles,
     SelectedMappingInfoView,
     Devices,
     ActionTable,

@@ -75,7 +75,8 @@ export class NiaExecuteCodeEventResponse implements serializable<NiaExecuteCodeE
 
   toExecutionResult(): ExecutionResult {
     return {
-      message: this.message,
+      code: this.code,
+      result: this.message,
       failure: this.failure,
       error: this.error,
       success: this.success,

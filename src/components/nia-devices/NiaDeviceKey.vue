@@ -12,7 +12,20 @@
       class="nia-device-key-content"
       :class="classes"
     >
-      {{ mappedKeyCode }}
+      <template
+        v-if="canBeReplacedByFAIcon"
+      >
+        <fa-icon
+          class="fa-icon"
+          :icon="faIcon"
+        />
+      </template>
+
+      <template v-else>
+        <span>
+        {{ mappedKeyCode }}
+        </span>
+      </template>
     </div>
   </div>
 </template>
@@ -25,6 +38,8 @@
   import {
     mapKeyCodeToString,
   } from '@/utils/utils'
+  import * as codes from '@/utils/utils/linux-input-event-codes'
+  import {KEY_VOLUMEUP} from '@/utils/utils/linux-input-event-codes'
 
   export interface NiaDeviceKeySelectEvent {
     keyCode: number;
@@ -92,6 +107,39 @@
         'in-selected-mapping': this.inSelectedMapping,
         'hover': this.hover,
       }
+    }
+
+    get canBeReplacedByFAIcon(): boolean {
+      return [
+        codes.KEY_VOLUMEUP,
+        codes.KEY_VOLUMEDOWN,
+        codes.KEY_MUTE,
+        codes.KEY_STOPCD,
+        codes.KEY_PREVIOUSSONG,
+        codes.KEY_NEXTSONG,
+        codes.KEY_PLAYPAUSE,
+      ].includes(this.code)
+    }
+
+    get faIcon(): [string, string] {
+      switch (this.code) {
+        case codes.KEY_VOLUMEUP:
+          return ['fas', 'volume-up']
+        case codes.KEY_VOLUMEDOWN:
+          return ['fas', 'volume-down']
+        case codes.KEY_MUTE:
+          return ['fas', 'volume-off']
+        case codes.KEY_STOPCD:
+          return ['fas', 'stop-circle']
+        case codes.KEY_PREVIOUSSONG:
+          return ['fas', 'step-backward']
+        case codes.KEY_NEXTSONG:
+          return ['fas', 'step-forward']
+        case codes.KEY_PLAYPAUSE:
+          return ['fas', 'pause']
+      }
+
+      return ['', '']
     }
 
     get mappedKeyCode(): string {
@@ -231,5 +279,9 @@
     border: 2px dotted gold;
     border-radius: 10%;
     background-color: #33FFDD03;
+  }
+
+  .fa-icon {
+    font-size: 1.5em;
   }
 </style>

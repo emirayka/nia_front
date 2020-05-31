@@ -26,7 +26,7 @@ import {
   NiaActionWait,
   NiaActionWaitSerialized,
 } from './basic-actions'
-import {NiaActionType, SerializablePB} from '@/utils'
+import {SerializablePB} from '@/utils'
 import {
   Action,
   ActionControlKeyClick,
@@ -181,58 +181,7 @@ export class NiaAction implements SerializablePB<NiaAction, Action>, Serializabl
   }
 
   getActionTypeName(): string {
-    switch (this.actionType) {
-      case NiaActionType.TextKeyClick:
-      case NiaActionType.NumberKeyClick:
-      case NiaActionType.FunctionKeyClick:
-      case NiaActionType.ControlKeyClick:
-      case NiaActionType.KPKeyClick:
-      case NiaActionType.MultimediaKeyClick:
-      case NiaActionType.MouseButtonKeyClick:
-      case NiaActionType.KeyClick:
-        return 'Key Click'
-
-      case NiaActionType.KeyPress:
-        return 'Key Press'
-
-      case NiaActionType.KeyRelease:
-        return 'Key Release'
-
-      case NiaActionType.MouseButtonClick:
-        return 'Mouse button Click'
-
-      case NiaActionType.MouseButtonPress:
-        return 'Mouse button Press'
-
-      case NiaActionType.MouseButtonRelease:
-        return 'Mouse button Release'
-
-      case NiaActionType.MouseAbsoluteMove:
-        return 'Mouse absolute move'
-
-      case NiaActionType.MouseRelativeMove:
-        return 'Mouse absolute move'
-
-      case NiaActionType.Wait:
-        return 'Wait'
-
-      case NiaActionType.TextType:
-        return 'Type text'
-
-      case NiaActionType.ExecuteCode:
-        return 'Execute code'
-
-      case NiaActionType.ExecuteNamedAction:
-        return 'Execute action'
-
-      case NiaActionType.ExecuteFunction:
-        return 'Execute function'
-
-      case NiaActionType.ExecuteOSCommand:
-        return 'Execute OS command'
-    }
-
-    return ''
+    return this.action.getActionTypeName()
   }
 
   isKeyPressAction(): boolean {

@@ -11,21 +11,26 @@
         -
       </NiaButton>
     </NiaContainer>
-    <NiaTable :columns="columns">
-      <NiaTableRow
-        class="nia-mapping-table__row"
-        v-for="(mapping, index) in definedMappings"
-        :class="mappingRowClasses(mapping, index)"
-        @hover="hoverHandler(index, $event)"
-        @click="clickHandler(mapping)"
-        @contextmenu="mappingRowContextMenuHandler(mapping, $event)"
-        :key="index"
-      >
-        <NiaTableRowItem>
-          {{ mapping.stringify() }}
-        </NiaTableRowItem>
-      </NiaTableRow>
-    </NiaTable>
+
+    <NiaScrollBar>
+      <NiaContainer class="nia-mapping-table__mappings">
+        <NiaTable :columns="columns">
+          <NiaTableRow
+            class="nia-mapping-table__row"
+            v-for="(mapping, index) in mappings"
+            :class="mappingRowClasses(mapping, index)"
+            @hover="hoverHandler(index, $event)"
+            @click="clickHandler(mapping)"
+            @contextmenu="mappingRowContextMenuHandler(mapping, $event)"
+            :key="index"
+          >
+            <NiaTableRowItem>
+              {{ mapping.stringify() }}
+            </NiaTableRowItem>
+          </NiaTableRow>
+        </NiaTable>
+      </NiaContainer>
+    </NiaScrollBar>
   </NiaContainer>
 </template>
 
@@ -33,7 +38,7 @@
   import Vue from 'vue'
   import Component from 'vue-class-component'
 
-  import {NiaKeyChord, NiaMapping} from '../../utils/domain/key'
+  import {NiaKey, NiaKeyChord, NiaMapping} from '../../utils/domain/key'
 
   import store from '@/store'
   import {NiaTableColumnDefinition} from '@/components/nia/lib'
@@ -44,8 +49,23 @@
   export default class NiaMappingTable extends Vue {
     hoveredIndex: number | null = null
 
-    get definedMappings(): Array<NiaMapping> {
+    get mappings(): Array<NiaMapping> {
+      const keys: Array<NiaKey> = store.getters.UI.Devices.selectedKeys
+
       return store.getters.Keymapping.Mappings.definedMappings
+        // .filter((mapping: NiaMapping) => {
+          // if (keys.length === 0) {
+          //   return true
+          // }
+          //
+          // for (const key of keys) {
+          //   if (mapping.hasKey(key)) {
+          //     return true
+          //   }
+          // }
+          //
+          // return false
+        // })
     }
 
     get selectedMapping(): NiaMapping | null {
@@ -126,8 +146,13 @@
 
 <style scoped>
   .nia-mapping-table {
+    overflow: hidden;
     width: 100%;
     height: 100%;
+  }
+
+  .ps {
+    height: 330px;
   }
 
   .nia-mapping-table__row {

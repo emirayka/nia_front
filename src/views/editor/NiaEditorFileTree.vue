@@ -1,11 +1,15 @@
 <template>
-  <NiaTreeView :item="item"
-               :selected-items="selectedItems"
-               @click="clickHandler($event)"
-               @double-click="doubleClickHandler($event)"
-               @control-click="controlClickHandler($event)"
-               @show-item-context-menu="showItemContextMenuHandler($event)"
-  />
+  <NiaContainer>
+    <NiaScrollBar>
+      <NiaTreeView :item="item"
+                   :selected-items="selectedItems"
+                   @click="clickHandler($event)"
+                   @double-click="doubleClickHandler($event)"
+                   @control-click="controlClickHandler($event)"
+                   @show-item-context-menu="showItemContextMenuHandler($event)"
+      />
+    </NiaScrollBar>
+  </NiaContainer>
 </template>
 
 <script lang="ts">
@@ -16,6 +20,7 @@
   import store from '@/store'
   import {NiaTreeViewItemContextMenuEvent} from '@/components/nia/NiaTreeViewItem.vue'
   import {TreePart} from '@/utils'
+  import {NiaFile} from '@/store/modules/file'
 
   @Component({
     name: "editor-file-tree",
@@ -35,10 +40,14 @@
       }
 
       if (store.getters.File.isFileOpened(item.fullPath)) {
-        return
-      }
+        const file: NiaFile | null = store.getters.File.getFileByPath(item.fullPath)
 
-      store.dispatch.FileConnection.openFile(item.fullPath)
+        if (file !== null) {
+          store.commit.UI.OpenedFiles.setOpenedFile(file)
+        }
+      } else {
+        store.dispatch.FileConnection.openFile(item.fullPath)
+      }
     }
 
     clickHandler(item: NiaTreeViewObject): void {
@@ -63,5 +72,7 @@
 </script>
 
 <style scoped>
-
+  .ps {
+    height: 950px;
+  }
 </style>

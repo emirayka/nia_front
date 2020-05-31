@@ -222,6 +222,7 @@ const FileConnectionModule = defineModule({
       const file: NiaFile = response.toFile()
 
       rootCommit.File.setOpenedFile(file)
+      rootCommit.UI.OpenedFiles.setOpenedFile(file)
     },
 
     handleSaveFile(context, response: NiaSaveFileEventResponse): void {

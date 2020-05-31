@@ -7,65 +7,67 @@
       <NiaButton @click.stop="removeSelectedActionsHandler()">-</NiaButton>
     </NiaContainer>
 
-    <NiaTable
-      class="nia-action-table__actions"
-      :columns="columns"
-    >
-
-      <NiaTableRow
-        v-for="(action, index) in definedActions"
-        class="nia-action-table__actions__action"
-        :class="actionRowClasses(action)"
-        :key="index"
-        @click="toggleActionSelectionHandler(action)"
-        @contextmenu="actionRowContextMenuHandler(action, $event)"
-        @hover="hoverHandler(action, $event)"
+    <NiaScrollBar>
+      <NiaTable
+        class="nia-action-table__actions"
+        :columns="columns"
       >
-        <NiaTableRowItem>
+
+        <NiaTableRow
+          v-for="(action, index) in definedActions"
+          class="nia-action-table__actions__action"
+          :class="actionRowClasses(action)"
+          :key="index"
+          @click="toggleActionSelectionHandler(action)"
+          @contextmenu="actionRowContextMenuHandler(action, $event)"
+          @hover="hoverHandler(action, $event)"
+        >
+          <NiaTableRowItem>
           <span
             class="nia-action-table__actions__action__action-name"
           >
             {{ getActionName(action) }}
           </span>
-        </NiaTableRowItem>
+          </NiaTableRowItem>
 
-        <NiaTableRowItem>
+          <NiaTableRowItem>
           <span
             class="nia-action-table__actions__action__action-type"
           >
             {{ getActionType(action) }}
           </span>
-        </NiaTableRowItem>
+          </NiaTableRowItem>
 
-        <template v-if="getActionArgumentCount(action) === 1">
-          <NiaTableRowItem>
+          <template v-if="getActionArgumentCount(action) === 1">
+            <NiaTableRowItem>
           <span
             class="nia-action-table__actions__action__action-first-argument"
           >
             {{ getFirstArgument(action) }}
           </span>
-          </NiaTableRowItem>
-        </template>
+            </NiaTableRowItem>
+          </template>
 
-        <template v-else>
-          <NiaTableRowItem>
+          <template v-else>
+            <NiaTableRowItem>
           <span
             class="nia-action-table__actions__action__action-first-argument"
           >
             {{ getFirstArgument(action) }}
           </span>
-          </NiaTableRowItem>
+            </NiaTableRowItem>
 
-          <NiaTableRowItem>
+            <NiaTableRowItem>
           <span
             class="nia-action-table__actions__action__action-second-argument"
           >
             {{ getSecondArgument(action) }}
           </span>
-          </NiaTableRowItem>
-        </template>
-      </NiaTableRow>
-    </NiaTable>
+            </NiaTableRowItem>
+          </template>
+        </NiaTableRow>
+      </NiaTable>
+    </NiaScrollBar>
   </div>
 </template>
 
@@ -194,7 +196,11 @@
 
 <style scoped>
   .nia-action-table {
-    min-height: 350px;
+    height: 350px;
+  }
+
+  .ps {
+    height: 300px;
   }
 
   .nia-action-table__actions__action.selected {

@@ -5,6 +5,7 @@ import {defineModule} from 'direct-vuex'
 import {moduleActionContext, moduleGetterContext} from '@/store'
 
 import loggers from '@/utils/logger'
+
 const logger = loggers('store/Keymapping/Mappings')
 
 export interface MappingsModuleState {
@@ -18,6 +19,11 @@ const MappingsModule = defineModule({
   } as MappingsModuleState,
   getters: {
     definedMappings: (state: MappingsModuleState): Array<NiaMapping> => state.definedMappings,
+    firstMapping: (state: MappingsModuleState): NiaMapping | null => {
+      return state.definedMappings.length === 0
+        ? null
+        : state.definedMappings[0]
+    },
   },
   mutations: {
     setMappings(state: MappingsModuleState, actions: Array<NiaMapping>) {
@@ -30,7 +36,7 @@ const MappingsModule = defineModule({
         mapping,
       )
     },
-    changeMapping: (state: MappingsModuleState, {keyChords, action}: {keyChords: Array<NiaKeyChord>, action: NiaAction}) => {
+    changeMapping: (state: MappingsModuleState, { keyChords, action }: { keyChords: Array<NiaKeyChord>, action: NiaAction }) => {
       // todo: show error when action is already defined
       for (const mapping of state.definedMappings) {
         if (NiaKeyChord.vectorsAreSame(mapping.getKeyChords(), keyChords)) {

@@ -11,8 +11,10 @@
       @mouseover.stop="hover = true"
       @mouseleave.stop="hover = false"
     >
-      <pre>{{ itemName }} </pre>
-      <span v-if="isFolder">[{{ isOpen ? '-' : '+' }}]</span>
+      <pre>{{ spaces }} </pre>
+      <fa-icon v-if="isFolder && isOpen" :icon="['fas', 'folder-open']"/>
+      <fa-icon v-else-if="isFolder" :icon="['fas', 'folder']"/>
+      <pre> {{ itemName }}</pre>
     </div>
     <ul
       class="nia-tree-view-item__list"
@@ -67,8 +69,12 @@
     @Prop({ required: true })
     level!: number
 
+    get spaces(): string {
+      return `${' '.repeat(this.level * 2)}`
+    }
+
     get itemName(): string {
-      return `${' '.repeat(this.level * 2)}${this.item?.name}`
+      return `${this.item?.name}`
     }
 
     get isFolder(): boolean {

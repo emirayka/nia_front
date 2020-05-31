@@ -56,10 +56,11 @@
 
       this.editor.setOption("extraKeys", {
         "Ctrl-Enter": _.throttle((instance: CodeMirror.Editor) => {
-          let selectedCode = instance.getSelection()
+          const selectedCode: string = instance.getSelection()
+          instance.setCursor(instance.getCursor())
 
           if (selectedCode === '') {
-            selectedCode = instance.getValue()
+            return
           }
 
           this.$emit('execute', selectedCode)
