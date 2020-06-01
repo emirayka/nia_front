@@ -21,7 +21,6 @@
     "@types/codemirror": "0.0.91",
     "@types/color": "^3.0.1",
     "@types/globby": "^9.1.0",
-    "@types/google-protobuf": "^3.7.2",
     "@types/rimraf": "^3.0.0",
     "@types/underscore": "^1.10.0",
     "@types/winston": "^2.4.4",

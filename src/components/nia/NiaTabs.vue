@@ -121,6 +121,7 @@
     }
 
     updateTabs(): void {
+      // @ts-ignore
       this.tabs.forEach((tab: NiaTab, tabIndex: number) => tab.selected = tabIndex === this.selectedTabIndex)
     }
 

@@ -1,4 +1,4 @@
-import {NiaFileEvent, NiaFileEventType} from '@/utils/file-event/events/file-event'
+import {NiaFileEvent, NiaFileEventType} from '@/utils'
 
 export interface NiaFileEventInterface {
   toFileEvent(): NiaFileEvent;

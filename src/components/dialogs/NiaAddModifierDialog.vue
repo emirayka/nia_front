@@ -70,10 +70,10 @@
         keys = selectedDevice
           .getDeviceModel()
           .getKeyDescriptions()
-          .map((key) => mapKeyCodeToString(key.getKeyCode()))
+          .map((key) => mapKeyCodeToString(key.getKeyCode()) ?? '')
 
         selectedDeviceIndex = deviceNames.indexOf(selectedDevice.getDeviceName())
-        selectedKeyIndex = keys.indexOf(mapKeyCodeToString(selectedKeyCode))
+        selectedKeyIndex = keys.indexOf(mapKeyCodeToString(selectedKeyCode) ?? '')
       }
 
       return [
@@ -149,7 +149,7 @@
     }
 
     selectKeyCodeHandler(keyCodeName: string): void {
-      const keyCode: number = mapStringToKeyCode(keyCodeName)
+      const keyCode: number = mapStringToKeyCode(keyCodeName) ?? -1
 
       if (Number.isInteger(keyCode)) {
         store.commit.UI.AddModifierDialog.setSelectedKeyCode(keyCode)

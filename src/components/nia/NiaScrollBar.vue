@@ -33,6 +33,10 @@
         this.callback = () => {
           const container = this.$refs.scrolled.parentElement
 
+          if (container === null) {
+            return
+          }
+
           container.scrollTop = container.scrollHeight;
         }
 

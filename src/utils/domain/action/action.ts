@@ -26,7 +26,7 @@ import {
   NiaActionWait,
   NiaActionWaitSerialized,
 } from './basic-actions'
-import {NiaActionType, NiaNamedAction, SerializablePB} from '@/utils'
+import {NiaNamedAction, SerializablePB} from '@/utils'
 import {
   Action,
   ActionControlKeyClick,

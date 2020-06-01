@@ -233,37 +233,37 @@ const SelectedMappingInfoViewModule = defineModule({
       switch (state.selectedCategory) {
         case SelectedActionCategory.KeysKP:
           return new NiaActionKPKeyClick({
-            keyCode: mapStringToKeyCode(getters.itemsKeysKP[getters.keysKPIndex]),
+            keyCode: mapStringToKeyCode(getters.itemsKeysKP[getters.keysKPIndex]) ?? 0,
           }).toAction()
 
         case SelectedActionCategory.KeysMouseButton:
           return new NiaActionMouseButtonKeyClick({
-            keyCode: mapStringToKeyCode(getters.itemsKeysMouseButton[getters.keysMouseButtonIndex]),
+            keyCode: mapStringToKeyCode(getters.itemsKeysMouseButton[getters.keysMouseButtonIndex]) ?? 0,
           }).toAction()
 
         case SelectedActionCategory.KeysControl:
           return new NiaActionControlKeyClick({
-            keyCode: mapStringToKeyCode(getters.itemsKeysControl[getters.keysControlIndex]),
+            keyCode: mapStringToKeyCode(getters.itemsKeysControl[getters.keysControlIndex]) ?? 0,
           }).toAction()
 
         case SelectedActionCategory.KeysMultimedia:
           return new NiaActionMultimediaKeyClick({
-            keyCode: mapStringToKeyCode(getters.itemsKeysMultimedia[getters.keysMultimediaIndex]),
+            keyCode: mapStringToKeyCode(getters.itemsKeysMultimedia[getters.keysMultimediaIndex]) ?? 0,
           }).toAction()
 
         case SelectedActionCategory.KeysFunction:
           return new NiaActionFunctionKeyClick({
-            keyCode: mapStringToKeyCode(getters.itemsKeysFunction[getters.keysFunctionIndex]),
+            keyCode: mapStringToKeyCode(getters.itemsKeysFunction[getters.keysFunctionIndex]) ?? 0,
           }).toAction()
 
         case SelectedActionCategory.KeysNumber:
           return new NiaActionNumberKeyClick({
-            keyCode: mapStringToKeyCode(getters.itemsKeysNumber[getters.keysNumberIndex]),
+            keyCode: mapStringToKeyCode(getters.itemsKeysNumber[getters.keysNumberIndex]) ?? 0,
           }).toAction()
 
         case SelectedActionCategory.KeysText:
           return new NiaActionTextKeyClick({
-            keyCode: mapStringToKeyCode(getters.itemsKeysText[getters.keysTextIndex]),
+            keyCode: mapStringToKeyCode(getters.itemsKeysText[getters.keysTextIndex]) ?? 0,
           }).toAction()
 
         case SelectedActionCategory.CodeExecute:
@@ -273,32 +273,32 @@ const SelectedMappingInfoViewModule = defineModule({
 
         case SelectedActionCategory.LowLevelKeyClick:
           return new NiaActionKeyClick({
-            keyCode: mapStringToKeyCode(getters.itemsLowLevelKeyClick[getters.lowLevelKeyClickIndex]),
+            keyCode: mapStringToKeyCode(getters.itemsLowLevelKeyClick[getters.lowLevelKeyClickIndex]) ?? 0,
           }).toAction()
 
         case SelectedActionCategory.LowLevelKeyPress:
           return new NiaActionKeyPress({
-            keyCode: mapStringToKeyCode(getters.itemsLowLevelKeyPress[getters.lowLevelKeyPressIndex]),
+            keyCode: mapStringToKeyCode(getters.itemsLowLevelKeyPress[getters.lowLevelKeyPressIndex]) ?? 0,
           }).toAction()
 
         case SelectedActionCategory.LowLevelKeyRelease:
           return new NiaActionKeyRelease({
-            keyCode: mapStringToKeyCode(getters.itemsLowLevelKeyRelease[getters.lowLevelKeyReleaseIndex]),
+            keyCode: mapStringToKeyCode(getters.itemsLowLevelKeyRelease[getters.lowLevelKeyReleaseIndex]) ?? 0,
           }).toAction()
 
         case SelectedActionCategory.LowLevelMouseButtonClick:
           return new NiaActionMouseButtonClick({
-            buttonCode: mapStringToKeyCode(getters.itemsLowLevelMouseButtonClick[getters.lowLevelMouseButtonClickIndex]),
+            buttonCode: mapStringToKeyCode(getters.itemsLowLevelMouseButtonClick[getters.lowLevelMouseButtonClickIndex]) ?? 0,
           }).toAction()
 
         case SelectedActionCategory.LowLevelMouseButtonPress:
           return new NiaActionMouseButtonPress({
-            buttonCode: mapStringToKeyCode(getters.itemsLowLevelMouseButtonPress[getters.lowLevelMouseButtonPressIndex]),
+            buttonCode: mapStringToKeyCode(getters.itemsLowLevelMouseButtonPress[getters.lowLevelMouseButtonPressIndex]) ?? 0,
           }).toAction()
 
         case SelectedActionCategory.LowLevelMouseButtonRelease:
           return new NiaActionMouseButtonRelease({
-            buttonCode: mapStringToKeyCode(getters.itemsLowLevelMouseButtonRelease[getters.lowLevelMouseButtonReleaseIndex]),
+            buttonCode: mapStringToKeyCode(getters.itemsLowLevelMouseButtonRelease[getters.lowLevelMouseButtonReleaseIndex]) ?? 0,
           }).toAction()
 
         case SelectedActionCategory.LowLevelMouseAbsoluteMove:
@@ -407,49 +407,49 @@ const SelectedMappingInfoViewModule = defineModule({
           const textKeyClickAction: NiaActionTextKeyClick = (action.getAction() as NiaActionTextKeyClick)
 
           state.selectedCategory = SelectedActionCategory.KeysText
-          state.keysTextIndex = GROUP_TEXT_KEYS.indexOf(mapKeyCodeToString(textKeyClickAction.getKeyCode()))
+          state.keysTextIndex = GROUP_TEXT_KEYS.indexOf(mapKeyCodeToString(textKeyClickAction.getKeyCode()) ?? '')
           break
 
         case NiaActionType.NumberKeyClick:
           const numberKeyClickAction: NiaActionNumberKeyClick = (action.getAction() as NiaActionNumberKeyClick)
 
           state.selectedCategory = SelectedActionCategory.KeysNumber
-          state.keysNumberIndex = GROUP_NUMBER_KEYS.indexOf(mapKeyCodeToString(numberKeyClickAction.getKeyCode()))
+          state.keysNumberIndex = GROUP_NUMBER_KEYS.indexOf(mapKeyCodeToString(numberKeyClickAction.getKeyCode()) ?? '')
           break
 
         case NiaActionType.FunctionKeyClick:
           const functionKeyClickAction: NiaActionFunctionKeyClick = (action.getAction() as NiaActionFunctionKeyClick)
 
           state.selectedCategory = SelectedActionCategory.KeysFunction
-          state.keysFunctionIndex = GROUP_FUNCTION_KEYS.indexOf(mapKeyCodeToString(functionKeyClickAction.getKeyCode()))
+          state.keysFunctionIndex = GROUP_FUNCTION_KEYS.indexOf(mapKeyCodeToString(functionKeyClickAction.getKeyCode()) ?? '')
           break
 
         case NiaActionType.ControlKeyClick:
           const controlKeyClickAction: NiaActionControlKeyClick = (action.getAction() as NiaActionControlKeyClick)
 
           state.selectedCategory = SelectedActionCategory.KeysControl
-          state.keysControlIndex = GROUP_CONTROL_KEYS.indexOf(mapKeyCodeToString(controlKeyClickAction.getKeyCode()))
+          state.keysControlIndex = GROUP_CONTROL_KEYS.indexOf(mapKeyCodeToString(controlKeyClickAction.getKeyCode()) ?? '')
           break
 
         case NiaActionType.KPKeyClick:
           const kpKeyClickAction: NiaActionKPKeyClick = (action.getAction() as NiaActionKPKeyClick)
 
           state.selectedCategory = SelectedActionCategory.KeysKP
-          state.keysKPIndex = GROUP_KP_KEYS.indexOf(mapKeyCodeToString(kpKeyClickAction.getKeyCode()))
+          state.keysKPIndex = GROUP_KP_KEYS.indexOf(mapKeyCodeToString(kpKeyClickAction.getKeyCode()) ?? '')
           break
 
         case NiaActionType.MultimediaKeyClick:
           const multimediaKeyClickAction: NiaActionMultimediaKeyClick = (action.getAction() as NiaActionMultimediaKeyClick)
 
           state.selectedCategory = SelectedActionCategory.KeysMultimedia
-          state.keysMultimediaIndex = GROUP_MULTIMEDIA_KEYS.indexOf(mapKeyCodeToString(multimediaKeyClickAction.getKeyCode()))
+          state.keysMultimediaIndex = GROUP_MULTIMEDIA_KEYS.indexOf(mapKeyCodeToString(multimediaKeyClickAction.getKeyCode()) ?? '')
           break
 
         case NiaActionType.MouseButtonKeyClick:
           const mouseButtonKeyClickAction: NiaActionMouseButtonKeyClick = (action.getAction() as NiaActionMouseButtonKeyClick)
 
           state.selectedCategory = SelectedActionCategory.KeysMouseButton
-          state.keysMouseButtonIndex = GROUP_MOUSE_BUTTON_KEYS.indexOf(mapKeyCodeToString(mouseButtonKeyClickAction.getKeyCode()))
+          state.keysMouseButtonIndex = GROUP_MOUSE_BUTTON_KEYS.indexOf(mapKeyCodeToString(mouseButtonKeyClickAction.getKeyCode()) ?? '')
           break
 
         case NiaActionType.ExecuteCode:
@@ -485,7 +485,7 @@ const SelectedMappingInfoViewModule = defineModule({
         case NiaActionType.KeyClick:
           const keyClickAction: NiaActionKeyClick = (action.getAction() as NiaActionKeyClick)
 
-          let indexKeyClick: number = mapKeyCodeToIndex(keyClickAction.getKeyCode())
+          let indexKeyClick: number = mapKeyCodeToIndex(keyClickAction.getKeyCode()) ?? -1
 
           if (indexKeyClick === -1) {
             return
@@ -499,7 +499,7 @@ const SelectedMappingInfoViewModule = defineModule({
         case NiaActionType.KeyPress:
           const keyPressAction: NiaActionKeyPress = (action.getAction() as NiaActionKeyPress)
 
-          let indexKeyPress: number = mapKeyCodeToIndex(keyPressAction.getKeyCode())
+          let indexKeyPress: number = mapKeyCodeToIndex(keyPressAction.getKeyCode()) ?? -1
 
           if (indexKeyPress === -1) {
             return
@@ -513,7 +513,7 @@ const SelectedMappingInfoViewModule = defineModule({
         case NiaActionType.KeyRelease:
           const keyReleaseAction: NiaActionKeyRelease = (action.getAction() as NiaActionKeyRelease)
 
-          let indexKeyRelease: number = mapKeyCodeToIndex(keyReleaseAction.getKeyCode())
+          let indexKeyRelease: number = mapKeyCodeToIndex(keyReleaseAction.getKeyCode()) ?? -1
 
           if (indexKeyRelease === -1) {
             return
@@ -527,7 +527,7 @@ const SelectedMappingInfoViewModule = defineModule({
         case NiaActionType.MouseButtonClick:
           const mouseButtonClickAction: NiaActionMouseButtonClick = (action.getAction() as NiaActionMouseButtonClick)
 
-          let indexMouseButtonClick: number = mapMouseButtonCodeToIndex(mouseButtonClickAction.getButtonCode())
+          let indexMouseButtonClick: number = mapMouseButtonCodeToIndex(mouseButtonClickAction.getButtonCode()) ?? -1
 
           if (indexMouseButtonClick === -1) {
             return
@@ -541,7 +541,7 @@ const SelectedMappingInfoViewModule = defineModule({
         case NiaActionType.MouseButtonPress:
           const mouseButtonPressAction: NiaActionMouseButtonPress = (action.getAction() as NiaActionMouseButtonPress)
 
-          let indexMouseButtonPress: number = mapMouseButtonCodeToIndex(mouseButtonPressAction.getButtonCode())
+          let indexMouseButtonPress: number = mapMouseButtonCodeToIndex(mouseButtonPressAction.getButtonCode()) ?? -1
 
           if (indexMouseButtonPress === -1) {
             return
@@ -555,7 +555,7 @@ const SelectedMappingInfoViewModule = defineModule({
         case NiaActionType.MouseButtonRelease:
           const mouseButtonReleaseAction: NiaActionMouseButtonRelease = (action.getAction() as NiaActionMouseButtonRelease)
 
-          let indexMouseButtonRelease: number = mapMouseButtonCodeToIndex(mouseButtonReleaseAction.getButtonCode())
+          let indexMouseButtonRelease: number = mapMouseButtonCodeToIndex(mouseButtonReleaseAction.getButtonCode()) ?? -1
 
           if (indexMouseButtonRelease === -1) {
             return

@@ -85,18 +85,24 @@
       const style: object = {}
 
       if (this.selectedItems.includes(this.item?.fullPath)) {
+        // @ts-ignore
         style.backgroundColor = '#555'
       } else if (this.hover) {
+        // @ts-ignore
         style.backgroundColor = '#333'
       }
 
       if (this.item?.isDirectory) {
+        // @ts-ignore
         style.color = 'gold'
       } else if (this.item?.name.endsWith('.nia')) {
+        // @ts-ignore
         style.color = 'purple'
       } else if (this.item?.name.endsWith('nl')) {
+        // @ts-ignore
         style.color = 'ligthtskyblue'
       } else {
+        // @ts-ignore
         style.color = 'white'
       }
 

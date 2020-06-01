@@ -1,4 +1,7 @@
-import {NiaFileEventResponse, NiaFileEventResponseType} from '@/utils/file-event/responses/file-event-response'
+import {
+  NiaFileEventResponse,
+  NiaFileEventResponseType
+} from '@/utils'
 
 export interface NiaFileEventResponseInterface {
   toFileEventResponse(): NiaFileEventResponse;
