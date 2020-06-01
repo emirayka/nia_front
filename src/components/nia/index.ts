@@ -1,5 +1,6 @@
 import NiaAccordion from './NiaAccordion.vue'
 import NiaAccordionItem from './NiaAccordionItem.vue'
+import NiaBasicTerminal from './NiaBasicTerminal.vue'
 import NiaButton from './NiaButton.vue'
 import NiaCodeEditor from './NiaCodeEditor.vue'
 import NiaColoredDiv from './NiaColoredDiv.vue'
@@ -71,6 +72,7 @@ Vue.component('NiaTable', NiaTable)
 Vue.component('NiaTableRow', NiaTableRow)
 Vue.component('NiaTableRowItem', NiaTableRowItem)
 Vue.component('NiaTabs', NiaTabs)
+Vue.component('NiaBasicTerminal', NiaBasicTerminal)
 Vue.component('NiaToolbar', NiaToolbar)
 Vue.component('NiaToolbarItem', NiaToolbarItem)
 Vue.component('NiaTreeView', NiaTreeView)

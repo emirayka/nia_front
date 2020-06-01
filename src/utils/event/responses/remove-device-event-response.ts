@@ -4,6 +4,7 @@ import {
 } from '@/utils'
 import SerializableObject from '@/utils/serializable-object'
 import {NiaRemoveDeviceByPathResponse} from '@/utils/protocol/responses/remove-device-by-path-response'
+import {ExecutionResult} from '@/store/models'
 
 export interface NiaRemoveDeviceResponseObject {
   devicePath: string
@@ -68,6 +69,16 @@ export class NiaRemoveDeviceEventResponse implements SerializableObject<NiaRemov
     const niaEventResponse = new NiaEventResponse(this)
 
     return niaEventResponse
+  }
+
+  toExecutionResult(): ExecutionResult {
+    return {
+      code: ``,
+      success: this.success,
+      error: this.error,
+      failure: this.failure,
+      result: this.message
+    }
   }
 
   static deserialize(serialized: NiaRemoveDeviceResponseObject): NiaRemoveDeviceEventResponse {

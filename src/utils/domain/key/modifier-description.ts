@@ -42,6 +42,10 @@ SerializableObject<NiaModifierDescription, NiaModifierDescriptionSerialized> {
     }
   }
 
+  stringify(): string {
+    return `Modifier: ${this.key.stringify()}`
+  }
+
   static deserialize(serialized: NiaModifierDescriptionSerialized): NiaModifierDescription {
     const args: NiaModifierDescriptionObject = {
       key: NiaKey.deserialize(serialized.key),

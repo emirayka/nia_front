@@ -17,8 +17,8 @@
           @nav="$emit('nav', $event)"
         />
         <NiaNavbarNav
-          title="Settings"
-          path="/Settings"
+          title="Terminal"
+          path="/Terminal"
           @nav="$emit('nav', $event)"
         />
       </NiaNavbarItem>

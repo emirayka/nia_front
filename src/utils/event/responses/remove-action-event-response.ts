@@ -7,6 +7,7 @@ import {
 } from '@/utils'
 
 import SerializableObject from '@/utils/serializable-object'
+import {ExecutionResult} from '@/store/models'
 
 export interface NiaRemoveActionEventResponseObject {
   actionName: string
@@ -53,6 +54,16 @@ export class NiaRemoveActionEventResponse implements SerializableObject<NiaRemov
     }
 
     return new NiaRemoveActionEventResponse(args)
+  }
+
+  toExecutionResult(): ExecutionResult {
+    return {
+      code: ``,
+      result: this.message,
+      success: this.success,
+      error: this.error,
+      failure: this.failure,
+    }
   }
 
   getActionName(): string {

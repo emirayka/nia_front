@@ -48,6 +48,10 @@ import {
   NiaDisconnectedEventResponse,
   NiaDisconnectedEventResponseSerialized,
 } from '@/utils/event/responses/disconnected-event-response'
+import {
+  NiaExecuteTerminalCodeEventResponse,
+  NiaExecuteTerminalCodeEventResponseSerialized,
+} from '@/utils/event/responses/execute-terminal-code-event-response'
 
 export enum NiaEventResponseType {
   Connected,
@@ -55,6 +59,7 @@ export enum NiaEventResponseType {
 
   Synchronize,
   ExecuteCode,
+  ExecuteTerminalCode,
 
   DefineDevice,
   RemoveDevice,
@@ -79,6 +84,7 @@ export type NiaEventResponseUnderlyingType =
 
   NiaSynchronizeEventResponse |
   NiaExecuteCodeEventResponse |
+  NiaExecuteTerminalCodeEventResponse |
 
   NiaDefineDeviceEventResponse |
   NiaRemoveDeviceEventResponse |
@@ -102,6 +108,7 @@ export type NiaEventResponseUnderlyingTypeSerialized =
 
   NiaSynchronizeEventResponseSerialized |
   NiaExecuteCodeEventResponseSerialized |
+  NiaExecuteTerminalCodeEventResponseSerialized |
 
   NiaDefineDeviceEventResponseSerialized |
   NiaRemoveDeviceResponseSerialized |
@@ -145,6 +152,10 @@ export class NiaEventResponse implements SerializableObject<NiaEventResponse, Ni
 
   isExecuteCodeEventResponse(): boolean {
     return this.event instanceof NiaExecuteCodeEventResponse
+  }
+
+  isExecuteTerminalCodeEventResponse(): boolean {
+    return this.event instanceof NiaExecuteTerminalCodeEventResponse
   }
 
   isDefineDeviceEventResponse(): boolean {
@@ -206,6 +217,10 @@ export class NiaEventResponse implements SerializableObject<NiaEventResponse, Ni
 
   takeExecuteCodeEventResponse(): NiaExecuteCodeEventResponse {
     return this.event as NiaExecuteCodeEventResponse
+  }
+
+  takeExecuteTerminalCodeEventResponse(): NiaExecuteTerminalCodeEventResponse {
+    return this.event as NiaExecuteTerminalCodeEventResponse
   }
 
   takeDefineDeviceEventResponse(): NiaDefineDeviceEventResponse {
@@ -273,6 +288,11 @@ export class NiaEventResponse implements SerializableObject<NiaEventResponse, Ni
         const executeCodeEventResponseSerialized = serialized.eventResponse as NiaExecuteCodeEventResponseSerialized
         const executeCodeEventResponse = NiaExecuteCodeEventResponse.deserialize(executeCodeEventResponseSerialized)
         return new NiaEventResponse(executeCodeEventResponse)
+
+      case NiaEventResponseType.ExecuteTerminalCode:
+        const executeTerminalCodeEventResponseSerialized = serialized.eventResponse as NiaExecuteTerminalCodeEventResponseSerialized
+        const executeTerminalCodeEventResponse = NiaExecuteTerminalCodeEventResponse.deserialize(executeTerminalCodeEventResponseSerialized)
+        return new NiaEventResponse(executeTerminalCodeEventResponse)
 
       case NiaEventResponseType.DefineDevice:
         const defineDeviceEventResponseSerialized = serialized.eventResponse as NiaDefineDeviceEventResponseSerialized
@@ -356,6 +376,11 @@ export class NiaEventResponse implements SerializableObject<NiaEventResponse, Ni
       return {
         eventType: NiaEventResponseType.ExecuteCode,
         eventResponse: (this.event as NiaExecuteCodeEventResponse).serialize(),
+      }
+    } else if (this.event instanceof NiaExecuteTerminalCodeEventResponse) {
+      return {
+        eventType: NiaEventResponseType.ExecuteTerminalCode,
+        eventResponse: (this.event as NiaExecuteTerminalCodeEventResponse).serialize(),
       }
     } else if (this.event instanceof NiaDefineDeviceEventResponse) {
       return {

@@ -7,6 +7,7 @@ import {
 } from '@/utils'
 
 import SerializableObject from '@/utils/serializable-object'
+import {ExecutionResult} from '@/store/models'
 
 export interface NiaDefineMappingEventResponseObject {
   mapping: NiaMapping
@@ -39,6 +40,16 @@ export class NiaDefineMappingEventResponse implements SerializableObject<NiaDefi
     this.success = args.success
     this.error = args.error
     this.failure = args.failure
+  }
+
+  toExecutionResult(): ExecutionResult {
+    return {
+      code: ``,
+      result: this.message,
+      success: this.success,
+      error: this.error,
+      failure: this.failure,
+    }
   }
 
   static from(event: NiaDefineMappingEvent, response: NiaDefineMappingResponse): NiaDefineMappingEventResponse {

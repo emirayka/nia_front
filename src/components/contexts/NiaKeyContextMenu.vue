@@ -51,10 +51,22 @@
     addMapping(): void {
       const selectedKeys: Array<NiaKey> = store.getters.UI.Devices.selectedKeys
       const selectedOrdinaryKeys: Array<NiaKey> = selectedKeys.filter((key: NiaKey) => {
-        return !store.getters.Keymapping.Modifiers.isKeyModifier(key)
+        const genericKey: NiaKey = key.toGenericKey()
+
+        return !store.getters.Keymapping.Modifiers.isKeyModifier(key) &&
+          !store.getters.Keymapping.Modifiers.isKeyModifier(genericKey)
       })
       const selectedModifierKeys: Array<NiaKey> = selectedKeys.filter((key: NiaKey) => {
-        return store.getters.Keymapping.Modifiers.isKeyModifier(key)
+        const genericKey: NiaKey = key.toGenericKey()
+
+        return store.getters.Keymapping.Modifiers.isKeyModifier(key) ||
+          store.getters.Keymapping.Modifiers.isKeyModifier(genericKey)
+      }).map((key: NiaKey) => {
+        if (!store.getters.Keymapping.Modifiers.isKeyModifier(key)) {
+          return key.toGenericKey()
+        }
+
+        return key
       })
 
       if (selectedOrdinaryKeys.length === 1) {
@@ -82,6 +94,11 @@
 
     clickHandler(name: string): void {
       const key: NiaKey | null = store.getters.Context.Key.key
+      let genericKey: NiaKey | null = null
+
+      if (key !== null) {
+        genericKey = key.toGenericKey()
+      }
 
       if (key !== null) {
         switch (name) {
@@ -94,10 +111,17 @@
             break;
 
           case ITEM_REMOVE_FROM_MODIFIERS:
-            store.dispatch.Connection.removeModifier({
-              deviceId: key.getDeviceId(),
-              keyCode: key.getKeyCode(),
-            })
+            if (store.getters.Keymapping.Modifiers.isKeyModifier(key)) {
+              store.dispatch.Connection.removeModifier({
+                keyCode: key.getKeyCode(),
+                deviceId: key.getDeviceId()
+              })
+            } else if (genericKey !== null && store.getters.Keymapping.Modifiers.isKeyModifier(genericKey)) {
+              store.dispatch.Connection.removeModifier({
+                keyCode: genericKey.getKeyCode(),
+                deviceId: genericKey.getDeviceId()
+              })
+            }
             break;
 
           case ITEM_ADD_TO_MODIFIERS:
@@ -130,7 +154,10 @@
 
         const selectedKeys: Array<NiaKey> = store.getters.UI.Devices.selectedKeys
         const selectedOrdinaryKeys: Array<NiaKey> = selectedKeys.filter((key: NiaKey) => {
-          return !store.getters.Keymapping.Modifiers.isKeyModifier(key)
+          const genericKey: NiaKey = key.toGenericKey()
+
+          return !store.getters.Keymapping.Modifiers.isKeyModifier(key) &&
+            !store.getters.Keymapping.Modifiers.isKeyModifier(genericKey)
         })
 
         if (selectedOrdinaryKeys.length === 1) {

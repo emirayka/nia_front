@@ -31,6 +31,16 @@ export class NiaStopListeningEventResponse implements serializable<NiaStopListen
     this.failure = args.failure
   }
 
+  toExecutionResult(): ExecutionResult {
+    return {
+      code: ``,
+      result: this.message,
+      success: this.success,
+      error: this.error,
+      failure: this.failure,
+    }
+  }
+
   static from(event: NiaStopListeningEvent, response: NiaStopListeningResponse): NiaStopListeningEventResponse {
     const args: NiaStopListeningEventResponseObject = {
       message: response.getMessage(),

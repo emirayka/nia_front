@@ -3,6 +3,7 @@ import VueRouter, {RouteConfig} from 'vue-router'
 
 import Devices from '../views/Devices.vue'
 import Editor from '../views/Editor.vue'
+import Terminal from '../views/Terminal.vue'
 import Settings from '../views/Settings.vue'
 
 Vue.use(VueRouter)
@@ -17,6 +18,11 @@ const routes: Array<RouteConfig> = [
     path: '/Editor',
     name: 'Editor',
     component: Editor,
+  },
+  {
+    path: '/Terminal',
+    name: 'Terminal',
+    component: Terminal,
   },
   {
     path: '/Settings',

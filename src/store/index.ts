@@ -10,6 +10,7 @@ import {
   Editor,
   Keymapping,
   Theme,
+  Terminal,
   UI,
 } from './modules'
 
@@ -29,6 +30,7 @@ const {
     Context,
     Keymapping,
     Theme,
+    Terminal,
     UI,
     Editor,
   },

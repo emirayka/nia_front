@@ -9,6 +9,7 @@ import {
 } from '@/utils'
 
 import SerializableObject from '@/utils/serializable-object'
+import {ExecutionResult} from '@/store/models'
 
 export interface NiaRemoveModifierEventResponseObject {
   deviceId: number
@@ -53,6 +54,16 @@ export class NiaRemoveModifierEventResponse implements SerializableObject<NiaRem
     }
 
     return new NiaRemoveModifierEventResponse(args)
+  }
+
+  toExecutionResult(): ExecutionResult {
+    return {
+      code: ``,
+      result: this.message,
+      success: this.success,
+      error: this.error,
+      failure: this.failure,
+    }
   }
 
   getDeviceId(): number {

@@ -23,6 +23,13 @@ export class NiaKey implements SerializablePB<NiaKey, Key>, SerializableObject<N
     this.deviceId = args.deviceId
   }
 
+  toGenericKey(): NiaKey {
+    return new NiaKey({
+      keyCode: this.keyCode,
+      deviceId: null
+    })
+  }
+
   getDeviceId(): number | null {
     return this.deviceId
   }
@@ -32,7 +39,11 @@ export class NiaKey implements SerializablePB<NiaKey, Key>, SerializableObject<N
   }
 
   stringify(): string {
-    const keyCode: string = mapKeyCodeToString(this.keyCode)
+    const keyCode: string | null = mapKeyCodeToString(this.keyCode)
+
+    if (keyCode === null) {
+      return 'Unknown'
+    }
 
     if (this.deviceId !== null) {
       return `${this.deviceId}:${keyCode}`

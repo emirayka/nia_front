@@ -6,6 +6,7 @@ import {
 
 import SerializableObject from '@/utils/serializable-object'
 import {NiaDefineActionResponse} from '@/utils/protocol/responses/define-action-response'
+import {ExecutionResult} from '@/store/models'
 
 export interface NiaDefineActionEventResponseObject {
   action: NiaNamedAction
@@ -38,6 +39,16 @@ export class NiaDefineActionEventResponse implements SerializableObject<NiaDefin
     this.success = args.success
     this.error = args.error
     this.failure = args.failure
+  }
+
+  toExecutionResult(): ExecutionResult {
+    return {
+      code: ``,
+      result: this.message,
+      success: this.success,
+      error: this.error,
+      failure: this.failure,
+    }
   }
 
   static from(event: NiaDefineActionEvent, response: NiaDefineActionResponse): NiaDefineActionEventResponse {

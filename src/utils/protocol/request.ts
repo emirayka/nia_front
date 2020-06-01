@@ -10,7 +10,7 @@ import {
   GetDefinedModifiersRequest,
   GetDevicesRequest,
   HandshakeRequest, IsListeningRequest,
-  RemoveActionRequest,
+  RemoveActionRequest, RemoveDeviceByIdRequest,
   RemoveDeviceByNameRequest,
   RemoveDeviceByPathRequest,
   RemoveMappingRequest,
@@ -37,6 +37,7 @@ import {NiaChangeMappingRequest} from '@/utils/protocol/requests/change-mapping-
 import {NiaStartListeningRequest} from '@/utils/protocol/requests/start-listening-request'
 import {NiaStopListeningRequest} from '@/utils/protocol/requests/stop-listening-request'
 import {NiaIsListeningRequest} from '@/utils/protocol/requests/is-listening-request'
+import {NiaRemoveDeviceByIdRequest} from '@/utils/protocol/requests/remove-device-by-id-request'
 
 export type NiaRequestUnderlyingType = NiaHandshakeRequest |
   NiaGetDevicesRequest |
@@ -45,6 +46,8 @@ export type NiaRequestUnderlyingType = NiaHandshakeRequest |
   NiaDefineDeviceRequest |
   NiaRemoveDeviceByNameRequest |
   NiaRemoveDeviceByPathRequest |
+  NiaRemoveDeviceByIdRequest |
+  NiaRemoveDeviceByIdRequest |
   NiaDefineModifierRequest |
   NiaRemoveModifierRequest |
   NiaGetDefinedActionsRequest |
@@ -66,6 +69,7 @@ export enum NiaRequestType {
   DefineDevice,
   RemoveDeviceByName,
   RemoveDeviceByPath,
+  RemoveDeviceById,
   DefineModifier,
   RemoveModifier,
   GetDefinedActions,
@@ -148,6 +152,13 @@ export class NiaRequest implements SerializablePB<NiaRequest, Request> {
         const removeDeviceByPathRequestPB: RemoveDeviceByPathRequest = removeDeviceByPathRequest.toPB()
 
         request.setRemoveDeviceByPathRequest(removeDeviceByPathRequestPB)
+        break
+
+      case NiaRequestType.RemoveDeviceById:
+        const removeDeviceByIdRequest: NiaRemoveDeviceByIdRequest = this.request as NiaRemoveDeviceByIdRequest
+        const removeDeviceByIdRequestPB: RemoveDeviceByIdRequest = removeDeviceByIdRequest.toPB()
+
+        request.setRemoveDeviceByIdRequest(removeDeviceByIdRequestPB)
         break
 
       case NiaRequestType.DefineModifier:

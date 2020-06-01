@@ -31,6 +31,16 @@ export class NiaStartListeningEventResponse implements serializable<NiaStartList
     this.failure = args.failure
   }
 
+  toExecutionResult(): ExecutionResult {
+    return {
+      code: ``,
+      result: this.message,
+      success: this.success,
+      error: this.error,
+      failure: this.failure,
+    }
+  }
+
   static from(event: NiaStartListeningEvent, response: NiaStartListeningResponse): NiaStartListeningEventResponse {
     const args: NiaStartListeningEventResponseObject = {
       message: response.getMessage(),

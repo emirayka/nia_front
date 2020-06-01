@@ -32,10 +32,15 @@ import {NiaRemoveActionEvent, NiaRemoveActionEventSerialized} from '@/utils'
 import {NiaChangeMappingEvent, NiaChangeMappingEventSerialized} from '@/utils/event/events/change-mapping-event'
 import {NiaStartListeningEvent, NiaStartListeningEventSerialized} from '@/utils/event/events/start-listening-event'
 import {NiaStopListeningEvent, NiaStopListeningEventSerialized} from '@/utils/event/events/stop-listening-event'
+import {
+  NiaExecuteTerminalCodeEvent,
+  NiaExecuteTerminalCodeEventSerialized,
+} from '@/utils/event/events/execute-terminal-code-event'
 
 export enum NiaEventType {
   Synchronize,
   ExecuteCode,
+  ExecuteTerminalCode,
 
   DefineDevice,
   RemoveDevice,
@@ -56,6 +61,7 @@ export enum NiaEventType {
 
 export type NiaEventUnderlyingTypeSerialized = NiaSynchronizeEventSerialized |
   NiaExecuteCodeEventSerialized |
+  NiaExecuteTerminalCodeEventSerialized |
   NiaDefineDeviceEventSerialized |
   NiaRemoveDeviceEventSerialized |
   NiaDefineModifierEventSerialized |
@@ -71,6 +77,7 @@ export type NiaEventUnderlyingTypeSerialized = NiaSynchronizeEventSerialized |
 export type NiaEventUnderlyingType =
   NiaSynchronizeEvent |
   NiaExecuteCodeEvent |
+  NiaExecuteTerminalCodeEvent |
   NiaDefineDeviceEvent |
   NiaRemoveDeviceEvent |
   NiaDefineModifierEvent |
@@ -103,6 +110,10 @@ export class NiaEvent implements SerializableObject<NiaEvent, NiaEventSerialized
 
   isExecuteCodeEvent(): boolean {
     return this.eventType === NiaEventType.ExecuteCode
+  }
+
+  isExecuteTerminalCodeEvent(): boolean {
+    return this.eventType === NiaEventType.ExecuteTerminalCode
   }
 
   isDefineDeviceEvent(): boolean {
@@ -155,6 +166,10 @@ export class NiaEvent implements SerializableObject<NiaEvent, NiaEventSerialized
 
   takeExecuteCodeEvent(): NiaExecuteCodeEvent {
     return this.event as NiaExecuteCodeEvent
+  }
+
+  takeExecuteTerminalCodeEvent(): NiaExecuteTerminalCodeEvent {
+    return this.event as NiaExecuteTerminalCodeEvent
   }
 
   takeDefineDeviceEvent(): NiaDefineDeviceEvent {
@@ -212,6 +227,11 @@ export class NiaEvent implements SerializableObject<NiaEvent, NiaEventSerialized
         const executeCodeEventSerialized = serialized.event as NiaExecuteCodeEventSerialized
         const executeCodeEvent = NiaExecuteCodeEvent.deserialize(executeCodeEventSerialized)
         return new NiaEvent(executeCodeEvent)
+
+      case NiaEventType.ExecuteTerminalCode:
+        const executeTerminalCodeEventSerialized = serialized.event as NiaExecuteTerminalCodeEventSerialized
+        const executeTerminalCodeEvent = NiaExecuteTerminalCodeEvent.deserialize(executeTerminalCodeEventSerialized)
+        return new NiaEvent(executeTerminalCodeEvent)
 
       case NiaEventType.DefineDevice:
         const defineDeviceEventSerialized = serialized.event as NiaDefineDeviceEventSerialized
@@ -285,6 +305,12 @@ export class NiaEvent implements SerializableObject<NiaEvent, NiaEventSerialized
         return {
           eventType: this.eventType,
           event: (this.event as NiaExecuteCodeEvent).serialize(),
+        }
+
+      case NiaEventType.ExecuteTerminalCode:
+        return {
+          eventType: this.eventType,
+          event: (this.event as NiaExecuteTerminalCodeEvent).serialize(),
         }
 
       case NiaEventType.DefineDevice:

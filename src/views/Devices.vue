@@ -60,7 +60,6 @@
     <NiaAddModifierDialog v-if="addModifierDialogIsShown"/>
     <NiaAddActionDialog v-if="addActionDialogIsShown" />
     <NiaAddMappingDialog v-if="addMappingDialogIsShown" />
-    <NiaErrorDialog v-if="errorDialogIsShown" />
 
     <NiaActionContextMenu />
     <NiaActionTableContextMenu />
@@ -86,7 +85,6 @@
   import NiaAddModifierDialog from '@/components/dialogs/NiaAddModifierDialog.vue'
   import NiaAddActionDialog from '@/components/dialogs/NiaAddActionDialog.vue'
   import NiaAddMappingDialog from '@/components/dialogs/NiaAddMappingDialog.vue'
-  import NiaErrorDialog from '@/components/dialogs/NiaErrorDialog.vue'
 
   import NiaKeyContextMenu from '@/components/contexts/NiaKeyContextMenu.vue'
   import NiaDeviceContextMenu from '@/components/contexts/NiaDeviceContextMenu.vue'
@@ -110,7 +108,6 @@
       NiaAddModifierDialog,
       NiaAddActionDialog,
       NiaAddMappingDialog,
-      NiaErrorDialog,
       NiaMappingView,
 
       NiaKeyContextMenu,
@@ -132,9 +129,6 @@
     }
     get addMappingDialogIsShown(): boolean {
       return store.getters.UI.AddMappingDialog.isShown
-    }
-    get errorDialogIsShown(): boolean {
-      return store.getters.UI.ErrorDialog.isShown
     }
   }
 </script>

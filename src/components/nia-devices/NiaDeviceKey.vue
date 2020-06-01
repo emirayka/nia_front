@@ -143,11 +143,7 @@
     }
 
     get mappedKeyCode(): string {
-      const result: string | undefined = mapKeyCodeToString(this.code)
-
-      if (result === undefined) {
-        return 'Unknown'
-      }
+      const result: string = mapKeyCodeToString(this.code) ?? 'Unknown'
 
       return result
     }

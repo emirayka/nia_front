@@ -1,5 +1,3 @@
-import {ok, err, Result} from 'neverthrow'
-
 import {
   RemoveDeviceByPathResponse,
   Response,

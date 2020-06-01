@@ -7,6 +7,7 @@ import {
 import SerializableObject from '@/utils/serializable-object'
 import {NiaChangeMappingEvent} from '@/utils/event/events/change-mapping-event'
 import {NiaChangeMappingResponse} from '@/utils/protocol/responses/change-mapping-response'
+import {ExecutionResult} from '@/store/models'
 
 export interface NiaChangeMappingEventResponseObject {
   keyChords: Array<NiaKeyChord>
@@ -44,6 +45,16 @@ export class NiaChangeMappingEventResponse implements SerializableObject<NiaChan
     this.success = args.success
     this.error = args.error
     this.failure = args.failure
+  }
+
+  toExecutionResult(): ExecutionResult {
+    return {
+      code: ``,
+      result: this.message,
+      success: this.success,
+      error: this.error,
+      failure: this.failure,
+    }
   }
 
   static from(event: NiaChangeMappingEvent, response: NiaChangeMappingResponse): NiaChangeMappingEventResponse {

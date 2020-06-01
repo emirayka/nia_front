@@ -100,14 +100,14 @@
       const device: NiaDeviceInfo | null = store.getters.Keymapping.DevicesInfo.getDeviceById(deviceId)
 
       if (device === null) {
-        return ''
+        return 'Every device'
       }
 
       return device.getDeviceName()
     }
 
     getModifierName(keyCode: number): string {
-      return mapKeyCodeToString(keyCode)
+      return mapKeyCodeToString(keyCode) ?? ''
     }
 
     modifierRowClasses(modifier: NiaModifierDescription): object {

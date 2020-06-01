@@ -12,6 +12,7 @@ import {
 } from '@/utils'
 
 import SerializableObject from '@/utils/serializable-object'
+import {ExecutionResult} from '@/store/models'
 
 export interface NiaDefineModifierEventResponseObject {
   modifier: NiaModifierDescription,
@@ -85,6 +86,16 @@ export class NiaDefineModifierEventResponse implements SerializableObject<NiaDef
     const niaEventResponse = new NiaEventResponse(this)
 
     return niaEventResponse
+  }
+
+  toExecutionResult(): ExecutionResult {
+    return {
+      code: ``,
+      result: this.message,
+      success: this.success,
+      error: this.error,
+      failure: this.failure,
+    }
   }
 
   static deserialize(serialized: NiaDefineModifierEventResponseSerialized): NiaDefineModifierEventResponse {

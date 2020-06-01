@@ -9,6 +9,7 @@
     </keep-alive>
 
     <NiaLoadingDialog v-if="!connected"/>
+    <NiaErrorDialog v-if="errorDialogIsShown" />
   </div>
 </template>
 
@@ -19,6 +20,7 @@
   import Component from 'vue-class-component'
 
   import NiaLoadingDialog from '@/components/dialogs/NiaLoadingDialog.vue'
+  import NiaErrorDialog from '@/components/dialogs/NiaErrorDialog.vue'
 
   import store from '@/store'
 
@@ -29,11 +31,16 @@
     components: {
       NiaAppNavbar,
       NiaLoadingDialog,
+      NiaErrorDialog,
     },
   })
   export default class extends Vue {
     get connected(): boolean {
       return store.getters.Connection.isConnected
+    }
+
+    get errorDialogIsShown(): boolean {
+      return store.getters.UI.ErrorDialog.isShown
     }
 
     handleNav(event: string) {

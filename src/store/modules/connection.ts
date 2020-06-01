@@ -54,6 +54,13 @@ import {NiaStartListeningEvent} from '@/utils/event/events/start-listening-event
 import {NiaConnectedEventResponse} from '@/utils/event/responses/connected-event-response'
 import {NiaDisconnectedEventResponse} from '@/utils/event/responses/disconnected-event-response'
 
+// @ts-ignore
+import {createStdout} from 'vue-command'
+import {
+  NiaExecuteTerminalCodeEvent,
+  NiaExecuteTerminalCodeEventObject,
+} from '@/utils/event/events/execute-terminal-code-event'
+import {NiaExecuteTerminalCodeEventResponse} from '@/utils/event/responses/execute-terminal-code-event-response'
 
 type IPCListener = (_: any, eventResponse: NiaEventResponseSerialized) => void;
 
@@ -141,7 +148,14 @@ const ConnectionModule = defineModule({
 
       dispatch.sendEvent(event)
     },
+    executeTerminalCode(context, args: NiaExecuteTerminalCodeEventObject): void {
+      const { dispatch } = ConnectionModuleActionContext(context)
 
+      const executeTerminalCodeEvent: NiaExecuteTerminalCodeEvent = new NiaExecuteTerminalCodeEvent(args)
+      const event: NiaEvent = executeTerminalCodeEvent.toEvent()
+
+      dispatch.sendEvent(event)
+    },
     defineDevice(context, args: NiaDefineDeviceEventObject): void {
       const { dispatch } = ConnectionModuleActionContext(context)
 
@@ -233,6 +247,7 @@ const ConnectionModule = defineModule({
         dispatch.sendEvent(event)
       } else {
         rootCommit.UI.ErrorDialog.show('There is no devices to listen.')
+        rootCommit.Terminal.resolve(createStdout("No devices were defined."))
       }
     },
 
@@ -288,14 +303,23 @@ const ConnectionModule = defineModule({
 
       rootCommit.Editor.addExecutionResult(executionResult)
     },
+    handleExecuteTerminalCodeEventResponse(context, response: NiaExecuteTerminalCodeEventResponse): void {
+      const { rootCommit } = ConnectionModuleActionContext(context)
+      const executionResult: ExecutionResult = response.toExecutionResult()
+
+      rootCommit.Terminal.resolve(executionResult)
+    },
     handleDefineDeviceResponse(context, response: NiaDefineDeviceEventResponse): void {
       const { rootCommit } = ConnectionModuleActionContext(context)
 
       if (response.isSuccess()) {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         rootCommit.Keymapping.DevicesInfo.makeDeviceDefined(response.getDeviceId())
       } else if (response.isError()) {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         rootCommit.UI.ErrorDialog.show(response.getMessage())
       } else {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         rootCommit.UI.ErrorDialog.show(response.getMessage())
       }
     },
@@ -303,10 +327,13 @@ const ConnectionModule = defineModule({
       const { rootCommit } = ConnectionModuleActionContext(context)
 
       if (response.isSuccess()) {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         rootCommit.Keymapping.DevicesInfo.makeDeviceRemoved(response.getDevicePath())
       } else if (response.isError()) {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         rootCommit.UI.ErrorDialog.show(response.getMessage())
       } else {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         rootCommit.UI.ErrorDialog.show(response.getMessage())
       }
     },
@@ -315,10 +342,13 @@ const ConnectionModule = defineModule({
 
       if (response.isSuccess()) {
         const modifier: NiaModifierDescription = response.getModifier()
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         rootCommit.Keymapping.Modifiers.defineModifier(modifier)
       } else if (response.isError()) {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         rootCommit.UI.ErrorDialog.show(response.getMessage())
       } else {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         rootCommit.UI.ErrorDialog.show(response.getMessage())
       }
     },
@@ -326,11 +356,15 @@ const ConnectionModule = defineModule({
       const { rootCommit } = ConnectionModuleActionContext(context)
 
       if (response.isSuccess()) {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         const modifierKey: NiaKey = response.toModifierKey()
+
         rootCommit.Keymapping.Modifiers.removeModifier(modifierKey)
       } else if (response.isError()) {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         rootCommit.UI.ErrorDialog.show(response.getMessage())
       } else {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         rootCommit.UI.ErrorDialog.show(response.getMessage())
       }
     },
@@ -338,11 +372,14 @@ const ConnectionModule = defineModule({
       const { rootCommit } = ConnectionModuleActionContext(context)
 
       if (response.isSuccess()) {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         rootCommit.Keymapping.Actions.defineAction(response.getAction())
         rootCommit.UI.AddActionDialog.hide()
       } else if (response.isError()) {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         rootCommit.UI.ErrorDialog.show(response.getMessage())
       } else {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         rootCommit.UI.ErrorDialog.show(response.getMessage())
       }
     },
@@ -350,10 +387,13 @@ const ConnectionModule = defineModule({
       const { rootCommit } = ConnectionModuleActionContext(context)
 
       if (response.isSuccess()) {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         rootCommit.Keymapping.Actions.removeAction(response.getActionName())
       } else if (response.isError()) {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         rootCommit.UI.ErrorDialog.show(response.getMessage())
       } else {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         rootCommit.UI.ErrorDialog.show(response.getMessage())
       }
     },
@@ -361,12 +401,15 @@ const ConnectionModule = defineModule({
       const { rootCommit } = ConnectionModuleActionContext(context)
 
       if (response.isSuccess()) {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         rootCommit.Keymapping.Mappings.defineMapping(response.getMapping())
         rootCommit.UI.AddMappingDialog.hide()
         rootCommit.UI.MappingTable.selectMapping(response.getMapping())
       } else if (response.isError()) {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         rootCommit.UI.ErrorDialog.show(response.getMessage())
       } else {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         rootCommit.UI.ErrorDialog.show(response.getMessage())
       }
     },
@@ -374,14 +417,17 @@ const ConnectionModule = defineModule({
       const { rootCommit } = ConnectionModuleActionContext(context)
 
       if (response.isSuccess()) {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         rootCommit.Keymapping.Mappings.changeMapping({
             keyChords: response.getKeyChords(),
             action: response.getAction(),
           },
         )
       } else if (response.isError()) {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         rootCommit.UI.ErrorDialog.show(response.getMessage())
       } else {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         rootCommit.UI.ErrorDialog.show(response.getMessage())
       }
     },
@@ -389,6 +435,8 @@ const ConnectionModule = defineModule({
       const { rootCommit, rootGetters } = ConnectionModuleActionContext(context)
 
       if (response.isSuccess()) {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
+
         rootCommit.Keymapping.Mappings.removeMapping(response.getKeyChords())
         rootCommit.UI.MappingTable.unselectMapping()
 
@@ -400,8 +448,10 @@ const ConnectionModule = defineModule({
           rootCommit.UI.MappingTable.unselectMapping()
         }
       } else if (response.isError()) {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         rootCommit.UI.ErrorDialog.show(response.getMessage())
       } else {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         rootCommit.UI.ErrorDialog.show(response.getMessage())
       }
     },
@@ -409,10 +459,13 @@ const ConnectionModule = defineModule({
       const { rootCommit } = ConnectionModuleActionContext(context)
 
       if (response.isSuccess()) {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         rootCommit.Keymapping.Listening.setListening(true)
       } else if (response.isError()) {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         rootCommit.UI.ErrorDialog.show(response.getMessage())
       } else {
+        rootCommit.Terminal.resolve(response.toExecutionResult())
         rootCommit.UI.ErrorDialog.show(response.getMessage())
       }
     },
@@ -423,10 +476,13 @@ const ConnectionModule = defineModule({
 
       if (response.isSuccess()) {
         rootCommit.Keymapping.Listening.setListening(false)
+        rootCommit.Terminal.resolve(response.toExecutionResult())
       } else if (response.isError()) {
         rootCommit.UI.ErrorDialog.show(response.getMessage())
+        rootCommit.Terminal.resolve(response.toExecutionResult())
       } else {
         rootCommit.UI.ErrorDialog.show(response.getMessage())
+        rootCommit.Terminal.resolve(response.toExecutionResult())
       }
     },
     handleEventResponse(context, response: NiaEventResponse): void {
@@ -440,6 +496,8 @@ const ConnectionModule = defineModule({
         dispatch.handleSynchronizeEventResponse(response.takeSynchronizeEventResponse())
       } else if (response.isExecuteCodeEventResponse()) {
         dispatch.handleExecuteCodeEventResponse(response.takeExecuteCodeEventResponse())
+      } else if (response.isExecuteTerminalCodeEventResponse()) {
+        dispatch.handleExecuteTerminalCodeEventResponse(response.takeExecuteTerminalCodeEventResponse())
       } else if (response.isDefineDeviceEventResponse()) {
         dispatch.handleDefineDeviceResponse(response.takeDefineDeviceEventResponse())
       } else if (response.isRemoveDeviceEventResponse()) {

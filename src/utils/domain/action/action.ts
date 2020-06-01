@@ -26,7 +26,7 @@ import {
   NiaActionWait,
   NiaActionWaitSerialized,
 } from './basic-actions'
-import {SerializablePB} from '@/utils'
+import {NiaActionType, NiaNamedAction, SerializablePB} from '@/utils'
 import {
   Action,
   ActionControlKeyClick,
@@ -158,6 +158,26 @@ export class NiaAction implements SerializablePB<NiaAction, Action>, Serializabl
   constructor(args: NiaActionObject) {
     this.action = args.action
     this.actionType = args.action.getActionType()
+  }
+
+  toNamed(actionName: string): NiaNamedAction {
+    return new NiaNamedAction({
+      actionName,
+      action: this,
+    })
+  }
+
+  stringify(): string {
+    let stringified: string = `${this.getActionTypeName()}(${this.getFirstArgument()}`
+
+    if (this.actionType === NiaActionType.MouseAbsoluteMove ||
+      this.actionType === NiaActionType.MouseRelativeMove) {
+      stringified += `, ${this.getSecondArgument()}`
+    }
+
+    stringified += ')'
+
+    return stringified
   }
 
   getAction(): NiaActionUnderlyingType {

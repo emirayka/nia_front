@@ -135,7 +135,11 @@
     // methods
     getDeviceModifiers(deviceId: number): Array<NiaModifierDescription> {
       return this.modifiers
-        .filter((selectedModifier) => selectedModifier.getKey().getDeviceId() == deviceId)
+        .filter((selectedModifier) => {
+          const modifierDeviceId: number | null = selectedModifier.getKey().getDeviceId()
+
+          return modifierDeviceId === null || modifierDeviceId === deviceId
+        })
     }
 
     getDeviceSelectedKeys(deviceId: number): Array<NiaKey> {

@@ -6,6 +6,7 @@ import {
 import serializable from '@/utils/serializable-object'
 import {NiaDefineDeviceResponse} from '@/utils/protocol/responses/define-device-response'
 import SerializableObject from '@/utils/serializable-object'
+import {ExecutionResult} from '@/store/models'
 
 export interface NiaDefineDeviceEventResponseObject {
   deviceId: number
@@ -69,6 +70,16 @@ export class NiaDefineDeviceEventResponse implements SerializableObject<NiaDefin
     const niaEventResponse = new NiaEventResponse(this)
 
     return niaEventResponse
+  }
+
+  toExecutionResult(): ExecutionResult {
+    return {
+      code: `(device:define ${this.deviceId})`,
+      success: this.success,
+      error: this.error,
+      failure: this.failure,
+      result: this.message
+    }
   }
 
   static deserialize(obj: NiaDefineDeviceEventResponseSerialized): NiaDefineDeviceEventResponse {

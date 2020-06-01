@@ -139,7 +139,7 @@
     ),
     makeActionType(
       NiaActionType.MouseButtonPress,
-      'Mouse button click',
+      'Mouse button press',
       [
         {
           type: NiaFormPropertyType.Select,
@@ -151,7 +151,7 @@
     ),
     makeActionType(
       NiaActionType.MouseButtonClick,
-      'Mouse button press',
+      'Mouse button click',
       [
         {
           type: NiaFormPropertyType.Select,

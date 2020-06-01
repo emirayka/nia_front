@@ -57,6 +57,8 @@ import {NiaIsListeningResponse} from '@/utils/protocol/responses/is-listening-re
 import {ConnectionHolder} from '@/utils/sockets/connection-holder'
 import {NiaConnectedEventResponse} from '@/utils/event/responses/connected-event-response'
 import {NiaDisconnectedEventResponse} from '@/utils/event/responses/disconnected-event-response'
+import {NiaExecuteTerminalCodeEvent} from '@/utils/event/events/execute-terminal-code-event'
+import {NiaExecuteTerminalCodeEventResponse} from '@/utils/event/responses/execute-terminal-code-event-response'
 
 const logger  = loggers('handle')
 
@@ -128,6 +130,19 @@ const handleExecuteCodeEvent = async (
   )
 
   return executeCodeEventResponse.toEventResponse()
+}
+
+const handleExecuteTerminalCodeEvent = async (
+  niaProtocol: NiaProtocol,
+  event: NiaExecuteTerminalCodeEvent,
+): Promise<NiaEventResponse> => {
+  const executeTerminalCodeResponse: NiaExecuteCodeResponse = await niaProtocol.executeCode(event.getCode())
+  const executeTerminalCodeEventResponse: NiaExecuteTerminalCodeEventResponse = NiaExecuteTerminalCodeEventResponse.from(
+    event,
+    executeTerminalCodeResponse,
+  )
+
+  return executeTerminalCodeEventResponse.toEventResponse()
 }
 
 const handleDefineDeviceEvent = async (
@@ -355,6 +370,8 @@ const handleEvent = async (
     return handleSynchronizeEvent(niaProtocol)
   } else if (event.isExecuteCodeEvent()) {
     return handleExecuteCodeEvent(niaProtocol, event.takeExecuteCodeEvent())
+  } else if (event.isExecuteTerminalCodeEvent()) {
+    return handleExecuteTerminalCodeEvent(niaProtocol, event.takeExecuteTerminalCodeEvent())
   } else if (event.isDefineDeviceEvent()) {
     return handleDefineDeviceEvent(niaProtocol, event.takeDefineDeviceEvent())
   } else if (event.isRemoveDeviceEvent()) {

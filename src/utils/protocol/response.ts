@@ -6,7 +6,7 @@ import {
   ExecuteCodeResponse, GetDefinedActionsResponse, GetDefinedMappingsResponse,
   GetDefinedModifiersResponse,
   GetDevicesResponse,
-  HandshakeResponse, IsListeningResponse, RemoveActionResponse,
+  HandshakeResponse, IsListeningResponse, RemoveActionResponse, RemoveDeviceByIdResponse,
   RemoveDeviceByNameResponse,
   RemoveDeviceByPathResponse, RemoveMappingResponse, RemoveModifierResponse,
   Response, StartListeningResponse, StopListeningResponse,
@@ -33,6 +33,7 @@ import {NiaStartListeningResponse} from '@/utils/protocol/responses/start-listen
 import {NiaStopListeningRequest} from '@/utils/protocol/requests/stop-listening-request'
 import {NiaStopListeningResponse} from '@/utils/protocol/responses/stop-listening-response'
 import {NiaIsListeningResponse} from '@/utils/protocol/responses/is-listening-response'
+import {NiaRemoveDeviceByIdResponse} from '@/utils/protocol/responses/remove-device-by-id-response'
 
 export type NiaResponseUnderlyingType = NiaDefineDeviceResponse |
   NiaDefineModifierResponse |
@@ -42,6 +43,7 @@ export type NiaResponseUnderlyingType = NiaDefineDeviceResponse |
   NiaHandshakeResponse |
   NiaRemoveDeviceByNameResponse |
   NiaRemoveDeviceByPathResponse |
+  NiaRemoveDeviceByIdResponse |
   NiaRemoveModifierResponse |
   NiaGetDefinedActionsResponse |
   NiaDefineActionResponse |
@@ -63,6 +65,7 @@ export enum NiaResponseType {
   Handshake,
   RemoveDeviceByName,
   RemoveDeviceByPath,
+  RemoveDeviceById,
   RemoveModifier,
   GetDefinedActions,
   DefineAction,
@@ -174,6 +177,16 @@ export class NiaResponse {
 
         const removeDeviceByPathResponse: NiaRemoveDeviceByPathResponse = NiaRemoveDeviceByPathResponse.fromPB(removeDeviceByPathResponsePB)
         return new NiaResponse(removeDeviceByPathResponse)
+
+      case Response.ResponseCase.REMOVE_DEVICE_BY_ID_RESPONSE:
+        const removeDeviceByIdResponsePB: RemoveDeviceByIdResponse | undefined = responsePB.getRemoveDeviceByIdResponse()
+
+        if (removeDeviceByIdResponsePB === undefined) {
+          throw new Error('RemoveDeviceByIdResponse was not set')
+        }
+
+        const removeDeviceByIdResponse: NiaRemoveDeviceByIdResponse = NiaRemoveDeviceByIdResponse.fromPB(removeDeviceByIdResponsePB)
+        return new NiaResponse(removeDeviceByIdResponse)
 
       case Response.ResponseCase.REMOVE_MODIFIER_RESPONSE:
         const removeModifierResponsePB: RemoveModifierResponse | undefined = responsePB.getRemoveModifierResponse()
