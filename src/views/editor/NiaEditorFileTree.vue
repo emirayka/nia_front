@@ -48,6 +48,7 @@
       } else {
         store.dispatch.FileConnection.openFile(item.fullPath)
       }
+      store.commit.UI.EditorFileTree.selectItem(item)
     }
 
     clickHandler(item: NiaTreeViewObject): void {

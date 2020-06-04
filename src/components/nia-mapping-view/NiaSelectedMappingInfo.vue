@@ -258,6 +258,23 @@
             />
           </NiaContainer>
         </NiaTab>
+
+        <NiaTab title="Misc">
+          <NiaContainer>
+            <NiaSelectedMappingInfoEmpty
+              class="nia-selected-mapping-info__action-type-execute-interpreter-value"
+              title="Interpreter value to execute"
+              :selected="getters.isActiveExecuteInterpreterValue"
+            >
+              <span
+                v-if="getters.isActiveExecuteInterpreterValue"
+                style="color: lightgreen"
+              >
+                Details unavailable
+              </span>
+            </NiaSelectedMappingInfoEmpty>
+          </NiaContainer>
+        </NiaTab>
       </NiaTabs>
     </NiaContainer>
   </NiaContainer>
@@ -271,6 +288,7 @@
   import NiaSelectedMappingInfoNumber2 from './nia-selected-mapping-info/NiaSelectedMappingInfoNumber2.vue'
   import NiaSelectedMappingInfoText from './nia-selected-mapping-info/NiaSelectedMappingInfoText.vue'
   import NiaSelectedMappingInfoCode from './nia-selected-mapping-info/NiaSelectedMappingInfoCode.vue'
+  import NiaSelectedMappingInfoEmpty from './nia-selected-mapping-info/NiaSelectedMappingInfoEmpty.vue'
 
   import store from '@/store'
   import {NiaAction, NiaMapping} from '@/utils'
@@ -285,6 +303,7 @@
       NiaSelectedMappingInfoNumber2,
       NiaSelectedMappingInfoText,
       NiaSelectedMappingInfoCode,
+      NiaSelectedMappingInfoEmpty,
     },
   })
   export default class NiaSelectedMappingInfo extends Vue {
@@ -356,6 +375,11 @@
   }
 
   .nia-selected-mapping-info__action-type-execute-os-command {
+    box-sizing: border-box;
+    width: 95% !important;
+  }
+
+  .nia-selected-mapping-info__action-type-execute-interpreter-value {
     box-sizing: border-box;
     width: 95% !important;
   }

@@ -31,7 +31,7 @@ import {
   Action,
   ActionControlKeyClick,
   ActionExecuteCode,
-  ActionExecuteFunction,
+  ActionExecuteFunction, ActionExecuteInterpreterValue,
   ActionExecuteNamedAction,
   ActionExecuteOSCommand,
   ActionFunctionKeyClick,
@@ -86,6 +86,10 @@ import {
   NiaActionExecuteNamedActionSerialized,
 } from '@/utils/domain/action/basic-actions/action-execute-named-action'
 import ActionCase = Action.ActionCase
+import {
+  NiaActionExecuteInterpreterValue,
+  NiaActionExecuteInterpreterValueSerialized,
+} from '@/utils/domain/action/basic-actions/action-execute-interpreter-value'
 
 export type NiaActionUnderlyingType =
   NiaActionKeyPress |
@@ -112,7 +116,8 @@ export type NiaActionUnderlyingType =
   NiaActionExecuteCode |
   NiaActionExecuteFunction |
   NiaActionExecuteOSCommand |
-  NiaActionExecuteNamedAction
+  NiaActionExecuteNamedAction |
+  NiaActionExecuteInterpreterValue
 
 export type NiaActionUnderlyingTypeSerialized =
   NiaActionKeyPressSerialized |
@@ -140,7 +145,8 @@ export type NiaActionUnderlyingTypeSerialized =
   NiaActionExecuteFunctionSerialized |
   NiaActionExecuteCodeSerialized |
   NiaActionExecuteOSCommandSerialized |
-  NiaActionExecuteNamedActionSerialized
+  NiaActionExecuteNamedActionSerialized |
+  NiaActionExecuteInterpreterValueSerialized
 
 export interface NiaActionObject {
   action: NiaActionUnderlyingType,
@@ -257,6 +263,10 @@ export class NiaAction implements SerializablePB<NiaAction, Action>, Serializabl
   }
 
   isExecuteNamedActionAction(): boolean {
+    return this.actionType === NiaActionType.ExecuteOSCommand
+  }
+
+  isExecuteInterpreterValueAction(): boolean {
     return this.actionType === NiaActionType.ExecuteOSCommand
   }
 
@@ -430,6 +440,14 @@ export class NiaAction implements SerializablePB<NiaAction, Action>, Serializabl
 
         actionPB = new Action()
         actionPB.setActionExecuteNamedAction(executeNamedActionActionPB)
+        break
+
+      case NiaActionType.ExecuteInterpreterValue:
+        const executeInterpreterValueAction: NiaActionExecuteInterpreterValue = this.action as NiaActionExecuteInterpreterValue
+        const executeInterpreterValueActionPB: ActionExecuteInterpreterValue = executeInterpreterValueAction.toPB()
+
+        actionPB = new Action()
+        actionPB.setActionExecuteInterpreterValue(executeInterpreterValueActionPB)
         break
     }
 
@@ -758,6 +776,21 @@ export class NiaAction implements SerializablePB<NiaAction, Action>, Serializabl
         })
 
         break
+
+      case ActionCase.ACTION_EXECUTE_INTERPRETER_VALUE:
+        const executeInterpreterValueActionPB: ActionExecuteInterpreterValue | undefined = actionPB.getActionExecuteInterpreterValue()
+
+        if (executeInterpreterValueActionPB === undefined) {
+          throw new Error('ExecuteInterpreterValueAction was not set in Action')
+        }
+
+        const executeInterpreterValueAction: NiaActionExecuteInterpreterValue = NiaActionExecuteInterpreterValue.fromPB(executeInterpreterValueActionPB)
+
+        action = new NiaAction({
+          action: executeInterpreterValueAction,
+        })
+
+        break
     }
 
     if (action === null) {
@@ -878,6 +911,11 @@ export class NiaAction implements SerializablePB<NiaAction, Action>, Serializabl
       case NiaActionType.ExecuteNamedAction:
         return new NiaAction({
           action: NiaActionExecuteNamedAction.deserialize(serialized.action as NiaActionExecuteNamedActionSerialized),
+        })
+
+      case NiaActionType.ExecuteInterpreterValue:
+        return new NiaAction({
+          action: NiaActionExecuteInterpreterValue.deserialize(serialized.action as NiaActionExecuteInterpreterValueSerialized),
         })
 
       default:

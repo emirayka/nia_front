@@ -37,6 +37,7 @@ import {NiaActionFunctionKeyClick} from '@/utils/domain/action/basic-actions/act
 import {NiaActionNumberKeyClick} from '@/utils/domain/action/basic-actions/action-number-key-click'
 import {NiaActionTextKeyClick} from '@/utils/domain/action/basic-actions/action-text-key-click'
 import {NiaActionExecuteNamedAction} from '@/utils/domain/action/basic-actions/action-execute-named-action'
+import {NiaActionExecuteInterpreterValue} from '@/utils/domain/action/basic-actions/action-execute-interpreter-value'
 
 export enum SelectedActionCategory {
   KeysText,
@@ -62,6 +63,7 @@ export enum SelectedActionCategory {
   ExecuteFunction,
   ExecuteOSCommand,
   ExecuteNamedAction,
+  ExecuteInterpreterValue,
 }
 
 export interface SelectedMappingInfoViewState {
@@ -216,7 +218,7 @@ const SelectedMappingInfoViewModule = defineModule({
     isActiveCodeExecute: (state: SelectedMappingInfoViewState) => state.selectedCategory === SelectedActionCategory.CodeExecute,
     codeToExecute: (state: SelectedMappingInfoViewState) => state.codeToExecute,
 
-    // misc
+    // execute
     isActiveExecuteFunction: (state: SelectedMappingInfoViewState) => state.selectedCategory === SelectedActionCategory.ExecuteFunction,
     functionNameToExecute: (state: SelectedMappingInfoViewState) => state.functionNameToExecute,
 
@@ -225,6 +227,9 @@ const SelectedMappingInfoViewModule = defineModule({
 
     isActiveExecuteNamedAction: (state: SelectedMappingInfoViewState) => state.selectedCategory === SelectedActionCategory.ExecuteNamedAction,
     actionNameToExecute: (state: SelectedMappingInfoViewState) => state.actionNameToExecute,
+
+    // misc
+    isActiveExecuteInterpreterValue: (state: SelectedMappingInfoViewState) => state.selectedCategory === SelectedActionCategory.ExecuteInterpreterValue,
 
     // get current action
     getCurrentAction: (...args): NiaAction => {
@@ -333,6 +338,10 @@ const SelectedMappingInfoViewModule = defineModule({
             actionName: getters.actionNameToExecute
           }).toAction()
 
+        case SelectedActionCategory.ExecuteInterpreterValue:
+          return new NiaActionExecuteInterpreterValue({
+          }).toAction()
+
         default:
           throw new Error('Some action were forgotten to implement')
       }
@@ -390,7 +399,7 @@ const SelectedMappingInfoViewModule = defineModule({
     selectCodeExecute: makeSelectedCategorySetter(SelectedActionCategory.CodeExecute),
     setCodeToExecute: (state: SelectedMappingInfoViewState, value: string) => state.codeToExecute = value,
 
-    // misc
+    // execute
     selectFunctionExecute: makeSelectedCategorySetter(SelectedActionCategory.ExecuteFunction),
     setFunctionNameToExecute: (state: SelectedMappingInfoViewState, value: string) => state.functionNameToExecute = value,
 
@@ -399,6 +408,9 @@ const SelectedMappingInfoViewModule = defineModule({
 
     selectExecuteNamedAction: makeSelectedCategorySetter(SelectedActionCategory.ExecuteNamedAction),
     setActionNameToExecute: (state: SelectedMappingInfoViewState, value: string) => state.actionNameToExecute = value,
+
+    // misc
+    selectExecuteInterpreterValue: makeSelectedCategorySetter(SelectedActionCategory.ExecuteInterpreterValue),
 
     // set current action
     setCurrentAction: (state: SelectedMappingInfoViewState, action: NiaAction) => {
@@ -590,6 +602,13 @@ const SelectedMappingInfoViewModule = defineModule({
 
           state.selectedCategory = SelectedActionCategory.ExecuteNamedAction
           state.actionNameToExecute = actionName
+
+          break
+
+        case NiaActionType.ExecuteInterpreterValue:
+          const executeInterpreterValue: NiaActionExecuteInterpreterValue = (action.getAction() as NiaActionExecuteInterpreterValue)
+
+          state.selectedCategory = SelectedActionCategory.ExecuteInterpreterValue
 
           break
       }
