@@ -7,7 +7,7 @@ const {
 import loggers from '@/utils/logger'
 const logger = loggers('store/Connection')
 
-import {moduleActionContext, moduleGetterContext, rootActionContext} from '@/store'
+import store, {moduleActionContext, moduleGetterContext, rootActionContext} from '@/store'
 
 import {
   NiaAction,
@@ -279,7 +279,7 @@ const ConnectionModule = defineModule({
     handleSynchronizeEventResponse(context, response: NiaSynchronizeEventResponse): void {
       logger.debug('Handling synchronized event response...')
 
-      const { rootCommit } = rootActionContext(context)
+      const { rootCommit, rootGetters } = rootActionContext(context)
 
       const version: string = response.getVersion()
       const info: string = response.getInfo()
@@ -296,6 +296,13 @@ const ConnectionModule = defineModule({
       rootCommit.Keymapping.Modifiers.setModifiers(definedModifiers)
       rootCommit.Keymapping.Actions.setActions(definedActions)
       rootCommit.Keymapping.Mappings.setMappings(definedMappings)
+
+      let firstMapping: NiaMapping | null = rootGetters.Keymapping.Mappings.firstMapping
+
+      if (firstMapping !== null) {
+        rootCommit.UI.MappingTable.selectMapping(firstMapping)
+        rootCommit.UI.SelectedMappingInfoView.setCurrentAction(firstMapping.getAction())
+      }
     },
     handleExecuteCodeEventResponse(context, response: NiaExecuteCodeEventResponse): void {
       const { rootCommit } = ConnectionModuleActionContext(context)

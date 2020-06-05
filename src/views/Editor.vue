@@ -1,12 +1,12 @@
 <template>
   <div class="nia-editor">
     <NiaToolbar>
-      <NiaToolbarItem>
+      <NiaToolbarItem style="visibility: hidden">
         1
       </NiaToolbarItem>
-      <NiaToolbarItem>
-        2
-      </NiaToolbarItem>
+<!--      <NiaToolbarItem>-->
+<!--        2-->
+<!--      </NiaToolbarItem>-->
     </NiaToolbar>
 
     <NiaGridLayout
